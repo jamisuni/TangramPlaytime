@@ -1,0 +1,45 @@
+{
+  "_comment": "SWDev guard config for TangramPlaytime (intake path C, SWDev v0.20, scaffolded 2026-10-08 — the TangramNoAds re-run). Read by the PreToolUse guard hook, the bash approver, trace-check, plan-check, wo-metrics and the verifier runner. The spec is the SwReqCollector collection in Requirements/ (locked 2026-10-01, v1.1): every locked REQ of every level is Contract, so the locked REQ files, the feature tree, the types and the change deltas are denied to the build side — a change is a chg-draft in capture-outbox/ (never a write into the collection). architecture.md and owner-evidence.md are the owner's. At G2 add the governed contract files (puzzle format / IPuzzleLibrary → locked; progress store contracts, kernel value types, ADRs → notify) and re-freeze. Never govern Requirements/views/**, sources.md, evidence/ or reviews/ (the G1 review is written there in the capture side's format).",
+  "spec_dir": "Requirements",
+  "spec_format": "swreq-v2",
+  "swreq_tools": "C:/GitHub/AI/SwReqCollector/tools",
+  "contract_paths": {
+    "locked": [
+      "Requirements/reqs/*.md",
+      "Requirements/features.md",
+      "Requirements/req_types.md",
+      "Requirements/changes/**",
+      "architecture.md",
+      "owner-evidence.md"
+    ],
+    "notify": [
+      "build-map.md"
+    ]
+  },
+  "hard_stop_paths": [],
+  "_comment_hard_stop_paths": "None at P1. The manifest's no-permission / no-network rules (owner rule 1, REQ-001/010) are a verifier at every WO close, not a path block.",
+  "unlocked": [],
+  "benign_roots": [
+    "C:/Users/Jami/AppData/Local/Android/Sdk",
+    "C:/Program Files/Android/Android Studio"
+  ],
+  "_comment_benign_roots": "The Android SDK (adb, emulator, platform-tools) and Android Studio's JDK (jbr) — reads and writes there never prompt. From the v1 run's shell history; adjust if the machine differs.",
+  "test_globs": [
+    "*/src/test/*",
+    "*/src/androidTest/*"
+  ],
+  "_comment_test_globs": "Product tests only, one test tree per module. tools/tests/test_prototype.py are the PROTOTYPE's browser tests (design input DI-1), deliberately not scanned.",
+  "product_globs": [
+    "*/src/main/**"
+  ],
+  "verifiers": {
+    "dir": ".swdev/verifiers",
+    "manifest": ".swdev/verifiers/manifest.json",
+    "budget_per_wo": {
+      "count": 1,
+      "lines": 150
+    }
+  },
+  "capture_outbox": "capture-outbox",
+  "owner_evidence_file": "owner-evidence.md"
+}

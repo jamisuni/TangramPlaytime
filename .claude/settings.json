@@ -1,0 +1,157 @@
+{
+  "_comment": "SWDev: place this file at <project>/.claude/settings.json (create the .claude folder; merge if one exists). Permission stance: the PROJECT tree is fully editable without prompts (acceptEdits + allow Edit/Write ./**), the FRAMEWORK is readable without prompts (additionalDirectories + allow Read) and mechanically NON-editable (deny beats everything; //c/... = C:\\\\...). Common build commands are pre-approved in 'allow' - extend that list for your stack rather than answering prompts one by one. GIT (v0.16): agents may READ history (status, diff, log, show, blame...) and never WRITE it - commit, tag, push, reset, checkout, add... are denied here and by the bash approver; the owner commits by hand at WO closes (floor F3). Hooks wired: the PreToolUse guard on the edit tools AND on Bash (denies edits and shell writes to locked-tier Contract files and hard-stop paths per .swdev/guard.json, logs contract-delta events for notify-tier writes, fails CLOSED on a broken guard.json), the Bash auto-approver (DENIES shell writes to .md ledgers, writes under the framework, backslash paths outside quotes or inside inline scripts, and git writes; ALLOWS safe project-local commands incl. the session scratchpad and guard.json 'benign_roots' such as an SDK; everything else falls back to normal prompts), the telemetry hook (subagent launches with the model tier that actually runs, skill invocations, completions, session starts -> .swdev/log/telemetry.jsonl; never blocks), and the Stop reminder (progress.md discipline). If the framework lives elsewhere than C:/GitHub/AI/SWDev, update ALL paths. Requires python on PATH. Ledgers (tasks.md, progress.md, decisions.md, workorders/...) are edited with the Edit/Write tools only - never through the shell.",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "C:/GitHub/AI/SWDev"
+    ],
+    "allow": [
+      "Edit(./**)",
+      "Write(./**)",
+      "Read(//c/GitHub/AI/SWDev/**)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(dotnet:*)",
+      "Bash(dart:*)",
+      "Bash(flutter:*)",
+      "Bash(npm:*)",
+      "Bash(mkdir:*)",
+      "Bash(dir:*)",
+      "Bash(ls:*)",
+      "Bash(copy:*)",
+      "Bash(cp:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git describe:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git stash list:*)",
+      "Bash(git stash show:*)",
+      "Bash(git branch --list:*)",
+      "Bash(git tag --list:*)",
+      "Bash(git remote -v:*)"
+    ],
+    "deny": [
+      "Edit(//c/GitHub/AI/SWDev/**)",
+      "Write(//c/GitHub/AI/SWDev/**)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git mv:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git restore:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git revert:*)",
+      "Bash(git stash push:*)",
+      "Bash(git stash pop:*)",
+      "Bash(git stash drop:*)",
+      "Bash(git stash apply:*)",
+      "Bash(git stash clear:*)",
+      "Bash(git clean:*)",
+      "Bash(git branch -d:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git branch -m:*)",
+      "Bash(git worktree:*)",
+      "Bash(git config:*)",
+      "Bash(git remote add:*)",
+      "Bash(git remote remove:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git clone:*)",
+      "Bash(git apply:*)",
+      "Bash(git am:*)",
+      "Bash(git gc:*)",
+      "Bash(git reflog expire:*)",
+      "Bash(git reflog delete:*)",
+      "Bash(git update-ref:*)",
+      "Bash(git symbolic-ref:*)",
+      "Bash(git filter-branch:*)",
+      "Bash(git filter-repo:*)",
+      "Bash(git notes:*)",
+      "Bash(git submodule:*)",
+      "Bash(git bisect:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:/GitHub/AI/SWDev/adapters/claude/hooks/swdev_guard.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Task|Agent|Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:/GitHub/AI/SWDev/adapters/claude/hooks/swdev_telemetry.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:/GitHub/AI/SWDev/adapters/claude/hooks/swdev_bash_approve.py\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:/GitHub/AI/SWDev/adapters/claude/hooks/swdev_telemetry.py\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:/GitHub/AI/SWDev/adapters/claude/hooks/swdev_telemetry.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:/GitHub/AI/SWDev/adapters/claude/hooks/swdev_session_end.py\""
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:/GitHub/AI/SWDev/adapters/claude/hooks/swdev_telemetry.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
