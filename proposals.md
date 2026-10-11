@@ -115,3 +115,32 @@ from starvation.
   whether to act — or state that a turn ended by a background station carries
   no signal and the next one does.
 - **Severity:** low
+
+## 2026-10-11 — WO-002: plan-check reads Covers as a REQ × A-number product; `\|` in seam cells; req-lint dies on a cp1252 console
+
+- **plan-check (a):** the script's comment says explicit `REQ-NNN.A<n>`
+  tokens in a Covers cell override the REQ × A-number cross-product, but the
+  code adds them to it. A row naming six REQs in Implements and ten explicit
+  tokens in Covers is reported as covering 8 IDs "outside the WO's scope"
+  (REQ-007.A3, REQ-038.A2 … REQ-045.A3) that no cell names. The warning was
+  accepted by hand twice (planner, plan reviewer) — a warning that is always
+  accepted trains everyone to accept warnings. **Proposal:** when a Covers
+  cell contains any dotted token, use only the dotted tokens.
+- **plan-check (b):** a `\|` inside a code span in a seam-table cell shifts
+  the column split, so two seams read as "names no delivering task" until the
+  planner rewrote `\|` as "or" in the design. (Same family as the WO-001
+  entry's item c.) **Proposal:** split on unescaped pipes only.
+- **trace-check req-lint:** `validate.py` prints a warning containing `→`
+  (U+2192); on a Windows console with cp1252 stdout it dies with
+  `UnicodeEncodeError` and trace-check reports `FAIL: req-lint` — a RED
+  caused by the console, not the collection. Green with `PYTHONUTF8=1`.
+  **Proposal:** trace-check runs req-lint with `PYTHONUTF8=1` (or captures
+  stdout as UTF-8 bytes), and validate.py sets `sys.stdout.reconfigure(encoding="utf-8")`.
+- **The `[P]` rule on read-only inputs (observation, no proposal yet):** the
+  tools task (Python, touches nothing under `content/`) was serialized
+  behind the Kotlin lane because it *reads* the same `Tangrams/*.json` the
+  kit reads. The v0.18 rule exists for files a task *changes*; two readers
+  of a file nobody changes could be `[P]`. Cost here: one short Sonnet
+  dispatch of wall time. Worth a line in task-decomposition.md if it recurs.
+- **Severity:** low (a and the req-lint one each hide a real check behind a
+  false signal)

@@ -1,6 +1,6 @@
 # Build map — TangramPlaytime
 
-**Status:** Signed off (G2)  ·  **Version:** 1.0  ·  **Last updated:** 2026-10-11
+**Status:** Signed off (G2)  ·  **Version:** 1.2  ·  **Last updated:** 2026-10-11
 **Approved by:** the orchestrator under governance row 4 (`ai+inform`), with `architecture.md` v1.0  ·  **Approved on:** 2026-10-11 (owner informed the same day)
 **Feature tree:** `Requirements/features.md` (SwReqCollector collection v1.2, locked 2026-10-01; G1 accepted for this project 2026-10-11)
 
@@ -30,7 +30,7 @@
 | #Settings | `app/` | Planned | #PlayTime, #ResumePuzzle (via `IProgressStore`) | settings screen, sound toggle + playback + haptic, reset with confirmation |
 | #Language | `app/` | Planned | #Content (via `IPuzzleLibrary` titles) | `values/` + `values-fi/`; English Contract, Finnish reference (pending CHG) |
 | #Layout | `app/` | Planned | — | TYPE-007 window class, phone/tablet layouts, insets, back button, touch targets |
-| #Content | `content/` | Planned | — | `Tangrams/*.json` as assets, parser, load-time validity, ordering; `IPuzzleLibrary` implementation |
+| #Content | `content/` | Built (WO-002) | (kernel) (via `ILockEngine`: piece congruence through `vertices`, overlap through `stillValid` — the engine is injected, `:content` main code depends on `:contracts` only) | `Tangrams/*.json` bundled as Java resources at build (WO-002 design), parser, load-time validity, ordering; `IPuzzleLibrary` implementation |
 | #Release | — | Planned | — | store listing, data safety, rating, icon (DI-9 in `app/src/main/res`), release verifier; owner-evidence rows |
 | #DevTools | `play/` (`src/debug`) | Planned | (kernel) (via `ILockEngine` solve) | REQ-046 debug-only; absent from release (G-08) |
 
@@ -49,3 +49,4 @@ WO-001 #Locking (+ `:contracts`, `:kernel`) → WO-002 #Content → WO-003 #Solv
 | 0.9 | 2026-10-11 | initial map from the locked tree: six modules, kernel row, system-level rows, WO order | P2 | — |
 | 1.0 | 2026-10-11 | signed with architecture.md v1.0; the six modules exist and compile (`.swdev/run-log/P2-skeleton.md`) | G2 | orchestrator (row 4 `ai+inform`) |
 | 1.1 | 2026-10-11 | `#SolvedCheck` row (code home `kernel/`); `#Locking` and `#SolvedCheck` build status Built (WO-001); REQ-020.A2 noted as WO-003's | WO-001: the tag had inherited `play/`; the component map already placed the solved check in `:kernel` | orchestrator (notify-tier delta, WO-001 Contract deltas) |
+| 1.2 | 2026-10-11 | `#Content` cross-feature deps `—` → `(kernel) (via ILockEngine)`; build status In progress (WO-002); notes updated (Java resources, not Android assets) | WO-002 design (reviewed): piece geometry comes through the seam instead of a second TYPE-001 shape table in `:content` (D1 value rules once) | orchestrator (notify-tier delta, WO-002 Contract deltas) |

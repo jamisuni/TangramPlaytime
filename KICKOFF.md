@@ -63,6 +63,85 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## State after WO-002 (2026-10-11, closed 15:45)
+
+- **WO-002 #Content done** (`workorders/WO-002.md`, Full (b)): `:content` has
+  `BundledPuzzles` (the 13 `Tangrams/*.json` bundled as **Java resources**
+  by a Gradle task — `content/build/generated/puzzles/`, read through one
+  `ClassLoader` call on JVM and device), `PuzzleParser`/`PuzzleDtos`,
+  `PuzzleLoader` (15 `Rule`s, sealed `LoadResult`), `ValidityCheck` + `Edges`
+  (congruence and overlap through `ILockEngine`), `PuzzleLibrary` and the
+  entry point **`PuzzleLibraries.bundled(engine: ILockEngine): IPuzzleLibrary`**
+  (fails fast on a bad bundled file). Kit 16 + 37 tests, 10/10 IDs green;
+  trace-check `--wo` GREEN; code review 0 B. `IPuzzleLibrary.kt`, the schema
+  and `Tangrams/` unchanged; one notify delta (`build-map.md` v1.2: #Content
+  depends on the kernel via `ILockEngine`). `tools/tangram_geom.outline_corners`
+  now uses the contiguity rule (warmup-4 gains (2,2); `tools/tests/test_tangram_geom.py`).
+- **Carry into WO-003 #Solving (first WO with device tests):** wire
+  `PuzzleLibraries.bundled(LockEngine())` in `:app` (design review F4) and
+  call it once on the **floor image** `Phone_API_26` — the bundle read is
+  proven on the JVM and by APK/AAR listings only (code review N4; check R8
+  keeps the resources in the release build). Carried acceptance lines:
+  **REQ-020.A2** (no error message for a missed drop), **REQ-039.A1** (no
+  picture paints outside its outline — the solved-picture drawing clips),
+  **REQ-045.A2** (placing the three mini pieces shows the solved picture).
+  Add a `build-map.md` row for the rendering half of #PuzzleArt (code home
+  `play/`) as WO-001 did for #SolvedCheck, or trace-check reads the play
+  test as directory theater. Doc drift in the locked `architecture.md`
+  (code review N5): §3 says "assets" (they are Java resources) and G-15
+  names `LoadResult.Unreadable` (the real type is `LoadResult.Rejected`) —
+  the owner may fix the wording; not a Contract change.
+- **Carry into WO-004 #Browsing:** REQ-040.A1, REQ-041.A1, REQ-045.A1 are
+  proven at the seam; the screen half ("a fresh install opens on …") is
+  re-covered there. `ILockEngine.stillValid` scope question from WO-001 stands.
+- **Content batch WO (Light, after WO-003, before WO-009):** author new
+  puzzles to the owner's first-release count (checkpoint item 1 — default
+  **25**, stands 2026-10-14); the validator's V3 (vertex-set equality) is
+  looser than the Kotlin congruence (boundary order, 45° turns) and the
+  `rot/flip/at` form is rejected by the app (`PLACEMENT`) — author puzzles
+  in the `polygon` form and run both checks. REQ-042.A1 / REQ-039.A2 are
+  WO-009's with the owner's review marks.
+- **Lock behind build:** 25 outbox drafts still await a capture session;
+  REQ-038.A1 (and A2) stay `implemented (unverified)` until
+  `chg-draft-req038-validity-rules-in-contract.md` is signed; REQ-019.A1–A4
+  until the TYPE-004 dictionary draft is.
+- **Owner steps:** commit the WO-002 snapshot (prompted on the G4 surface);
+  answer checkpoint item 1 if 25 is not the number; run a capture session on
+  `capture-outbox/` when convenient; look at `review-notes.md` (the 13
+  puzzles and their Finnish reference titles).
+
+## Paste this to start the WO-003 session (one orchestrator context per WO)
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-003 #Solving (TangramPlaytime, SWDev
+v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+files), then governance.md, architecture.md, build-map.md, design-inputs.md
+§2, decisions.md, the last progress.md entry, KICKOFF.md "State after
+WO-002", capture-outbox/ (pending deltas), platform-notes/android.md.
+WO-003 scope: the #Solving subtree not yet built — #Board, #Tray, #SizeMarks,
+#Drag, #TapTurn, #TwistTurn, #Flip, #LandingPreview, #CornerTeach,
+#SolvedPicture (the REQ ids those tags carry in Requirements/features.md;
+#Locking and #SolvedCheck are built, #TurnButtons is withdrawn) — the Play
+screen in :play (Compose) consuming ILockEngine (:kernel) and IPuzzleLibrary
+(:content, PuzzleLibraries.bundled wired in :app, design review F4) — plus
+the carried lines REQ-020.A2, REQ-039.A1, REQ-045.A2 (KICKOFF "State after
+WO-002"). Persistence (IProgressStore) is WO-004's: the screen holds its
+state in memory this WO, behind the seam. Design inputs: DI-1 (prototype,
+behaviour reference only), DI-2 (Spec/02 layout), DI-3 (Spec/01 gameplay),
+DI-4 (Study/06, frozen), DI-9 not yet. Mode: decide from the four reasons
+(:play is a P2 skeleton like :content was; a governed interface is
+consumed, not implemented — say which reason, or Light).
+Verification channels at G3: Compose/device tests on the dev image
+Medium_Phone_API_37.0 AND the floor image Phone_API_26 (the floor is a G3
+precondition for this first device WO — boot it, run the trivial test,
+record it), one emulator at a time; JVM tests where the logic is pure;
+the release verifier (no debug tooling, canary) arrives with this WO per
+platform-notes/android.md. Draw paths in px (G-17). Checkpoint candidates
+(≤5, product-visible): colours and the size-mark glyphs only if a REQ leaves
+them open; strings to review-notes.md. Stations as subagents; the four
+scripts are duties. End every turn with the one signal.
+```
+
 ## State after WO-001 (2026-10-11, closed 13:04)
 
 - **WO-001 #Locking done** (`workorders/WO-001.md`, Full (b)): `:kernel` has

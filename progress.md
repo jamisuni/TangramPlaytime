@@ -317,3 +317,144 @@ v1.1, `build-map.md` v1.1, `proposals.md`, `.swdev/run-log/WO-001.md`,
 `KICKOFF.md`, `AGENTS.md`. **Snapshot prompt:** owner, please commit this
 state as the WO-001 close (e.g. "WO-001 #Locking closed: :kernel lock engine
 behind ILockEngine, kit 6/6, build-map v1.1").
+
+## 2026-10-11 — WO-002 #Content opened (P3, fresh orchestrator context)
+
+**Human (verbatim):**
+> WE ARE IN PHASE P3 — WORK ORDER WO-002 #Content (TangramPlaytime, SWDev
+> v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+> files), then governance.md, architecture.md, build-map.md, design-inputs.md
+> §2 (incl. item 13), decisions.md, the last progress.md entry, KICKOFF.md
+> "State after WO-001", capture-outbox/ (pending deltas), platform-notes/android.md.
+> WO-002 scope: #Content subtree (REQ-007, 038, 039, 040, 041, 042, 045) in
+> :content behind IPuzzleLibrary (locked tier — implement, never change):
+> Tangrams/*.json as assets, the tangram-puzzle/1 parser (kotlinx.serialization,
+> ADR-004), the load-time validity check (REQ-038 rules; pending
+> chg-draft-req038-validity-rules-in-contract.md), ordering kind → rating → id.
+> Design inputs: DI-5 (puzzle format, schema, the 13 puzzles, tools/). Also
+> re-judge tools/tangram_geom.outline_corners + V11 against the contiguity
+> corner rule (design-inputs.md §2 item 13) — a project-tool fix, not Contract.
+> Mode: decide from the four reasons (a new Android library module with assets
+> is reason (a) if :content counts as new; its skeleton exists from P2 — say so).
+> Verification channels at G3: JVM unit tests (:content testDebugUnitTest loads
+> every asset); device channels only if a task needs one — say so in the WO.
+> Checkpoint candidates (≤5, product-visible): the puzzle count for the first
+> release (DI-8 default 25, REQ-042 says ≥ 20). Stations as subagents; the four
+> scripts are duties. End every turn with the one signal.
+
+**What was done (summary, 13:55–):**
+
+- Read AGENTS.md, the framework's P3 files, governance (in force), architecture
+  v1.0, build-map v1.1, design-inputs v1.1 §2, decisions, the WO-001 close
+  entry, KICKOFF "State after WO-001", the outbox (25 drafts, five on this
+  WO's REQs), android.md, the seven REQs, the frozen `IPuzzleLibrary.kt` /
+  `Types.kt`, the locked schema, `Spec/03`, the content skeleton, the Python
+  corner rule and V11/V12. Drift check: v0.20 = v0.20. HEAD 9e983d2 (the
+  owner committed WO-001).
+- `workorders/WO-002.md` written: Implements REQ-007 A1..A2, REQ-038 A1,
+  REQ-040 A1..A2, REQ-041 A1..A2, REQ-042 A2..A3, REQ-045 A1 in `content/`;
+  `IPuzzleLibrary` implements (locked — never edited); **Full (b)**, reason
+  (a) considered and not claimed (the `:content` skeleton exists since P2);
+  channels JVM `:content:testDebugUnitTest` + `:contracts:test` + the Python
+  tool channel, device channels not needed as kicked off; DI-5, DI-8.
+- Scope moves and unverified lines recorded in `decisions.md` (rows 8, 20):
+  REQ-039.A1 / REQ-045.A2 → WO-003, REQ-039.A2 / REQ-042.A1 → WO-009 (+ the
+  content batch WO), REQ-038.A2 `implemented (unverified)` for the pending
+  deletion CHG. Checkpoint item 1: first-release puzzle count, default 25.
+- Toolchain proof (G3): `:content:testDebugUnitTest --rerun-tasks` green
+  13:56; validator 13/13 — `.swdev/run-log/WO-002.md`.
+- Design Author dispatched (`design-author`, Opus) — the fountain continues
+  in this entry's follow-ups below.
+
+**Follow-ups, same interaction (14:15–15:16; no new human input):**
+
+- Design (`design-author`, Opus) → forward: Java resources bundled by a
+  Gradle task and read through one `ClassLoader` path (no `AssetManager`,
+  no device task); piece geometry through `ILockEngine` (`vertices`,
+  `stillValid`); fail fast on a bad file; nine decisions rows. Design
+  review (`design-reviewer`, Fable) → forward 0 B / 4 S, the reading path
+  proven in a scratchpad build on AGP 9.4.1. `build-map.md` v1.2
+  (`#Content` deps via `ILockEngine` — one notify-tier contract-delta).
+- Plan (`wo-planner`, Opus): TASK-004 reading path → TASK-008 kit →
+  TASK-005 parser/validity/library → TASK-007 tools fix; F1–F4 carried.
+  Artifact channel proved in this tree (14:46). Plan review (Sonnet)
+  2 B / 2 S on the kit row → fixed by the same planner → second look 0 B.
+  plan-check GREEN. **G3 approved** (row 7, `decisions.md`).
+- P4: TASK-004 (`slice-implementer`, Opus) → done (run r1 14:56: 2 + 2
+  green; 14 bundle entries in the debug APK, release APK and AAR). Kit
+  draft (`acceptance-test-author`, Opus): 52 tests, 15 mutants caught;
+  landing in progress.
+
+**Follow-ups, same interaction (15:21–15:45; no new human input):**
+
+- Kit landed 15:21 (exactly ten tokens; red window as planned). TASK-005
+  (`slice-implementer`, Opus) → forward 15:32: parser, loader (15 rules,
+  sealed `LoadResult`), validity check through `ILockEngine`, library,
+  790 product LOC; orchestrator run r2: 65 green, plan-check GREEN with
+  the kit compiled. TASK-007 (`slice-implementer`, Sonnet) → forward 15:34:
+  the contiguity corner rule in `tools/tangram_geom.py`, tool test pins all
+  13 corner sets, validator 13/13 unchanged build orders.
+- trace-check preview GREEN under `PYTHONUTF8=1` (req-lint dies on a cp1252
+  console otherwise → `proposals.md`). Code review (Sonnet) 0 B / 2 S / 5 N
+  → kit author fixed S2 (picture leg on the REQ-007.A1 test), N1 (a token
+  demoted to a pin), added the S1 pin (unknown shape type = `JSON`;
+  decisions row); run r3: 66 green. Corrected checks 2.
+- Test & Verify (Sonnet) 10/10 PASS from r3 (hashes matched, no re-run);
+  Traceability Auditor (Sonnet) `--wo WO-002` GREEN, no draft written.
+- **Close 15:45:** `run_verifiers.py` (none), `wo_metrics.py --write` (+
+  hand-corrected same-day rows), DoD all ticked, **G4 under row 9
+  (`decisions.md`)**; TASK-004/007/008 done, TASK-005 `implemented
+  (unverified)` for the pending REQ-038 validity-rules CHG; `build-map.md`
+  #Content Built; `review-notes.md` row (the 13 puzzles); `KICKOFF.md`
+  "State after WO-002" + the WO-003 brief; `AGENTS.md` phase line;
+  `proposals.md` (plan-check cross-product, `\|` in seam cells, req-lint
+  encoding, the `[P]` rule on read-only inputs).
+
+### G4 surface — WO-002 #Content (outcomes first)
+
+**Satisfied (JVM channel, run r3, 66 tests / 0 failures; artifact channel
+14 bundle entries in the debug APK, release APK and AAR; Python channel
+13/13):** REQ-007 A1 (every shipped puzzle is listed and meets the shapes,
+picture and order rules, re-measured by the kit's own geometry), A2 (minis,
+then warm-ups); REQ-038 A1 (the written rules — piece set, congruence,
+overlap, edge-connectivity, titles, rating, kind, picture — each proven to
+discriminate on a crafted file; **`implemented (unverified)`** until the
+validity-rules CHG is signed); REQ-040 A1 (first entry rating 1), A2 (a
+rating-1 full puzzle whose id sorts first still follows every warm-up);
+REQ-041 A1 (four warm-ups follow the minis), A2 (each warm-up meets the
+half-outline measure; a mean-based check is caught); REQ-042 A2 (five
+categories), A3 (`shapes-square` listed); REQ-045 A1 (the first entry is a
+mini whose tray holds three pieces).
+**Carried, not covered here:** REQ-038.A2 (the tool's printed build order —
+unverified on the pending deletion; validator evidence in the log);
+REQ-039.A1, REQ-045.A2 → WO-003; REQ-039.A2, REQ-042.A1 → WO-009 and the
+content batch WO.
+**Checkpoint item 1 — answer by 2026-10-14 or the default stands:** how
+many puzzles in the first release? Thirteen exist (none reviewed yet);
+your 2026-10-01 answer was 25; the REQ says at least 20. **Default 25**;
+the batch is authored in a Light content WO after WO-003 so you can solve
+each one on the real Play screen.
+**Deliberately not touched:** `IPuzzleLibrary.kt`, `Tangrams/puzzle.schema.json`,
+`ILockEngine.kt`, `Types.kt`, every puzzle file; every screen; `:app` wiring
+(WO-003); persistence; the prototype and the UI sheets (not regenerated,
+G-06). **Risk notes:** the bundle read is proven on the JVM and by
+APK/AAR listings, not yet on a device (WO-003 calls it once on the floor
+image; R8 must keep the resources); the Kotlin congruence is stricter than
+the Python V3 (boundary order, 45° turns) — new puzzles must pass both;
+the locked `architecture.md` wording drifts ("assets", `LoadResult.Unreadable`)
+— yours to fix, not a Contract change. **Contract deltas:** 1 —
+`build-map.md` v1.2 (`#Content` depends on the kernel via `ILockEngine`;
+status Built). **Lock behind build:** 25 drafts awaiting a capture session,
+five on this WO's REQs, none written by this WO. **Corrected checks:** 2
+(code review S2, N1). **Station ledger:** complete, 11 launches, every
+station on its staffed tier.
+**Diff:** `content/build.gradle.kts` (+47), `content/src/main/kotlin/app/tangramplaytime/content/{BundledPuzzles,PuzzleDtos,PuzzleParser,PuzzleLoader,ValidityCheck,Edges,PuzzleLibrary,PuzzleLibraries}.kt`
+(+790), `Content.kt` (−3); `content/src/test/.../{KitTexts,PuzzleLibraryKitTest,PuzzleLoaderKitTest,ContentScaffoldTest}.kt`
++ `scaffolding/ParserScaffoldTest.kt` (+1,550); `tools/tangram_geom.py`
+(+44/−17), `tools/tests/test_tangram_geom.py` (+67); ledgers
+`workorders/WO-002*.md`, `designs/`, `reviews/` (5), `tasks.md`,
+`decisions.md` (+13 rows), `build-map.md` v1.2, `review-notes.md`,
+`proposals.md`, `.swdev/run-log/WO-002.md`, `KICKOFF.md`, `AGENTS.md`.
+**Snapshot prompt:** owner, please commit this state as the WO-002 close
+(e.g. "WO-002 #Content closed: :content puzzle library behind
+IPuzzleLibrary, kit 10/10, tools corner rule, build-map v1.2").

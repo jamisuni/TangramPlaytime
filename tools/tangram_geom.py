@@ -226,14 +226,34 @@ def placement_from_polygon(piece_id, target):
 # ---------------------------------------------------------------------------
 # Outline corners and build order (Study/06-snapping-by-anchors.md)
 # ---------------------------------------------------------------------------
-def _angle_at(poly, i):
-    """Interior angle (radians) of a convex float polygon at vertex i."""
-    ax, ay = poly[i - 1]
-    bx, by = poly[i]
-    cx, cy = poly[(i + 1) % len(poly)]
-    v1, v2 = (ax - bx, ay - by), (cx - bx, cy - by)
-    cos = (v1[0] * v2[0] + v1[1] * v2[1]) / (math.hypot(*v1) * math.hypot(*v2))
-    return math.acos(max(-1.0, min(1.0, cos)))
+TWO_PI = 2 * math.pi
+ARC_EPS = 1e-6
+
+
+def _direction(frm, to):
+    """Direction from frm to to, in [0, 2*pi)."""
+    return math.atan2(to[1] - frm[1], to[0] - frm[0]) % TWO_PI
+
+
+def _covered_arc(p, q):
+    """Arc (start, length) of directions around float point p covered by convex float polygon q,
+    or None when q does not touch p. At a vertex the arc spans the two edges; strictly inside an
+    edge it is the half-plane on the polygon's side."""
+    n = len(q)
+    idx = [i for i, v in enumerate(q) if abs(v[0] - p[0]) < 1e-9 and abs(v[1] - p[1]) < 1e-9]
+    if idx:
+        u, w = q[idx[0] - 1], q[(idx[0] + 1) % n]
+    else:
+        k = next((i for i in range(n) if _on_segment(p, q[i], q[(i + 1) % n])), None)
+        if k is None:
+            return None
+        u, w = q[k], q[(k + 1) % n]
+    centre = (sum(v[0] for v in q) / n, sum(v[1] for v in q) / n)
+    d1, d2, dc = _direction(p, u), _direction(p, w), _direction(p, centre)
+    span = (d2 - d1) % TWO_PI
+    if (dc - d1) % TWO_PI <= span:
+        return d1, span
+    return d2, (d1 - d2) % TWO_PI
 
 
 def _on_segment(p, a, b, eps=1e-9):
@@ -245,7 +265,10 @@ def _on_segment(p, a, b, eps=1e-9):
 
 
 def outline_corners(polys):
-    """Corners of the silhouette: solution vertices where the covered angle is neither 180° nor 360°.
+    """Corners of the silhouette, classified by the contiguity of the covered directions (the kernel's
+    rule, design-inputs 2 item 13): a vertex is interior when the full 360° is covered, a straight side
+    when exactly one gap remains and the covered total is 180°; every other vertex is a corner
+    (so 180° covered in two separate wedges, shapes-warmup-4 (2,2), is a corner).
     polys: {piece_id: exact polygon}. Returns a list of exact points (Q2, Q2)."""
     fl = {k: to_float(v) for k, v in polys.items()}
     seen, corners = set(), []
@@ -255,14 +278,18 @@ def outline_corners(polys):
                 continue
             seen.add(p)
             fp = (float(p[0]), float(p[1]))
-            total = 0.0
-            for q in fl.values():
-                idx = [i for i, v in enumerate(q) if abs(v[0] - fp[0]) < 1e-9 and abs(v[1] - fp[1]) < 1e-9]
-                if idx:
-                    total += _angle_at(q, idx[0])
-                elif any(_on_segment(fp, q[i], q[(i + 1) % len(q)]) for i in range(len(q))):
-                    total += math.pi
-            if abs(total - math.pi) > 1e-6 and abs(total - 2 * math.pi) > 1e-6:
+            arcs = [a for a in (_covered_arc(fp, q) for q in fl.values()) if a is not None]
+            total = sum(length for _, length in arcs)
+            if total >= TWO_PI - ARC_EPS:
+                continue
+            arcs.sort()
+            gaps = 0
+            for k, (start, length) in enumerate(arcs):
+                nxt = arcs[(k + 1) % len(arcs)][0]
+                gap = (nxt - (start + length)) % TWO_PI
+                if ARC_EPS < gap < TWO_PI - ARC_EPS:
+                    gaps += 1
+            if not (gaps == 1 and abs(total - math.pi) <= ARC_EPS):
                 corners.append(p)
     return corners
 

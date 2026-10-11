@@ -15,3 +15,4 @@ AI-written; **non-blocking**.
 
 | Date | WO | What to look at | Where (screen / file) | Decision row |
 |---|---|---|---|---|
+| 2026-10-11 | WO-002 | The thirteen shipped puzzles as the library lists them: 2 mini (Pyramid, Window), 4 warm-ups, then House, Arrow (rating 2), Cat, Chocolate bar, Sailboat (3), Mountain, Gift box (4). Their pictures on the preview sheets; their Finnish titles are reference translations (Mini: Pyramidi, Mini: Ikkuna, Lämmittely 1–4, Talo, Nuoli, Kissa, Suklaalevy (suorakulmio), Purjevene, Vuori, Lahjapaketti) — nothing to answer; `reviewedByHuman` stays `false` until you solve one and like its picture (owner rule 7) | `Tangrams/previews/*.png`, `Tangrams/*.json` `title.fi` | decisions.md 2026-10-11 (WO-002 scope, checkpoint item 1) |
