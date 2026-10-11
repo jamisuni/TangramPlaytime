@@ -226,4 +226,4 @@ signed on the capture side.
 
 ## Current phase
 
-`P3 — work orders (G1 accepted 2026-10-11 by Jami; G2 locked 2026-10-11 under row 4 ai+inform, architecture.md v1.0). Next: WO-001 #Locking in a fresh session — paste the brief from KICKOFF.md` — scaffolded 2026-10-08 under SWDev v0.20; the TangramNoAds re-run (T-28). Update this line as phases advance.
+`P3–P6 — work orders (G1 accepted 2026-10-11 by Jami; G2 locked 2026-10-11 under row 4 ai+inform, architecture.md v1.0). WO-001 #Locking closed 2026-10-11 (G4 row 9; :kernel lock engine behind ILockEngine, 6/6 IDs; REQ-019 lines unverified only for the unsigned TYPE-004 dictionary). Next: WO-002 #Content in a fresh session — paste the brief from KICKOFF.md` — scaffolded 2026-10-08 under SWDev v0.20; the TangramNoAds re-run (T-28). Update this line as phases advance.

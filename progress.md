@@ -207,3 +207,113 @@ deltas are "lock behind build" until the capture side applies them.
   style; the owner's G1 decisions).
 - Owner informed on the G2 surface (ai+inform, default stands 2026-10-14) and
   prompted to commit the snapshot.
+
+## 2026-10-11 — WO-001 #Locking opened (P3, fresh orchestrator context)
+
+**Human (verbatim):**
+> WE ARE IN PHASE P3 — WORK ORDER WO-001 #Locking (TangramPlaytime, SWDev
+> v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+> files), then governance.md, architecture.md, build-map.md, design-inputs.md
+> §2, decisions.md, the last progress.md entry, capture-outbox/ (the pending
+> deltas and the owner's G1 answers), platform-notes/android.md.
+> WO-001 scope: #Locking subtree (#AnchorLock REQ-019, #GoHome REQ-020,
+> #SolvedCheck REQ-022) plus the geometry rules of TYPE-001/003/004 in
+> :kernel behind ILockEngine (:contracts) — the prototype's findLock/validAt/
+> anchors ported per ADR-001, following the TYPE-004 text. Pure JVM; no UI.
+> Mode: Full, reason (b) a governed interface touched (ILockEngine is
+> implemented; its shape may change — notify tier, log the contract-delta).
+> Design inputs: DI-1 (prototype template, behaviour reference only), DI-4
+> (Study/06, frozen), DI-5 (tools/tangram_geom.py reference math).
+> Verification channels at G3: JVM unit tests (:kernel, :contracts); the
+> device channels are not needed for this WO (no UI) — say so in the WO.
+> Stations as subagents: design-author → design-reviewer → wo-planner →
+> plan-reviewer → [acceptance-test-author ∥ slice-implementer] → code-reviewer
+> → test-verify → traceability-auditor. The four scripts are duties. ≤5
+> checkpoint items, product-visible only. End every turn with the one signal.
+
+**What was done (summary, 11:11–):**
+
+- Read AGENTS.md, the framework's P3 files (principles, lifecycle, directives,
+  gates, definitions, orchestration, task-decomposition, orchestrator,
+  handoff contract, initnewproject §2b, the Windows page), governance,
+  architecture v1.0, build-map v1.0, design-inputs §2, decisions, the last
+  progress entry, the outbox (25 drafts; the owner's G1 answers), android.md,
+  REQ-019/020/022, TYPE-001/003/004, the frozen `ILockEngine.kt` / `Types.kt`,
+  the station pack. Drift check: framework v0.20 = project v0.20.
+- `workorders/WO-001.md` written: scope REQ-019 A1..A4, REQ-020 A1..A2,
+  REQ-022 A1 + TYPE-001/003/004 in `:kernel`; Full (b); channels = JVM unit
+  tests only, device channels explicitly not needed; DI-1/4/5; no checkpoint
+  items; lock behind build noted (`chg-draft-lock-type-dictionary.md` on
+  TYPE-004, `chg-draft-req020-interrupted-drag.md` on REQ-020).
+- Toolchain proof (G3): `:contracts:test :kernel:test --rerun-tasks` green,
+  HEAD bddffef; run log `.swdev/run-log/WO-001.md`.
+- Design Author dispatched (`design-author`, Opus) — the fountain continues
+  in this entry's follow-ups below.
+
+**Follow-ups, same interaction (11:24–12:50; no new human input):**
+
+- Design (`design-author`, Opus) → forward; design review (`design-reviewer`,
+  Fable) found **1 Blocker**: the 360°/180° angle-sum corner rule misses a
+  real outline corner at (2,2) of the shipped `shapes-warmup-4` (180° in two
+  separate wedges). Same author resumed, rule replaced by the contiguity of
+  covered directions; second look → forward, 0 B / 3 S. `design-inputs.md`
+  v1.1 item 13 (angle-sum rule superseded; the Python tool's blind spot →
+  WO-002). Three AI decisions rows (PG-only mirror, tie rule, G-15 requires).
+- Plan (`wo-planner`, Opus): TASK-003 kit in two stages ∥ TASK-001 geometry
+  helpers → TASK-002 `LockEngine`; `workorders/WO-001-briefs.md`. Seam-table
+  header renamed so plan-check's seam check runs; `proposals.md` entry on
+  three plan-check misreads. plan-check GREEN (orchestrator + reviewer runs);
+  plan review (`plan-reviewer`, Sonnet) 0 B / 2 S (ordering, handled in
+  dispatch). **G3 approved** under governance row 7 (`decisions.md`).
+- P4: TASK-001 (`slice-implementer`, Opus) → 4 helper files, 331 lines;
+  kit stage 1 (`acceptance-test-author`, Opus) → `KitFixtures.kt`,
+  `GeometryKitTest.kt` 20 G-04 pins, compiled green. Orchestrator run r1
+  (`.swdev/run-log/WO-001.md`): 20 + 1 + 10 + 2 green → **TASK-001 done**.
+- Scope note: **REQ-020.A2 moves to WO-003** — the seam-level oracle is G-15
+  conformance, not "no message shown" (`decisions.md`, WO Scope, tasks.md).
+- Kit stage 2 (`LockEngineKitTest.kt`, 14 tests, 6 tokens) landed 12:50;
+  TASK-002 `LockEngine.kt` (192 lines, all 7 members) → forward 12:55;
+  orchestrator run r2 12:57: 54 tests green (14 kit + 20 geometry + 18
+  scaffolding + 2 contracts), tokens exactly the six in-scope IDs, plan-check
+  GREEN with the kit compiled.
+- trace-check preview RED on bookkeeping only: Scope notes leaked IDs into
+  the parser; `#SolvedCheck` inherited `play/`. Fixed (notes moved;
+  `build-map.md` v1.1 `#SolvedCheck` → `kernel/`, **one notify-tier
+  contract-delta**, baseline re-frozen) → GREEN 6/6.
+- Code review (Sonnet) 0 B / 0 S / 3 N; Traceability Auditor GREEN for the
+  WO (project-wide RED on later WOs' REQs); Test & Verify 6/6 PASS from run
+  log r2 (hashes matched, no re-run); verifiers: none exist yet.
+- **Close 13:04:** `run_verifiers.py` (none), `wo_metrics.py --write` (+
+  hand-filled judgment rows; same-day window annotated), DoD all ticked,
+  **G4 under row 9 (`decisions.md`)**; TASK-001/003 done, TASK-002
+  `implemented (unverified)` for the unsigned TYPE-004 dictionary; KICKOFF.md
+  WO-002 brief; AGENTS.md phase line; proposals (corrected checks none;
+  wo-metrics window). Three log stamps corrected from telemetry.
+
+### G4 surface — WO-001 #Locking (outcomes first)
+
+**Satisfied (JVM channel, run r2, 54 tests / 0 failures):** REQ-019 A1 (lock
+exactly on an outline corner, a neighbour corner, the warmup-4 two-wedge
+corner, with the 30 dp floor), A2 (never overlaps / never sticks out, incl. a
+sweep), A3 (no hidden anchor — two discriminating poses), A4 (the seventh
+piece locks into its hole, 35 holes); REQ-020 A1 (every drop is Locked or
+None); REQ-022 A1 (a different exact cover, built lock by lock, is solved).
+**Moved:** REQ-020 A2 → WO-003 (the Play screen is the honest oracle).
+**Deliberately not touched:** `ILockEngine.kt`, `Types.kt` (implemented as
+frozen); every screen, gesture and animation; puzzle loading; persistence;
+TYPE-005/006/007; the Python tools. **Risk notes:** the TYPE-004 values are
+owner-confirmed but unsigned → REQ-019 lines `implemented (unverified)` until
+the dictionary CHG is signed; `stillValid` does only inside + no-overlap
+(REQ-025's WO decides); the content tool's corner rule has the blind spot the
+kernel fixed (WO-002). **Contract deltas:** 1 — `build-map.md` v1.1
+(`#SolvedCheck` → `kernel/`). **Lock behind build:** 25 drafts awaiting a
+capture session, none written by this WO. **Checkpoint items:** none.
+**Diff:** `kernel/src/main/kotlin/app/tangramplaytime/kernel/{PieceShapes,
+Polygons,Silhouette,LockRules,LockEngine}.kt` (+523), `Kernel.kt` (−3);
+`kernel/src/test/.../{KitFixtures,GeometryKitTest,LockEngineKitTest}.kt` +
+`scaffolding/` (+1,497); ledgers `workorders/WO-001*.md`, `designs/`,
+`reviews/` (4), `tasks.md`, `decisions.md` (+7 rows), `design-inputs.md`
+v1.1, `build-map.md` v1.1, `proposals.md`, `.swdev/run-log/WO-001.md`,
+`KICKOFF.md`, `AGENTS.md`. **Snapshot prompt:** owner, please commit this
+state as the WO-001 close (e.g. "WO-001 #Locking closed: :kernel lock engine
+behind ILockEngine, kit 6/6, build-map v1.1").

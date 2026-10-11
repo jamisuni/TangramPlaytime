@@ -63,7 +63,54 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
-## Paste this to start the WO-001 session (one orchestrator context per WO)
+## State after WO-001 (2026-10-11, closed 13:04)
+
+- **WO-001 #Locking done** (`workorders/WO-001.md`, Full (b)): `:kernel` has
+  `PieceShapes`, `Polygons`, `Silhouette`, `LockRules` and `LockEngine :
+  ILockEngine` (all 7 members, 523 LOC); kit `LockEngineKitTest` (14) +
+  `GeometryKitTest` (20); 6/6 in-scope IDs green on the JVM channel;
+  trace-check `--wo` GREEN; code review 0 B. `ILockEngine.kt` / `Types.kt`
+  unchanged; one notify delta on `build-map.md` (`#SolvedCheck` → `kernel/`).
+- **Carry into later WOs:** REQ-020.A2 ("no error message for a missed
+  drop") is **WO-003's** (seam oracle dishonest; the Play screen proves it).
+  WO-002 #Content re-judges `tools/tangram_geom.outline_corners` and the V11
+  build-order line: the angle-sum corner rule misses two-wedge corners
+  (`shapes-warmup-4` (2,2)); the kernel uses the contiguity rule
+  (`design-inputs.md` §2 item 13). WO-004: `ILockEngine.stillValid` checks
+  inside + no-overlap only (per KDoc) — decide if REQ-025 needs more.
+- **Lock behind build:** 25 outbox drafts still await a capture session;
+  REQ-019.A1–A4 stay `implemented (unverified)` until
+  `chg-draft-lock-type-dictionary.md` (TYPE-004 values) is signed over there.
+- **Owner steps:** commit the WO-001 snapshot (prompted on the G4 surface);
+  optionally review the diff (`decisions.md` G4 row recommends it for this
+  first WO); run a capture session on `capture-outbox/` when convenient.
+
+## Paste this to start the WO-002 session (one orchestrator context per WO)
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-002 #Content (TangramPlaytime, SWDev
+v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+files), then governance.md, architecture.md, build-map.md, design-inputs.md
+§2 (incl. item 13), decisions.md, the last progress.md entry, KICKOFF.md
+"State after WO-001", capture-outbox/ (pending deltas), platform-notes/android.md.
+WO-002 scope: #Content subtree (REQ-007, 038, 039, 040, 041, 042, 045) in
+:content behind IPuzzleLibrary (locked tier — implement, never change):
+Tangrams/*.json as assets, the tangram-puzzle/1 parser (kotlinx.serialization,
+ADR-004), the load-time validity check (REQ-038 rules; pending
+chg-draft-req038-validity-rules-in-contract.md), ordering kind → rating → id.
+Design inputs: DI-5 (puzzle format, schema, the 13 puzzles, tools/). Also
+re-judge tools/tangram_geom.outline_corners + V11 against the contiguity
+corner rule (design-inputs.md §2 item 13) — a project-tool fix, not Contract.
+Mode: decide from the four reasons (a new Android library module with assets
+is reason (a) if :content counts as new; its skeleton exists from P2 — say so).
+Verification channels at G3: JVM unit tests (:content testDebugUnitTest loads
+every asset); device channels only if a task needs one — say so in the WO.
+Checkpoint candidates (≤5, product-visible): the puzzle count for the first
+release (DI-8 default 25, REQ-042 says ≥ 20). Stations as subagents; the four
+scripts are duties. End every turn with the one signal.
+```
+
+## Paste this to start the WO-001 session (one orchestrator context per WO) — DONE 2026-10-11
 
 ```text
 WE ARE IN PHASE P3 — WORK ORDER WO-001 #Locking (TangramPlaytime, SWDev

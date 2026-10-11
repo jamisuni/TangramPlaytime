@@ -57,6 +57,7 @@ Derived 2026-10-11 by this run from DI-1…DI-9 read against the locked REQs and
 10. **DI-5 `Tangrams/README.md` "The first release needs at least 20 reviewed puzzles"** → REQ-042 says at least 20; the owner's standing answer (DI-8, SRC-016) is **25** for the first release — the default of the matching checkpoint item in WO-002/WO-009.
 11. **DI-1 prototype saves every 5 active seconds and on each piece change (`saveAll` / `persistPieces`)** → REQ-025 says only "the state survives closing the app"; the build saves at every state change (pending `chg-draft-req025-unreadable-state-and-save-timing.md`); the prototype's cadence is not a rule.
 12. **DI-1 prototype DEV button "hidden in the design sheets", "until the page is restarted"** → web-only clauses; the Android reading is "until the process restarts" and "debug build type only" (G-08; pending `chg-draft-req046-android-build-terms.md`).
+13. **DI-4 `Study/06` §Anchors "a total of 360° means inside the shape, 180° means on a straight side, and anything else is a corner"; DI-5 `tools/tangram_geom.outline_corners` (the same angle-sum rule)** → REQ-019 rule ("the silhouette's outline corners") and the `ILockEngine` definition ("a point where the boundary turns"): a vertex where the solution pieces cover 180° in **two separate wedges** is a corner — the angle sum misses it. Found by the WO-001 design review (F1) on the shipped `Tangrams/shapes-warmup-4.json`, point (2,2). The kernel classifies by the **contiguity of the covered directions** (`designs/WO-001-design.md` §2 `Silhouette`). The content tool keeps the blind spot (and so does the V11 build-order line it feeds): **WO-002 #Content** re-judges `tangram_geom.outline_corners` and the validator (a `tools/` change is a project-tool fix, not a Contract change); until then the Python tool is not the oracle for `outlineCorners` on warmup-4.
 
 ### Open forks (owner decision needed)
 
@@ -67,7 +68,7 @@ Derived 2026-10-11 by this run from DI-1…DI-9 read against the locked REQs and
 - **Time counting (DI-1, DI-3 §8, TYPE-005, REQ-029/030):** today's and all-time play time count every active second whatever is on screen (settings included); a puzzle's own time counts only while that puzzle is In progress and no overlay is open. The owner's 2026-10-05 words ("can be total time … if havent done anything for minute then stop counting", DI-8) describe exactly this.
 - **Board fit (DI-1 `layout()`: 0.82 / 0.80 of the board) = REQ-035 "about 10 % padding".**
 - **Tray scale computed for the full set, cells = turn diameter × scale + 12 dp, row ≤ max(84 dp, 16 % of height)** (DI-1, DI-2 §3) = REQ-013 rules, verbatim.
-- **Anchors = outline corners found by the 360° / 180° angle-sum rule** (DI-4 §Anchors, `tangram_geom.outline_corners`) — the kernel port uses the same rule on the puzzle's solution polygons.
+- **Anchors = the silhouette's outline corners and placed-piece corners only** (DI-4 §Anchors) — the kernel port uses the same anchor set on the puzzle's solution polygons. *(The 360° / 180° angle-sum way of finding the corners is superseded — item 13.)*
 - **Reduced motion (DI-2 §6, REQ-023, REQ-051):** no pop, confetti or pulse animation; the picture and the corner markers still appear.
 - **DI-9 icon:** option A used as is (foreground SVG + background colour → adaptive icon); REQ-048.A4.
 
@@ -78,3 +79,4 @@ Derived 2026-10-11 by this run from DI-1…DI-9 read against the locked REQs and
 | 0.1 | 2026-10-08 | register pre-filled from the v1 intake material (commit 10ccac4); §2 left for P2 | the TangramNoAds re-run under SWDev v0.20 (T-28) |
 | 0.2 | 2026-10-08 | DI-8 the owner's first-build answers (SRC-016) as checkpoint defaults; DI-9 the picked icon | same inputs **and the same owner decisions** — the AI's own first-run readings are not carried |
 | 1.0 | 2026-10-11 | §2 Contract-delta derived from DI-1…DI-9 against collection v1.2: 12 superseded statements, no open forks, 6 agreements; Status → Current | P2 (G1 accepted 2026-10-11) |
+| 1.1 | 2026-10-11 | §2 item 13: the angle-sum corner rule (DI-4, DI-5) superseded by the contiguity rule; the "Also fine" anchors bullet narrowed to the anchor set | WO-001 design review F1 (`reviews/WO-001-design-review.md`) |

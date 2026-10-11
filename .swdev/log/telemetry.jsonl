@@ -30,3 +30,117 @@
 {"ts": "2026-10-11T11:02:13", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
 {"ts": "2026-10-11T11:04:19", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
 {"ts": "2026-10-11T11:04:56", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:09:16", "hook": "telemetry", "event": "SessionStart", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:09:42", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:14:14", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "design-author", "model": "opus", "model_source": "agent-file", "desc": "WO-001 design: lock kernel", "prompt_chars": 6521}
+{"ts": "2026-10-11T11:14:45", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:16:47", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:17:18", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:18:49", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:20:52", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:21:23", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:21:54", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:22:25", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:22:40", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:23:29", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "design-reviewer", "model": "inherit", "model_source": "session", "desc": "WO-001 design review", "prompt_chars": 4964}
+{"ts": "2026-10-11T11:24:02", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:28:35", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:30:08", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:30:42", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:31:45", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:32:18", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:32:50", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:33:24", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:34:26", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:34:31", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:35:17", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:35:37", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:36:08", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:36:38", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:37:09", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:37:17", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:37:46", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:38:09", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:38:42", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:39:15", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:39:48", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:40:07", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:41:09", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "wo-planner", "model": "opus", "model_source": "agent-file", "desc": "WO-001 plan: tasks and briefs", "prompt_chars": 7916}
+{"ts": "2026-10-11T11:41:18", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:41:40", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:42:41", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:46:43", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:48:44", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:50:15", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:50:46", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:52:18", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:52:28", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:54:13", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "plan-reviewer", "model": "sonnet", "model_source": "agent-file", "desc": "WO-001 plan review", "prompt_chars": 4694}
+{"ts": "2026-10-11T11:54:45", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:55:16", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:55:26", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:56:48", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "acceptance-test-author", "model": "opus", "model_source": "agent-file", "desc": "WO-001 kit stage 1", "prompt_chars": 3033}
+{"ts": "2026-10-11T11:57:08", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "slice-implementer", "model": "opus", "model_source": "agent-file", "desc": "WO-001 TASK-001 geometry helpers", "prompt_chars": 3758}
+{"ts": "2026-10-11T11:57:20", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:57:39", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:57:51", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T11:58:10", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:01:11", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:01:42", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:02:13", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:02:44", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:03:13", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:03:52", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:04:24", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:05:25", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:06:57", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:07:28", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:07:59", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:10:31", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:11:02", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:11:33", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:12:04", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:12:35", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:13:06", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:13:37", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:14:39", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:16:40", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:17:11", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:45:13", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:45:44", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:46:16", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:47:17", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:47:48", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:48:19", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:48:27", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:50:15", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:50:33", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:50:38", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:51:05", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:51:26", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:52:06", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "slice-implementer", "model": "opus", "model_source": "agent-file", "desc": "WO-001 TASK-002 LockEngine", "prompt_chars": 4473}
+{"ts": "2026-10-11T12:52:16", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:52:37", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:53:09", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:54:40", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:55:12", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:55:43", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:56:14", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:56:45", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:56:49", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:58:21", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "code-reviewer", "model": "sonnet", "model_source": "agent-file", "desc": "WO-001 code review", "prompt_chars": 6257}
+{"ts": "2026-10-11T12:58:52", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:59:24", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T12:59:55", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:00:13", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:00:26", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:00:43", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:01:26", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "test-verify", "model": "sonnet", "model_source": "agent-file", "desc": "WO-001 Test & Verify", "prompt_chars": 4375}
+{"ts": "2026-10-11T13:01:40", "hook": "telemetry", "event": "agent-launch", "session": "02d49364-...", "agent": "traceability-auditor", "model": "sonnet", "model_source": "agent-file", "desc": "WO-001 traceability audit", "prompt_chars": 2558}
+{"ts": "2026-10-11T13:01:52", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:02:07", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:02:12", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:02:30", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:02:35", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:06:53", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}
+{"ts": "2026-10-11T13:45:26", "hook": "telemetry", "event": "SubagentStop", "session": "02d49364-..."}

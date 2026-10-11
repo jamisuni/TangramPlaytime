@@ -20,7 +20,8 @@
 | #NoMoney | `app/` | Planned | — | REQ-009 free note on the settings screen; REQ-008 negatives verified system-level by the same verifier |
 | #DeviceOnly | — | Planned | — | REQ-010: airplane-mode run + manifest scan |
 | #Solving | `play/` | Planned | #Content (via `IPuzzleLibrary`), (kernel) (via `ILockEngine`), #ResumePuzzle (via `IProgressStore`) | board, tray, size marks, drag, tap/twist/flip gestures, solved picture; the whole subtree inherits unless listed |
-| #Locking | `kernel/` | Planned | — | REQ-019, 020, 022 are JVM-tested here (geometry); the UI half of go-home and solve is #Solving's |
+| #Locking | `kernel/` | Built (WO-001) | — | REQ-019, 020 are JVM-tested here (geometry); the UI half of go-home is #Solving's (REQ-020.A2 covered in WO-003) |
+| #SolvedCheck | `kernel/` | Built (WO-001) | — | REQ-022: `ILockEngine.isSolved`, JVM-tested here (architecture.md §3: the solved check is `:kernel`'s); the solved *picture* and view are #SolvedPicture / #SolvedView (`play/`). Row added 2026-10-11 — without it the tag inherited `play/` from #Solving and trace-check read the kernel test as directory theater |
 | #LandingPreview | `play/` | Planned | (kernel) (via `ILockEngine`) | the dashed outline is UI; the search is the kernel's |
 | #CornerTeach | `play/` | Planned | (kernel) (via `ILockEngine` "went home") | REQ-051 pulse |
 | #Browsing | `play/` | Planned | #Content (via `IPuzzleLibrary`), #ResumePuzzle (via `IProgressStore`) | ‹ › top bar, resume/restart, solved view, long press, grid overview |
@@ -47,3 +48,4 @@ WO-001 #Locking (+ `:contracts`, `:kernel`) → WO-002 #Content → WO-003 #Solv
 |---|---|---|---|---|
 | 0.9 | 2026-10-11 | initial map from the locked tree: six modules, kernel row, system-level rows, WO order | P2 | — |
 | 1.0 | 2026-10-11 | signed with architecture.md v1.0; the six modules exist and compile (`.swdev/run-log/P2-skeleton.md`) | G2 | orchestrator (row 4 `ai+inform`) |
+| 1.1 | 2026-10-11 | `#SolvedCheck` row (code home `kernel/`); `#Locking` and `#SolvedCheck` build status Built (WO-001); REQ-020.A2 noted as WO-003's | WO-001: the tag had inherited `play/`; the component map already placed the solved check in `:kernel` | orchestrator (notify-tier delta, WO-001 Contract deltas) |
