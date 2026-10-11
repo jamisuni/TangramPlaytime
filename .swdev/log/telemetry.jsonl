@@ -1,1 +1,32 @@
 {"ts": "2026-10-11T09:52:35", "hook": "telemetry", "event": "SessionStart", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:08:06", "hook": "telemetry", "event": "agent-launch", "session": "0cfafa2f-...", "agent": "requirements-reviewer", "model": "inherit", "model_source": "session", "desc": "Fresh-eyes review of collection v1.2", "prompt_chars": 6898}
+{"ts": "2026-10-11T10:08:48", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:09:21", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:15:26", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:18:00", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:18:33", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:19:06", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:19:39", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:20:13", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:20:45", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:20:59", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:30:54", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:52:11", "hook": "telemetry", "event": "agent-launch", "session": "0cfafa2f-...", "agent": "slice-implementer", "model": "opus", "model_source": "agent-file", "desc": "P2 Gradle skeleton + contracts", "prompt_chars": 10931}
+{"ts": "2026-10-11T10:52:43", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:53:15", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:54:50", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:55:22", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:55:54", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:56:56", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:57:27", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:58:00", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:58:31", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:59:04", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T10:59:36", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:00:08", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:00:42", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:01:14", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:01:46", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:02:13", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:04:19", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}
+{"ts": "2026-10-11T11:04:56", "hook": "telemetry", "event": "SubagentStop", "session": "0cfafa2f-..."}

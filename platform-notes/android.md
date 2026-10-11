@@ -6,6 +6,13 @@ would find them. Copy this file into an Android project's root (or append
 it to `AGENTS.md`) at P2; delete it for other platforms. Each line is a
 duty of the station it names; none of it is methodology.
 
+## This project's channels (P2, 2026-10-11)
+
+- **Dev image:** AVD `Medium_Phone_API_37.0` (system image android-37.0, google_apis_playstore).
+- **Floor image:** AVD `Phone_API_26` (system image android-26, google_apis) — `minSdk 26`; booted headless 2026-10-11 as `emulator-5554` in 13.5 s (`emulator -avd Phone_API_26 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot`).
+- **Toolchain:** JDK `C:/Program Files/Android/Android Studio/jbr` (25), Gradle 9.8 wrapper, AGP 9.4.1, Kotlin 2.4.20, Compose BOM 2026.09.00; SDK `C:/Users/Jami/AppData/Local/Android/Sdk` (platform 37, build-tools 36.0.0).
+- **Shell:** `export JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'` then `cmd.exe //c ".\gradlew.bat <tasks>"`; one emulator at a time, `adb devices` after every boot.
+
 ## Verification channels (name them at G3)
 
 - **Two device channels at every WO close:** the full device suites run on

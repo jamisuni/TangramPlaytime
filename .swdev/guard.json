@@ -10,15 +10,22 @@
       "Requirements/req_types.md",
       "Requirements/changes/**",
       "architecture.md",
-      "owner-evidence.md"
+      "owner-evidence.md",
+      "contracts/src/main/kotlin/app/tangramplaytime/contracts/IPuzzleLibrary.kt",
+      "Tangrams/puzzle.schema.json"
     ],
     "notify": [
-      "build-map.md"
+      "build-map.md",
+      "contracts/src/main/kotlin/app/tangramplaytime/contracts/ILockEngine.kt",
+      "contracts/src/main/kotlin/app/tangramplaytime/contracts/IProgressStore.kt",
+      "contracts/src/main/kotlin/app/tangramplaytime/contracts/Types.kt"
     ]
   },
+  "_comment_contract_paths": "G2 (2026-10-11): tiers mirror architecture.md §4 — IPuzzleLibrary + the puzzle schema locked (a format change is a capture-side CHG), ILockEngine / IProgressStore / the contract types notify (logged contract-delta, summarized at WO close).",
   "hard_stop_paths": [],
   "_comment_hard_stop_paths": "None at P1. The manifest's no-permission / no-network rules (owner rule 1, REQ-001/010) are a verifier at every WO close, not a path block.",
   "unlocked": [],
+  "_comment_unlocked": "Emptied at the G2 freeze 2026-10-11 (the P2 authoring window for architecture.md is closed; decisions.md row 4 of that date).",
   "benign_roots": [
     "C:/Users/Jami/AppData/Local/Android/Sdk",
     "C:/Program Files/Android/Android Studio"

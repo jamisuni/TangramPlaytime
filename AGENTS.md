@@ -16,6 +16,7 @@ Start every session by reading this file, then `KICKOFF.md` (until WO-001 closes
 11. **The DEV solution reveal (REQ-046) is a testing aid.** Keep it in prototypes and test builds; a release build must not contain it.
 12. **No difficulty levels, no tray turn buttons.** Both were removed by Jami in round 6 (REQ-004, REQ-044 withdrawn). Do not bring them back as "helpful" additions; the puzzle rating is the difficulty and a tap turns a piece.
 13. **Every text in two languages.** The prototype and the game follow the device language (REQ-047, `fi` and `en`). A new string, a new puzzle title, a new note: both languages, always.
+    *Amended by the owner 2026-10-11 (G1 surface, verbatim in `capture-outbox/src-draft-g1-owner-answers.md`): "lets go english only, and finnish is there just as reference to make sure language can be change but translations for fin are not important." English is the Contract wording; a Finnish string is still added for every text so the mechanism works, but its wording is a reference translation listed in `review-notes.md`, never tested. Pending `chg-draft-req047-english-contract.md`.*
 
 ---
 
@@ -225,4 +226,4 @@ signed on the capture side.
 
 ## Current phase
 
-`P1 — acceptance of the locked collection (intake path C)` — scaffolded 2026-10-08 under SWDev v0.20; the TangramNoAds re-run (T-28). Update this line as phases advance.
+`P3 — work orders (G1 accepted 2026-10-11 by Jami; G2 locked 2026-10-11 under row 4 ai+inform, architecture.md v1.0). Next: WO-001 #Locking in a fresh session — paste the brief from KICKOFF.md` — scaffolded 2026-10-08 under SWDev v0.20; the TangramNoAds re-run (T-28). Update this line as phases advance.

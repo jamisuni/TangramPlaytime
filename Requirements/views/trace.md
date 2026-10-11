@@ -81,6 +81,10 @@
 - **CHG-001** — applied · targets REQ-048
 - **CHG-002** — applied · targets REQ-048
 
+## Fresh-eyes review findings without a verdict
+
+- none
+
 ## Summary
 
 - capture mode: ai-led — ai-approved releases an item for a prototype; only a signed lock binds

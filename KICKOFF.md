@@ -48,7 +48,44 @@ code, designs, decisions or reviews — comparing comes after, not during.
 
 ---
 
-## Paste this to start the first session
+## State after the first session (2026-10-11)
+
+- **G1 accepted** (Jami, 2026-10-11): collection v1.2 binds this project.
+  `Requirements/reviews/review-01.md` carries all 38 verdicts; 24 chg-drafts
+  + 1 src-draft wait in `capture-outbox/` for a capture session (lock behind
+  build). Owner decisions taken on the G1 surface are in
+  `capture-outbox/src-draft-g1-owner-answers.md` — read them: **English is
+  the Contract language (Finnish = reference locale)**, Google Play, Android
+  8.0 floor, licence line in Settings, the shared-type numbers confirmed.
+- **P2 artefacts:** `architecture.md` (G-01..G-17, O-01..O-08, registry:
+  `IPuzzleLibrary` locked; `ILockEngine`, `IProgressStore`, contract types
+  notify), `build-map.md` (six Gradle modules), `design-inputs.md` §2 (12
+  superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
+  G2 status: see `architecture.md` §7 and the last `progress.md` entry.
+
+## Paste this to start the WO-001 session (one orchestrator context per WO)
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-001 #Locking (TangramPlaytime, SWDev
+v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+files), then governance.md, architecture.md, build-map.md, design-inputs.md
+§2, decisions.md, the last progress.md entry, capture-outbox/ (the pending
+deltas and the owner's G1 answers), platform-notes/android.md.
+WO-001 scope: #Locking subtree (#AnchorLock REQ-019, #GoHome REQ-020,
+#SolvedCheck REQ-022) plus the geometry rules of TYPE-001/003/004 in
+:kernel behind ILockEngine (:contracts) — the prototype's findLock/validAt/
+anchors ported per ADR-001, following the TYPE-004 text. Pure JVM; no UI.
+Mode: Full, reason (b) a governed interface touched (ILockEngine is
+implemented; its shape may change — notify tier, log the contract-delta).
+Design inputs: DI-1 (prototype template, behaviour reference only), DI-4
+(Study/06, frozen), DI-5 (tools/tangram_geom.py reference math).
+Verification channels at G3: JVM unit tests (:kernel, :contracts); the
+device channels are not needed for this WO (no UI) — say so in the WO.
+Stations as subagents: design-author → design-reviewer → wo-planner →
+plan-reviewer → [acceptance-test-author ∥ slice-implementer] → code-reviewer
+→ test-verify → traceability-auditor. The four scripts are duties. ≤5
+checkpoint items, product-visible only. End every turn with the one signal.
+```
 
 ```text
 WE ARE IN PHASE P1 — ACCEPTANCE OF A LOCKED COLLECTION (intake path C,

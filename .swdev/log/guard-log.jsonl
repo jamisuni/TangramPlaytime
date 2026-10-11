@@ -1,0 +1,10 @@
+{"ts": "2026-10-11T10:09:56", "hook": "stop", "event": "progress-reminder", "age_min": 4554}
+{"ts": "2026-10-11T10:47:06", "hook": "guard", "event": "deny-contract", "path": "architecture.md", "pattern": "architecture.md", "tool": "Write"}
+{"ts": "2026-10-11T10:47:30", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Write"}
+{"ts": "2026-10-11T10:51:09", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Write"}
+{"ts": "2026-10-11T10:53:38", "hook": "stop", "event": "unlocked-at-stop", "session": "0cfafa2f-c63", "paths": ["architecture.md"]}
+{"ts": "2026-10-11T11:04:11", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-11T11:04:29", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-11T11:04:35", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-11T11:04:38", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-11T11:04:40", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
