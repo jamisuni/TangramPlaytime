@@ -3,7 +3,8 @@
   "permissions": {
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
-      "C:/GitHub/AI/SWDev"
+      "C:/GitHub/AI/SWDev",
+      "C:/GitHub/AI/SwReqCollector"
     ],
     "allow": [
       "Edit(./**)",
@@ -32,7 +33,8 @@
       "Bash(git stash show:*)",
       "Bash(git branch --list:*)",
       "Bash(git tag --list:*)",
-      "Bash(git remote -v:*)"
+      "Bash(git remote -v:*)",
+      "Read(//c/GitHub/AI/SwReqCollector/**)"
     ],
     "deny": [
       "Edit(//c/GitHub/AI/SWDev/**)",
@@ -80,7 +82,11 @@
       "Bash(git filter-repo:*)",
       "Bash(git notes:*)",
       "Bash(git submodule:*)",
-      "Bash(git bisect:*)"
+      "Bash(git bisect:*)",
+      "Edit(//c/GitHub/AI/SwReqCollector/**)",
+      "Write(//c/GitHub/AI/SwReqCollector/**)",
+      "MultiEdit(//c/GitHub/AI/SwReqCollector/**)",
+      "NotebookEdit(//c/GitHub/AI/SwReqCollector/**)"
     ]
   },
   "hooks": {
@@ -153,5 +159,6 @@
         ]
       }
     ]
-  }
+  },
+  "_comment_tangramplaytime": "Project addition (2026-10-11): the capture framework C:/GitHub/AI/SwReqCollector is readable (the collection's CLAUDE.md and the reviewer point at its format docs) and never writable (owner rule 4); its tools run through python as before."
 }

@@ -185,7 +185,16 @@ signed on the capture side.
   and requirements-reviewer inherit the strongest; raise a station for UI,
   rendering, concurrency or device-only work, never lower one *(v0.17)*.
   Inline station work in the main thread is a justified, WO-logged
-  exception. **Light mode is the default**; Full needs one of the four
+  exception. **This project's staffing (owner, 2026-10-11):** the main
+  session (orchestrator) runs on **Claude Fable** and only manages — it
+  never implements, designs, reviews or writes tests itself; the heavy
+  stations `slice-implementer`, `design-author`, `acceptance-test-author`
+  and `wo-planner` run on **Opus** (`model: opus` in their agent files —
+  keep that override when re-syncing the pack); `design-reviewer` and
+  `requirements-reviewer` inherit Fable; the mechanical stations
+  (`plan-reviewer`, `code-reviewer`, `test-verify`, `traceability-auditor`)
+  stay on Sonnet. Telemetry logs the model that actually ran.
+  **Light mode is the default**; Full needs one of the four
   reasons written in the WO. One acceptance kit, compiled against the tree;
   Test & Verify starts from your run log (command · tree hashes · result
   XML — keep it). Owner questions are **checkpoint items**: at most five per

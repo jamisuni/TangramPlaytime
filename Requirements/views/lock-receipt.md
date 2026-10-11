@@ -128,7 +128,7 @@ What the existing sign-off made Contract without an owner statement behind it:
 - **REQ-046** assumption: the DEV button sits in the bottom-left corner of the board, small and dashed, so it is not mistaken for part of the game.
 - **REQ-047** assumption: no in-game language switch.
 - **REQ-047** cites the agent's own proposal SRC-004
-- **REQ-048** assumption: the Finnish store title is "Tangram, ihan ilmainen"; the owner confirms the wording.
+- **REQ-048** assumption: the store title is "Tangram Playtime" in both store languages (the owner accepted CHG-001 on 2026-10-11 without naming a Finnish form); the Finnish short description carries the promise in Finnish.
 - **REQ-048** assumption: the hosted privacy policy is a page in the project's repository.
 - **REQ-049** assumption: the wording above, and its Finnish translation in the prototype.
 - **REQ-049** UI numbers never used on a build (no `firsthand` source)

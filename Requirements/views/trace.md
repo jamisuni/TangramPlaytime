@@ -26,7 +26,7 @@
 - **REQ-045** — two mini puzzles ship in the prototype (a triangle and a square) and they stay in the game as a first-run introduction; the owner asked for one, for testing.
 - **REQ-046** — the DEV button sits in the bottom-left corner of the board, small and dashed, so it is not mistaken for part of the game.
 - **REQ-047** — no in-game language switch.
-- **REQ-048** — the Finnish store title is "Tangram, ihan ilmainen"; the owner confirms the wording.
+- **REQ-048** — the store title is "Tangram Playtime" in both store languages (the owner accepted CHG-001 on 2026-10-11 without naming a Finnish form); the Finnish short description carries the promise in Finnish.
 - **REQ-048** — the hosted privacy policy is a page in the project's repository.
 - **REQ-049** — the wording above, and its Finnish translation in the prototype.
 - **REQ-050** — solved cells show the picture at thumbnail size, not the piece layout (REQ-026 hides piece positions).
@@ -57,6 +57,7 @@
 - **#DifficultyChoice** — Choose the difficulty
 - **#DifficultyRules** — What a level changes
 - **#PieceSets** — Other piece sets
+- **#SafetyRope** — Easy mode with a safety rope
 - **#Accessibility** — Colour-blind support
 
 ## Evidence — thin or weak
@@ -75,10 +76,15 @@
 
 - none
 
+## Change deltas (Phase D)
+
+- **CHG-001** — applied · targets REQ-048
+- **CHG-002** — applied · targets REQ-048
+
 ## Summary
 
 - capture mode: ai-led — ai-approved releases an item for a prototype; only a signed lock binds
-- 53 features (42 leaves = coding-agent work units), 51 REQs (0 ai-approved, 47 locked, 4 withdrawn)
-- feature status mix: idea: 2, captured: 0, specified: 0, ai-approved: 0, locked: 51
+- 54 features (43 leaves = coding-agent work units), 51 REQs (0 ai-approved, 47 locked, 4 withdrawn)
+- feature status mix: idea: 3, captured: 0, specified: 0, ai-approved: 0, locked: 51
 - REQ status mix: draft: 0, observed-provisional: 0, ai-approved: 0, locked: 47, withdrawn: 4
-- next free ids: REQ-052 · TYPE-008 · SRC-016 · DEF-002
+- next free ids: REQ-052 · TYPE-008 · SRC-017 · DEF-002 · CHG-003

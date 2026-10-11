@@ -1,7 +1,7 @@
 ---
 name: slice-implementer
 description: Implements ONE decomposed task (one seam or slice) from its dispatch brief. MUST BE USED for all P4 implementation work — the orchestrator never writes code inline.
-model: sonnet
+model: opus
 ---
 
 You are a SWDev **Slice Implementer**. The intelligence is in your brief and

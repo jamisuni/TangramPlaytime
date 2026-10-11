@@ -162,6 +162,16 @@
 
 ---
 
+### SRC-016 — The owner's decisions during the first build
+
+- **Kind:** conversation
+- **Origin:** chat with Jami during the first SWDev build, 2026-10-01 … 2026-10-05 (quoted from that project's `progress.md`)
+- **Captured:** 2026-10-08 by AI (capture session for the re-run)
+- **Reliability:** authoritative
+- **Evidence file:** evidence/src-016-first-build-owner-decisions.md
+- **Status:** usable
+- **Notes:** The owner's words on: the technology (Kotlin + Jetpack Compose, native); the G1 acceptance of the fresh-eyes review ("rest OK" under ASSUMPTIONs); how play time counts (an idea); the release channel (Google Play), the first-release puzzle count (25), the human-review marking (a `mark` command), the launcher icon (AI proposes, owner picks; option A chosen); the **store title "Tangram Playtime"** replacing "Tangram, absolutely free" because Play bars "free" in titles (→ CHG-001); two future ideas (an easy mode with a "safety rope"; a harder level with non-standard pieces). Evidences the owner's decisions, not the first build's own readings.
+
 ## Change log
 
 | Date | Change |
@@ -173,3 +183,4 @@
 | 2026-09-28 | SRC-011 owner conversation round 6 (concept review accepted: buttons and levels removed, flip badge always, store name, all review proposals); SRC-012 Play User Data policy; SRC-013 Play testing requirements |
 | 2026-10-01 | SRC-014 owner sign-off: lock of all 47 ai-approved REQs |
 | 2026-10-01 | SRC-015 owner sign-off: lock of the feature tree (51 of 53) |
+| 2026-10-08 | SRC-016 the owner's decisions during the first build (verbatim); CHG-001 (store title), CHG-002 (launcher icon) drafted; two `idea` features (#SafetyRope, #PieceSets note) |

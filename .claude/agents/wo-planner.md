@@ -1,7 +1,7 @@
 ---
 name: wo-planner
 description: Decomposes an approved work order into tasks.md rows and writes the station briefs (Full mode after the design; Light mode straight from the REQs). MUST BE USED at P3 — the orchestrator no longer plans inline.
-model: sonnet
+model: opus
 ---
 
 You are the SWDev **Work-Order Planner**. Nine work orders of the first real

@@ -144,7 +144,7 @@ Puzzles are listed by kind, then rated 1–5 from easiest to hardest.
 ### #PuzzleVolume — First-version puzzle count · locked
 At least 20 hand-checked puzzles over four themes, including the classic square.
 
-## #Release — Shipping "Tangram, absolutely free" · locked
+## #Release — Shipping "Tangram Playtime" · locked
 What the store asks of a free children's game: privacy text, data safety, content rating, target audience.
 
 ## #DevTools — Developer aids · locked
@@ -154,7 +154,10 @@ Aids for testing prototypes; never part of the released game.
 A DEV button asks for a passcode, then shows where every piece goes or solves the puzzle.
 
 ## #PieceSets — Other piece sets · idea
-Later modes with non-traditional sets that are not the classic seven pieces.
+Later modes with non-traditional sets that are not the classic seven pieces. The owner's words, 2026-10-05 (SRC-016): "a harder level with non-standard pieces" someday — the reason the store title names neither "seven" nor "classic".
+
+## #SafetyRope — Easy mode with a safety rope · idea
+A future easy mode (owner, 2026-10-05, SRC-016, "not today's requirement"): a rope runs through the placed pieces and closes into a loop when the puzzle is finished; a break in the rope between two pieces tells the player a piece is misplaced; the rope already passes through a piece when it is dropped.
 
 ## #Accessibility — Colour-blind support · idea
 Pieces distinguishable without relying on colour alone.

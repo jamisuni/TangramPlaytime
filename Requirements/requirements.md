@@ -1,6 +1,6 @@
 # Requirements Index — TangramNoAds
 
-**Status:** Locked (owner sign-off 2026-10-01, SRC-014, SRC-015) · **Version:** 1.1 · **Last updated:** 2026-10-01
+**Status:** Locked (owner sign-off 2026-10-01, SRC-014, SRC-015) · **Version:** 1.2 · **Last updated:** 2026-10-11
 **Framework:** SwReqCollector format v2 (tools v0.4) at `C:\GitHub\AI\SwReqCollector`
 **Capture purpose:** build
 **Capture mode:** ai-led
@@ -99,3 +99,4 @@ This is the only list of open questions. `../Spec/05-open-questions.md` keeps th
 | 0.4 | 2026-09-28 | SRC-011..013. Withdrawn: REQ-004, 027, 028 (levels), REQ-044 (tray buttons), TYPE-002. Rewritten: TYPE-004 (one lock parameter set with scoring and tolerance), TYPE-006 (transitions), REQ-018 (badge always), 019, 021, 024 (wrap), 025 (load check, profile note), 030, 031 (off by default), 032, 037 (dev aids exempt), 038 (edge-first clause dropped: V11 is vacuous), 042 (20 puzzles, ai-approved). Rules added: REQ-010, 012, 013, 016, 023, 033, 034, 035, 036, 040, 041, 043, 045. New: #Language REQ-047, #Release REQ-048/049, #PuzzleOverview REQ-050, #CornerTeach REQ-051 (all ai-approved for prototype 0.6). DEF-001. Open-question lists merged here. | owner round 6: concept review accepted | — |
 | 1.0 | 2026-10-01 | SRC-014. All 47 `ai-approved` REQs locked with `signoff: {by: Jami, date: 2026-10-01}`; the 13 `inferred` ones (REQ-010, 012, 013, 015, 017, 022, 031, 032, 033, 034, 037, 040, 043) became `stated` by the owner's confirmation; 20 inferred rule markers marked confirmed. Priorities left `none`. | owner sign-off | Jami |
 | 1.1 | 2026-10-01 | SRC-015. Feature tree locked: the 48 `ai-approved` features and the 3 `captured` difficulty features (only withdrawn REQs) → `locked`; #PieceSets and #Accessibility stay `idea` (no evidence, no REQs, later than v1). | owner sign-off | Jami |
+| 1.2 | 2026-10-11 | SRC-016 (the owner's decisions during the first build, verbatim). CHG-001 applied to REQ-048: store title "Tangram Playtime", the free promise in the short description, A2 rewritten; CHG-002 applied: launcher icon in scope, new A4; REQ-048 re-signed (decision date 2026-10-05); `#Release` heading; new `idea` feature #SafetyRope and a note on #PieceSets. No other locked item changed | the TangramPlaytime re-run starts from the same requirements plus the owner's own first-build decisions (SWDev harvest T3-09) | Jami (chat, 2026-10-11) |

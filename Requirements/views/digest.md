@@ -54,10 +54,11 @@
 | &nbsp;&nbsp;&nbsp;└ **#PuzzleArt** — Picture for every puzzle | locked | REQ-039 |
 | &nbsp;&nbsp;&nbsp;└ **#PuzzleOrder** — Puzzle difficulty and order | locked | REQ-040 |
 | &nbsp;&nbsp;&nbsp;└ **#PuzzleVolume** — First-version puzzle count | locked | REQ-042 |
-| **#Release** — Shipping "Tangram, absolutely free" | locked | REQ-048, REQ-049 |
+| **#Release** — Shipping "Tangram Playtime" | locked | REQ-048, REQ-049 |
 | **#DevTools** — Developer aids | locked | — |
 | &nbsp;&nbsp;&nbsp;└ **#SolutionReveal** — Show the solution with a passcode | locked | REQ-046 |
 | **#PieceSets** — Other piece sets | idea | — |
+| **#SafetyRope** — Easy mode with a safety rope | idea | — |
 | **#Accessibility** — Colour-blind support | idea | — |
 
 ## Requirements
@@ -111,7 +112,7 @@
 | REQ-045 | #PuzzleMini | FUN | A few tiny puzzles use only some pieces, for a fast first success and for testing the solved state. | Stated | Locked | none | — |
 | REQ-046 | #SolutionReveal | FUN | In prototype and test builds, a DEV button behind the passcode 0417 shows the solution or solves the puzzle; release builds leave it out. | Stated | Locked | none | — |
 | REQ-047 | #Language | FUN | The game follows the device language, ships Finnish and English, and falls back to English. | Stated | Locked | none | — |
-| REQ-048 | #Release | BIZ | The release meets the store's rules for a children's audience: privacy policy, data safety, content rating, target audience, Families policy; store name "Tangram, absolutely free". | Stated | Locked | none | — |
+| REQ-048 | #Release | BIZ | The release meets the store's rules for a children's audience: privacy policy, data safety, content rating, target audience, Families policy; store name "Tangram Playtime"; a launcher icon the owner picked. | Stated | Locked | none | — |
 | REQ-049 | #Release | UI | The settings screen carries the privacy policy as plain text, next to the free note. | Stated | Locked | none | — |
 | REQ-050 | #PuzzleOverview | FUN | A long press on › jumps to the next unsolved puzzle; the counter in the top bar opens a grid of all silhouettes. | Stated | Locked | none | — |
 | REQ-051 | #CornerTeach | UI | In a mini puzzle, when a drop goes home, the silhouette's corners pulse once, teaching that pieces hold on to corners. | Stated | Locked | none | — |
@@ -147,3 +148,4 @@
 | SRC-013 | web page | secondary | usable | REQ-048 |
 | SRC-014 | conversation | authoritative | usable | REQ-001, REQ-002, REQ-003, REQ-005, REQ-006, REQ-007, REQ-008, REQ-009, REQ-010, REQ-011, REQ-012, REQ-013, REQ-014, REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020, REQ-021, REQ-022, REQ-023, REQ-024, REQ-025, REQ-026, REQ-029, REQ-030, REQ-031, REQ-032, REQ-033, REQ-034, REQ-035, REQ-036, REQ-037, REQ-038, REQ-039, REQ-040, REQ-041, REQ-042, REQ-043, REQ-045, REQ-046, REQ-047, REQ-048, REQ-049, REQ-050, REQ-051 |
 | SRC-015 | conversation | authoritative | usable | — |
+| SRC-016 | conversation | authoritative | usable | REQ-048 |

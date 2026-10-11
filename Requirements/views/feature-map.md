@@ -76,6 +76,7 @@ flowchart LR
     SolutionReveal["#SolutionReveal"]:::featLock
   end
   PieceSets["#PieceSets"]:::featIdea
+  SafetyRope["#SafetyRope"]:::featIdea
   Accessibility["#Accessibility"]:::featIdea
   Promise --> NoMoney
   Promise --> DeviceOnly
