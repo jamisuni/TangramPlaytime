@@ -71,6 +71,26 @@ duty of the station it names; none of it is methodology.
   the final step by a visual that the completion itself replaces — the
   fixture must distinguish the states it claims to test
   (`task-decomposition.md`).
+- *(Project lessons, WO-003 close — six corrected checks.)* Every assertion
+  that is not a REQ's literal names its source in a comment: a seam row or a
+  `decisions.md` row. If it has no source, drop it. WO-003 had two that
+  invented a convention: tray rows sharing one `top`, and a visible share of
+  the picture's base colour.
+- A line with a quantifier ("always", "once", "never", "every") gets its
+  adversarial path in the same test. For a UI line that means:
+  - a move and a lift batched in one input frame;
+  - an activity recreation over a state holder that outlives the activity
+    (`ActivityScenario.recreate()`). `StateRestorationTester` does not
+    remove content under a paused clock.
+  WO-003 N3 and F2 were reachable defects behind a green kit.
+- Read geometry from the drawing (pixels) or from the nodes, never from a
+  number in a brief or a decision row's prose. Clip every pixel sampler to
+  its own capture. WO-003: a sampler read past its capture, and the badge
+  disc was assumed to sit at its node's centre.
+- Channel: `-Pandroid.testInstrumentationRunnerArguments.class=A,B` through
+  `cmd.exe //c` runs only `A`. Run one class per invocation, or omit the
+  argument for a whole set. The connected-test XML folder is overwritten on
+  every run, so copy each XML you cite to the scratchpad.
 
 ## Gradle from Git Bash on Windows
 

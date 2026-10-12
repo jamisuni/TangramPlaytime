@@ -458,3 +458,243 @@ station on its staffed tier.
 **Snapshot prompt:** owner, please commit this state as the WO-002 close
 (e.g. "WO-002 #Content closed: :content puzzle library behind
 IPuzzleLibrary, kit 10/10, tools corner rule, build-map v1.2").
+
+## 2026-10-11 — WO-003 #Solving opened (P3, fresh orchestrator context)
+
+**Human input (verbatim):**
+
+> WE ARE IN PHASE P3 — WORK ORDER WO-003 #Solving (TangramPlaytime, SWDev
+> v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+> files), then governance.md, architecture.md, build-map.md, design-inputs.md
+> §2, decisions.md, the last progress.md entry, KICKOFF.md "State after
+> WO-002", capture-outbox/ (pending deltas), platform-notes/android.md.
+> WO-003 scope: the #Solving subtree not yet built — #Board, #Tray, #SizeMarks,
+> #Drag, #TapTurn, #TwistTurn, #Flip, #LandingPreview, #CornerTeach,
+> #SolvedPicture (the REQ ids those tags carry in Requirements/features.md;
+> #Locking and #SolvedCheck are built, #TurnButtons is withdrawn) — the Play
+> screen in :play (Compose) consuming ILockEngine (:kernel) and IPuzzleLibrary
+> (:content, PuzzleLibraries.bundled wired in :app, design review F4) — plus
+> the carried lines REQ-020.A2, REQ-039.A1, REQ-045.A2 (KICKOFF "State after
+> WO-002"). Persistence (IProgressStore) is WO-004's: the screen holds its
+> state in memory this WO, behind the seam. Design inputs: DI-1 (prototype,
+> behaviour reference only), DI-2 (Spec/02 layout), DI-3 (Spec/01 gameplay),
+> DI-4 (Study/06, frozen), DI-9 not yet. Mode: decide from the four reasons
+> (:play is a P2 skeleton like :content was; a governed interface is
+> consumed, not implemented — say which reason, or Light).
+> Verification channels at G3: Compose/device tests on the dev image
+> Medium_Phone_API_37.0 AND the floor image Phone_API_26 (the floor is a G3
+> precondition for this first device WO — boot it, run the trivial test,
+> record it), one emulator at a time; JVM tests where the logic is pure;
+> the release verifier (no debug tooling, canary) arrives with this WO per
+> platform-notes/android.md. Draw paths in px (G-17). Checkpoint candidates
+> (≤5, product-visible): colours and the size-mark glyphs only if a REQ leaves
+> them open; strings to review-notes.md. Stations as subagents; the four
+> scripts are duties. End every turn with the one signal.
+
+**Summary (orchestrator, Fable; 16:22 → in progress):**
+- Read the framework's P3 set, governance (in force), architecture v1.0,
+  build-map v1.2, design-inputs §2, decisions, KICKOFF, the 25 outbox drafts
+  (nine touch this WO's REQs), the frozen contracts, the 16 REQ files, DI-2,
+  DI-3, DI-4, the skeleton. Framework v0.20 = project, no drift. HEAD 3fa75ac.
+- **G3 proofs:** toolchain `:play:testDebugUnitTest :contracts:test` green
+  16:30; **floor channel** `Phone_API_26` booted (13 s), FloorChannelTest
+  1/0/0 at 16:34; **dev channel** `Medium_Phone_API_37.0` booted, same test
+  1/0/0 at 16:36 (run log `.swdev/run-log/WO-003.md` g3/f26/d37). Dev image
+  left running for P4.
+- `workorders/WO-003.md` written: **Light** (neither (a) nor (b) by its
+  letter — § Mode); 32 acceptance IDs incl. REQ-002.A1 and the carried
+  REQ-020.A2 / REQ-039.A1 / REQ-045.A2, with REQ-020.A1 / REQ-045.A1 re-covered
+  on the screen so trace-check's code-home rule holds (build-map rows #GoHome,
+  #PuzzleArt, #PuzzleMini → `play/` at G3); REQ-002.A2 → WO-009; REQ-002.A1
+  and REQ-014.A1 `implemented (unverified)` on their G1 drafts; the release
+  verifier + reset script ride with the `:app` wiring task; UI/gesture tasks
+  and the Compose kit staffed on Fable (raise-for-UI rule).
+- `decisions.md`: six WO-003 rows (mode, scope, build-map homes, unverified
+  lines, touch-routing readings of the G1 drafts, checkpoint item 1).
+- **Checkpoint item 1 asked:** the board's colours — default the DI-2
+  palette (silhouette `#4A4E69`, board white, tray `#EFE7D6`, paper
+  `#FBF7EE`, accent `#3D8BFD`); stands 2026-10-14.
+- Planner dispatched (`wo-planner`, Opus) 16:39 with the seams duty (test
+  tags, state holder API, `:app` door) that Light leaves to the plan.
+
+**Continuation (same kickoff, no new human input; 16:40 → 17:50):**
+- `build-map.md` v1.3: rows `#GoHome`, `#PuzzleArt`, `#PuzzleMini` → `play/`,
+  `#Solving` In progress (notify-tier contract-delta, three guard events).
+- **Planner → forward 17:12** (Opus): seven tasks TASK-009…TASK-015, none
+  `[P]`; a Seams table S-1…S-16, a tag table and the touch routing in
+  `tasks.md` § WO-003; `workorders/WO-003-briefs.md` (58 KB). plan-check
+  GREEN (the known cross-product warning). Its seven questions answered —
+  five as `decisions.md` rows (px hit test is UI; size-neutral pop; pulse on
+  every go-home release in a mini; badge in the tray and on the board;
+  `TrayRest` the one copy), two in dispatch.
+- **Plan Reviewer → forward 17:15** (Sonnet): 0 B / 3 S (F1 TASK-015 depends
+  on TASK-014 — fixed, `tasks.md` 0.8; F2, F3 carried). **G3 approved 17:17**
+  under governance row 7 (`decisions.md` row).
+- **P4 opened:** TASK-009 JVM kit (Opus) ∥ TASK-011 device-kit draft
+  (Fable, scratchpad only). **TASK-009 landed 17:49**: 28 tests (7 tokened,
+  21 pins), token grep exactly the seven IDs, red window open as planned,
+  one draft-time corrected check. **TASK-010 dispatched** (Fable) with the
+  author's fifteen seam assumptions.
+- `review-notes.md`: the pulse-on-tray-drop reading and the colours to look
+  at when playing. Dev image `Medium_Phone_API_37.0` running as emulator-5554.
+
+**Continuation (17:50 → 18:40, no new human input):**
+- **TASK-010 → forward 18:00** (Fable): S-1…S-9 in `play/src/main` (606 LOC),
+  `:kernel`/`:content` test-only deps, bundle loads on `:play`'s test
+  classpath; orchestrator run r1 33 + 2 green → in review (REQ-002.A1
+  `implemented (unverified)`). Two decisions rows (tray numbers, gesture readings).
+- **TASK-011 device kit drafted 17:54 and landed 18:02** (Fable): 45 tests,
+  30 tokened; both device sets red only on TASK-012's seams.
+- **TASK-012 → 18:25** (Fable): the static screen core (S-10…S-14,
+  `SilhouettePath` as one merged path), BoardTrayKitTest's five IDs green on
+  the dev **and** the floor image (0 seam pixels on API 26); one untokened
+  kit pin red (shared row top) → arbitrated a test defect, kit author fixed
+  it, 7/0/0 rerun 18:27 → **TASK-012 in review**; corrected checks 1. Three
+  decisions rows (drawing numbers + merged path; flat pieces without the
+  white edge — owner-grade, review-notes; espresso pin).
+- **TASK-013 dispatched 18:26** (Fable) — terminated by the API session limit
+  (429) while reading; nothing in the tree.
+
+## 2026-10-12 — WO-003 resumed after the session limit
+
+**Human input (verbatim):**
+
+> plz continue
+
+**Summary (orchestrator, Fable; 05:38 →):**
+- Tree checked: TASK-013 left nothing; the emulator was gone — the dev image
+  rebooted headless. TASK-013 re-dispatched in a fresh context (Fable), same
+  brief. The chain after it: TASK-014 → TASK-015 → code review → Test &
+  Verify (both images) → trace audit → close.
+
+**Continuation (05:40 → 06:52, no new human input):**
+- **TASK-013 → forward 06:12** (Fable): `PointerRouter`, `HitTest`,
+  `DragLayer`, `PreviewLayer` (+ `PlayScreen.kt` to 364 lines); on the dev
+  image PreviewKitTest 2/0/0, BoardTrayKitTest 7/0/0, DragKitTest 18 with
+  one failure — REQ-016.A1 crashing inside the kit's pixel sampler (a read
+  two rows below its own tray capture, verified in the XML). Ruled a fixture
+  defect (corrected check 2); kit author fixed the sampler (clip to the
+  capture, alternative pose fitted by centre) → DragKitTest **18/0/0** at
+  06:14 → **TASK-013 in review** (REQ-014.A1 `implemented (unverified)`).
+  Two decisions rows (touch readings; motion numbers). Channel note: one test
+  class per `cmd.exe` invocation (`proposals.md` at close).
+- **TASK-014 dispatched 06:13** (Fable): decorations, badge, pulse, solve
+  picture, then the whole play device set on both images — running (mid-run
+  at 06:52, on its own device steps). Terminated ~07:10 by the API session
+  limit (reset 10:30) after its floor run, before its hand-back.
+
+## 2026-10-12 — WO-003 resumed a second time (TASK-014 cut off by the limit)
+
+**Human input (verbatim):**
+
+> plz continue
+
+**Summary (orchestrator, Fable; 17:57 →):**
+- State found: TASK-014's five files + three edits in the tree (`play/src/main`
+  2,784 LOC); its XML copies show the whole play device set at **44 tests /
+  1 failure on both images** (dev 07:00, floor 07:09). The failure is the
+  REQ-023.A1 test's "≥ 1 % base colour visible" assertion on the sailboat,
+  whose art covers every inside pixel → ruled a fixture defect (corrected
+  check 3), kit author resumed to drop it. Emulators were gone → dev image
+  rebooted (run log d37c). TASK-014 agent resumed for its hand-back.
+- **TASK-014 → forward 18:05** (context intact): decorations, badge in both
+  places, pulse, the solve picture (clipPath + 1.2 dp bevel outline); two
+  decisions rows. **Kit fix 3 → SolvedPictureKitTest 6/0/0 (18:04).**
+- **TASK-015 → forward 18:24** (Opus): `AppGraph`, `PlayLayouts`,
+  `MainActivity` on the Play screen, en/fi strings, `FloorChannelTest`
+  adapted; verifier V-01 (150 lines) + manifest + canary + reset script;
+  AppLaunchKitTest 1/0/0 + FloorChannelTest 1/0/0 on the dev image; V-01 PASS
+  + positive control PASS, runner GREEN within budget. Two decisions rows;
+  strings → review-notes.
+- **Orchestrator run r2 18:25:** JVM 45 + 2 green, device kits + release APK
+  built, plan-check GREEN with the kit compiled, verifiers GREEN, tokens 7 +
+  29, guardrail greps clean. **Every task in review; code reviewer (Sonnet)
+  dispatched 18:26.**
+
+**Human input (verbatim, mid-turn):**
+
+> plz stop on some good moment as we need to continue another model.. my fable credits are running off
+
+> make sure to have little status from where to continue for next model
+
+**Summary (18:28):** stopped after the code-review dispatch. Hand-over written:
+`KICKOFF.md` "WO-003 — MID-WO HAND-OVER" (state, evidence, what is left, a
+paste-able resume prompt); WO log 18:28 row. The code reviewer runs on; its
+report lands in `reviews/WO-003-code-review.md` for the next context.
+
+## 2026-10-12 — WO-003 resumed in a fresh orchestrator context (Opus 5.5)
+
+**Human input (verbatim):**
+
+> For the next model
+>
+> - KICKOFF.md has a new section, "WO-003 — MID-WO HAND-OVER", with the state, the evidence rows, the open items and a paste-able resume prompt. Start the next session by pasting that prompt.
+> - What is left: triage the code review, Test & Verify on both images, the traceability audit, then the close scripts, ledgers, G4 and the snapshot prompt.
+> - The dev emulator may not survive the gap. Check with adb devices and reboot it headless if needed.
+
+**Summary (orchestrator, Opus 5.5; 18:30 →):**
+- Read the hand-over brief's list (framework P3 files, WO-003, tasks, run
+  log, decisions, review-notes, android notes). No framework drift (v0.20).
+- `adb devices`: the dev image `emulator-5554` is still up.
+- The code reviewer dispatched 18:26 is still running in the previous
+  session; its report is not on disk yet. Not re-dispatched; this context
+  waits for `reviews/WO-003-code-review.md`, then triages, runs Test &
+  Verify on both images, the trace audit and the close.
+
+**Continuation (18:35 → 19:45, no new human input):**
+- **Code review → forward 18:35** (Sonnet): 0 B / 4 S / 5 N. Triage 18:38:
+  F1 (badge area into LT2's cell; board overlap), F2 (pulse/shake replay
+  on recreation), F4 (`.gitattributes`), N3 (a moving release could lock
+  away from the drawn preview — REQ-021 A1 "always"), N4 → fix now; F3
+  (main-thread bundle parse) and N1 (celebration replay once `open()` has a
+  caller) → WO-004; N2 no change; N5 → proposals at close. Draft
+  `chg-draft-req018-badge-touch-precedence.md` amended (board case).
+- **Kit author 19:11** (Opus): six new device cases, all red on the old
+  tree for the named defect; corrected checks now 5.
+- **Fix batch 19:44** (Opus): all six green; whole play set 48/0 and app
+  set 2/0 on the dev image; JVM 45 + 2; release builds, V-01 3/3.
+- Ruled the implementer's note: the tray badge area covered most of the PG
+  miniature → the visible thing wins in the tray too (decisions row, draft
+  amended again, `review-notes.md` line). A leftover-shake offset found by
+  the implementer → fix now. Kit author resumed for two more red pins.
+
+**Continuation (19:45 → 20:43, no new human input) — WO-003 closed:**
+- Kit pins red (19:53), then the implementer's second round (20:13). The
+  implementer contested one kit leg. The kit assumed the badge disc sat at
+  its node's centre, which came from my own brief's wrong statement. Ruled
+  a fixture defect: corrected check 6, disputes 1 / 0. Fixture fixed (disc
+  read from the drawing), DecorationKitTest 12/0 (20:23).
+- Final tree: test `29306d193615`, product `84a18f2f4e81`. plan-check GREEN.
+- **Traceability audit GREEN** (32/32, baseline re-frozen). The auditor
+  first reported a report file it had not written; it was resumed and
+  wrote it. Noted for the harvest.
+- **Test & Verify GREEN:** floor image play 51/0 + app 2/0, the dev image
+  reused by hash, JVM 45 + 2, V-01 3/3 + positive control. Cold launch
+  floor ~0.75 s, dev ~2 s (F3 → WO-004).
+- Close: `tasks.md` statuses (5 done, TASK-010/013 unverified for their
+  drafts); `build-map.md` → Built; trace-check + verifiers re-run GREEN;
+  wo-metrics written and hand-corrected; DoD, ledger, deltas; four lesson
+  lines in `platform-notes/android.md`; `proposals.md` entry; KICKOFF
+  "State after WO-003" + the WO-004 brief; AGENTS.md phase line.
+  **G4 under row 9** (`decisions.md`: owner play-test recommended).
+
+**G4 surface — WO-003 #Solving (outcomes first):**
+- **Satisfied:** 32 of 32 acceptance IDs green on JVM, the dev image and
+  the API 26 floor image. REQ-002.A1 and REQ-014.A1 are green but stay
+  `implemented (unverified)` for their pending G1 drafts. Release verifier
+  V-01 GREEN (no permission, no debug canary, no network classes).
+- **Deliberately not touched:** the top bar's ‹ › / counter / Restart /
+  grid and persistence (WO-004); DEV aid (WO-005); tablet layout, insets,
+  language screen (WO-006); sounds/haptics (WO-007, events only); timer
+  (WO-008); REQ-002.A2 and REQ-039.A2 (WO-009). No Contract file changed;
+  one notify delta (`build-map.md` v1.3), re-frozen.
+- **Risk notes:** the cold launch parses the bundle on the main thread
+  (~2 s on the dev emulator) → WO-004. The badge touch order was decided
+  under row 12 with a draft amendment, so play it.
+- **Lock behind build:** no pending capture-side CHG; 25 drafts await a
+  capture session; amended this WO:
+  `chg-draft-req018-badge-touch-precedence.md`; written: none.
+- **Snapshot to commit (owner):** the whole working tree. Suggested
+  message: `WO-003 #Solving closed: Play screen in :play behind
+  ILockEngine/IPuzzleLibrary, :app wiring, kit 32/32 on JVM + API 37 +
+  API 26, release verifier V-01, build-map v1.3`.

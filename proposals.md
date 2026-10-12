@@ -144,3 +144,110 @@ from starvation.
   dispatch of wall time. Worth a line in task-decomposition.md if it recurs.
 - **Severity:** low (a and the req-lint one each hide a real check behind a
   false signal)
+
+## 2026-10-12 — WO-003 close: six corrected checks, a mid-WO orchestrator hand-over, a station that reported a file it never wrote
+
+- **Corrected checks: 6, all kit-side, zero product change for any of them**
+  (orchestration §7, channel 2). Three classes:
+  - **(A) The kit asserted more than the line mandates** (×2). A tray-row
+    pin required every cell of a row to share one `top`. The seam said only
+    "cells are square", and the product centres them. A REQ-023.A1 assertion
+    required ≥ 1 % of the picture's base colour to show, but the sailboat's
+    art covers its whole base, and nothing mandates a visible base. The
+    rule "assert only what is mandated" already exists in
+    `task-decomposition.md`, and it still recurred twice in one kit.
+    **Proposal:** the acceptance-test-author agent file adds one self-check
+    before landing. For every assertion that is not a REQ's literal, name
+    the seam row or decisions row it comes from, or drop it.
+  - **(B) The token's test did not cover the line's quantifier** (×2,
+    found by the code review, N3 and F2). REQ-021.A1 says "*always* locks
+    it where the preview was drawn", but its test released a still finger
+    only; a move and a lift in one frame locked elsewhere. REQ-051.A1 says
+    "pulse *once*", but its test watched one composition, and an activity
+    recreation replayed the pulse. Both were reachable product defects that
+    the green kit could not see. **Proposal:** for a line with a quantifier
+    ("always", "once", "never", "every"), the kit names the adversarial
+    path it exercises. For a UI line that means input batched in one frame,
+    and an activity recreation (rotation, config change) over a state
+    holder that outlives the activity. Put this in task-decomposition.md's
+    kit checklist and in platform-notes/android.md § Compose test kit.
+  - **(C) Fixture plumbing** (×2). A pixel sampler read two rows outside
+    its own capture and crashed. One kit fixture took the badge disc to be
+    the centre of its touch-area node, which it is not. **The root cause of
+    the second one was the orchestrator.** My resume brief to the kit
+    author restated a geometry fact ("the disc is centred in the node")
+    instead of pointing at the decisions row, and the fact was stale. The
+    worker contested it once and won. That is the framework's own
+    watch-for, "paraphrasing spec content into briefs", and it happened
+    anyway in a short follow-up message. **Proposal:** orchestrator.md's
+    watch-for says "including follow-up and resume messages: cite the
+    row, never restate a number or a position".
+- **Light mode on the first UI WO (harvest note promised in WO § Mode).**
+  The code review found two Shoulds that a design review asks about
+  routinely: F1, touch areas that overlap across cells and pieces, and F2,
+  one-shot cues that live in a state holder outliving the activity. Then
+  the fix for F1 made the parallelogram un-turnable by a tap on its middle,
+  because the 60 dp badge area covered 57–82 % of it. One more ruling and
+  one more round followed: "the visible thing wins" on both surfaces, and
+  the badge-precedence chg-draft was amended twice. The seam table the
+  planner wrote in place of a design carried names, not geometry or
+  lifecycle. **Proposal:** either a fifth Full reason, "the first WO on a
+  new UI surface", or, for Light UI WOs, a planner-written "touch geometry
+  & lifecycle" paragraph in the seam table: overlapping hit areas and their
+  order, and what survives an activity recreation. The paragraph is
+  checked by the plan reviewer.
+- **Mid-WO orchestrator hand-over (model change for credits).** The owner
+  moved the orchestrator from Fable to Opus mid-P5. It worked through a
+  "MID-WO HAND-OVER" section in KICKOFF.md with a paste-able resume prompt.
+  Two gaps showed:
+  - (a) The code reviewer was still running as a subagent of the old
+    session. Its hand-back could only reach the old context, and both
+    contexts could have triaged it. This was resolved by a cross-session
+    message: the old session stood down and relayed the verdict.
+  - (b) "One orchestrator context per WO" has no wording for a forced
+    switch.
+  **Proposal:** a hand-over template in templates/work-order.md. It names
+  every station still running, which context receives its hand-back, and
+  the rule that the old context stops at the hand-over row. The staffing
+  note goes in the Metrics row "model actually run".
+- **A station reported an artifact it never wrote.** The traceability
+  auditor's first hand-back said "Report: reviews/WO-003-trace-audit.md".
+  The file did not exist. The bash approver's D1 had denied its shell
+  heredoc write, and the agent reported success anyway. Neither
+  `reviews/WO-001-trace-audit.md` nor `reviews/WO-002-trace-audit.md`
+  exists either, although the WO-002 station ledger cites the latter, so
+  this is a recurring blind spot. **Proposals:**
+  - (1) The auditor and test-verify agent files say "write the report with
+    the Write tool".
+  - (2) The orchestrator's RECEIVE step checks that every artifact a
+    hand-back names exists before logging it.
+  - (3) The station ledger links only files that exist. A one-line check
+    in wo-metrics or trace-check would do it.
+- **Two agents killed by the API session limit (HTTP 429).** TASK-013's
+  first attempt left nothing. TASK-014 died after its floor run and before
+  its hand-back, and was resumed with its context intact. Both were
+  recovered with `git status` plus the agent's scratchpad XML copies. No
+  rule was missing, but the recovery recipe lives only in this WO's log.
+  **Proposal:** add one paragraph to orchestration.md, "a station killed
+  mid-run". Read the tree and the agent's copies, resume the same context
+  if it survived, otherwise give a fresh context the same brief. A kill is
+  not a recirculation.
+- **Channel fact (platform-notes/android.md).** In
+  `-Pandroid.testInstrumentationRunnerArguments.class=A,B` passed through
+  `cmd.exe //c` from Git Bash, only the first class runs. Use one class per
+  invocation, or omit the argument for a whole set. The WO-003 briefs'
+  channel table said otherwise. The connected-test XML folder is also
+  overwritten per run, so stations must copy what they cite.
+- **Verifier freshness (code review N2).** A project verifier reads an
+  APK the close builds, but nothing ties that APK to the tree. A stale
+  `app-release-unsigned.apk` passes. Here the budget was full at exactly
+  150 lines, so the guard could not live in the verifier. **Proposal:**
+  `run_verifiers.py` checks, generically, that each artifact a manifest
+  entry names is newer than the newest source under `product_globs`. That
+  costs the project's budget nothing.
+- **Principle 16 again.** Most turns of this WO ended while a station ran
+  in the background. "All ready" was the least-wrong signal (see the
+  2026-10-11 entry). Still unresolved.
+- **Severity:** medium. Class B hid two real product defects behind a
+  green kit, and class C's root cause is an orchestrator duty. The rest
+  are low.

@@ -63,6 +63,123 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## State after WO-003 (2026-10-12, closed 20:43)
+
+- **WO-003 #Solving is done** (`workorders/WO-003.md`, Light).
+  - **The Play screen in `:play` (Compose):**
+    - the flat silhouette board, drawn in px (G-17);
+    - the fixed tray with S/M/L marks and ghost outlines;
+    - the flip badge in the tray and next to a placed parallelogram;
+    - the drag (grow, 30 dp float) with its landing preview;
+    - tap and two-finger twist turns, the mirror, and the 180 ms lock and go-home glides;
+    - the mini's corner pulse;
+    - the solve: a size-neutral pop, confetti, and the picture fading in, clipped to the silhouette.
+  - **The state holder:** `PlayController` keeps every puzzle's state in memory behind S-1…S-3, so WO-004 swaps the memory for `IProgressStore`.
+  - **The `:app` wiring:** `AppGraph` builds `LockEngine()` and `PuzzleLibraries.bundled(engine)` once per process. The bundle is read on the device on both images, which closes WO-002 N4.
+  - **Release safety:** the verifier `.swdev/verifiers/v01_release_apk.py` (no permission, no debug canary, no `java.net`/okhttp from product classes), with a positive control. The canary is `play/src/debug/.../DebugCanary.kt`; `tools/device_reset.sh` resets the device.
+  - **Results:** 32/32 IDs green on JVM + dev image + floor image. Trace-check `--wo` GREEN; verifiers GREEN within budget.
+  - **The code review found five product defects after the kit was green, all fixed with red-then-green kit cases:**
+    - the badge's touch area;
+    - the pulse and shake replaying on recreation;
+    - a moving release locking off the drawn preview;
+    - the parallelogram made un-turnable by the first badge fix;
+    - a cut-short shake leaving a piece off its place.
+  - **Corrected checks:** 6, all kit-side (`proposals.md` 2026-10-12).
+- **Carry into WO-004 #Browsing (+ `store/`):**
+  - **Load off the main thread.** `AppGraph` parses the bundle in the first composition: cold launch 1.7–2.3 s on the dev image, 0.7–0.8 s on the floor image. WO-004 adds the `IProgressStore` read at the same point, so load both off the main thread and compose the screen once the controller exists (`decisions.md` 2026-10-12, F3).
+  - **The celebration's trigger.** `SolveDriver` holds one "unsolved seen" id, so solve A, solve B, open A, open B replays B's celebration, and a solved puzzle shows one frame of coloured pieces. This becomes live once ‹ › and the grid call `open()`. Use a controller-held "just solved" cue, consumed once like the pulse and shake (`ShownCues`) (N1, same row).
+  - **The REQ-045.A1 screen half** ("a fresh install opens on …") and REQ-040.A1, REQ-041.A1 are re-covered with navigation.
+  - **The `ILockEngine.stillValid` scope question** (WO-001) for REQ-025 stands.
+  - **Pending drafts on REQ-025:** `chg-draft-req025-drop-profile-storage-rule.md`, `chg-draft-req025-unreadable-state-and-save-timing.md`, `chg-draft-type006-missing-transitions.md`.
+  - **Behaviours to keep:**
+    - `onStop` sends a running drag home (also on a rotation);
+    - twist steps are netted per frame, which matters for WO-007's `Turned` sound;
+    - the touch order "the visible thing wins" (`decisions.md` 2026-10-12).
+- **Lock behind build:**
+  - 25 outbox drafts still await a capture session. This WO amended one: `chg-draft-req018-badge-touch-precedence.md`, now covering the board, with its tray sentence aligned.
+  - REQ-002.A1 and REQ-014.A1 stay `implemented (unverified)` until `chg-draft-req002-a1-mirror.md` and `chg-draft-req014-a1-without-delay.md` are signed. REQ-038.A1 and REQ-019.A1–A4 stay unverified as before.
+- **Owner steps:**
+  - Commit the WO-003 snapshot (prompted on the G4 surface).
+  - **Play the build on a phone.** `review-notes.md` lists what to look at: the board colours (checkpoint item 1, whose default stands 2026-10-14), flat pieces without the white edge, the pulse on every go-home in a mini, the badge touch, the S/M/L marks.
+  - Run a capture session on `capture-outbox/` when convenient.
+
+## Paste this to start the WO-004 session (one orchestrator context per WO)
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-004 #Browsing + store/ (TangramPlaytime,
+SWDev v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on"
+framework files), then governance.md, architecture.md, build-map.md,
+design-inputs.md §2, decisions.md (incl. the WO-003 rows), the last
+progress.md entry, KICKOFF.md "State after WO-003", capture-outbox/ (the
+REQ-025 and TYPE-006 drafts), platform-notes/android.md (incl. the WO-003
+lesson lines in § Compose test kit).
+WO-004 scope: #Browsing — #PuzzleNav (REQ-024), #ResumePuzzle (REQ-025),
+#SolvedView (REQ-026), #PuzzleOverview (REQ-050), the parent REQ-003 — on
+the Play screen of :play (the top bar's ‹ › and counter, Restart / Retry,
+the grid), plus the store/ module implementing IProgressStore (notify tier)
+so PlayController's in-memory state (S-1…S-3) is persisted, and the
+re-covered screen halves of REQ-040.A1, REQ-041.A1, REQ-045.A1. Carried from
+WO-003: load the bundle and the store off the main thread (F3); the
+celebration's trigger as a consumed controller cue (N1). Timers are WO-008's
+(REQ-030 stays out).
+Mode: Full, reason (c) a new persistence format (build-map.md: store/ is
+built in WO-004) — design-author → design-reviewer first. The design names
+the touch geometry and what survives an activity recreation (proposals.md
+2026-10-12).
+Verification channels at G3: JVM (store/, the controller), the dev image
+Medium_Phone_API_37.0 AND the floor image Phone_API_26 (one emulator at a
+time; both proven in WO-003), the release verifier V-01 with its positive
+control; a migration/persistence test per governance row 11.
+Checkpoint candidates (≤5, product-visible). Stations as subagents; the four
+scripts are duties. End every turn with the one signal.
+```
+
+## WO-003 — MID-WO HAND-OVER (2026-10-12 18:28; the owner moved the orchestrator off Fable for credits) — DONE 2026-10-12 (resumed 18:30 in an Opus context, closed 20:43)
+
+**Where WO-003 #Solving stands (P5 — code review running):**
+- **G3 approved** 2026-10-11 17:17 (Light; `workorders/WO-003.md`, `tasks.md` § WO-003 — the planner's Seams S-1…S-16, tag table and touch routing are the design).
+- **Every task landed:** TASK-009 (JVM kit) done · TASK-011 (device kit) done · TASK-010, 012, 013, 014, 015 **in review**. Product: `play/src/main` 23 files (~2,800 LOC) + `play/src/debug/DebugCanary.kt` + `app/src/main` (`AppGraph`, `PlayLayouts`, `MainActivity`, `size_mark_*` strings en/fi); `.swdev/verifiers/v01_release_apk.py` + `manifest.json`; `tools/device_reset.sh`.
+- **Evidence so far** (`.swdev/run-log/WO-003.md`): orchestrator run **r2 (18:25)** — JVM `:play` 45 + `:contracts` 2 green, both device-kit APKs + the release APK built, plan-check GREEN with the kit compiled, `run_verifiers --wo WO-003` GREEN (V-01 3/3, positive control 2/2, within budget), tokens 7 (JVM) + 29 (device, REQ-045.A1 twice), G-12/G-14/G-08 greps clean. Device: the whole play set ran **44/44 by composition** — 43 on **both** images at i14 (07:00 dev, 07:09 floor) + `SolvedPictureKitTest` 6/0 after the kit fix (k14, dev only); `AppLaunchKitTest` + `FloorChannelTest` 2/0 on the dev image (i15). **Test & Verify must still run every set on both images from the final tree** (hashes in r2: test `6f2ef86c6d15`, product `1969f967fddb`).
+- **Corrected checks: 3** (all kit-side, zero product change: tray-row "shared top" pin; the sampler reading outside its capture; the "≥ 1 % base colour visible" assertion). Recirculations: kit author ×3 (resumed context). Hard-stops 0. Disputes 0. Two agents died of the API session limit (TASK-013 first attempt: nothing written; TASK-014: resumed with context intact).
+- **Unverified by plan:** REQ-002.A1 (TASK-010) and REQ-014.A1 (TASK-013) → `implemented (unverified)` for `chg-draft-req002-a1-mirror.md` / `chg-draft-req014-a1-without-delay.md` (tests green).
+- **Contract deltas:** `build-map.md` v1.3 (#GoHome / #PuzzleArt / #PuzzleMini → `play/`, #Solving In progress) — baseline re-freeze pending at the next `trace_check.py --wo WO-003` run. Contract files unchanged.
+- **Checkpoint item 1** (board colours, default DI-2 palette) asked 2026-10-11, default stands 2026-10-14. Owner-grade rows: flat pieces without the white edge; the pulse on every go-home release in a mini (`review-notes.md`).
+- **Emulator:** `Medium_Phone_API_37.0` running as `emulator-5554` at hand-over (may be gone by the next session — `adb devices`, reboot headless per `platform-notes/android.md`). One at a time.
+- **Known tool facts:** `-Pandroid.testInstrumentationRunnerArguments.class=` takes one class per `cmd.exe` invocation (a comma list runs only the first); omit it for a whole set. `PYTHONUTF8=1` for trace-check. The connected-test XML folder is overwritten per run — copy XMLs you need to keep.
+
+**Paste this to resume WO-003 (fresh orchestrator context, any model):**
+
+```text
+WE ARE IN PHASE P5→P6 — RESUMING WORK ORDER WO-003 #Solving (TangramPlaytime,
+SWDev v0.20, intake path C) in a fresh orchestrator context. Read AGENTS.md
+first (incl. the "from P3 on" framework files), then KICKOFF.md "WO-003 — MID-WO
+HAND-OVER", workorders/WO-003.md (§ Log is the narrative), tasks.md § WO-003,
+.swdev/run-log/WO-003.md, decisions.md (the WO-003 rows), the last progress.md
+entries, review-notes.md, platform-notes/android.md.
+State: every task landed; TASK-010/012/013/014/015 in review; a code-reviewer
+(Sonnet) was dispatched 18:26 on 2026-10-12 — its report is
+reviews/WO-003-code-review.md (read it; if absent, dispatch code-reviewer with
+the brief shape of the WO-002 one: fresh eyes on the whole diff, substance audit
+per token, re-derive by running). Then: triage findings (Blockers → the owning
+implementer or kit author; kit fixes count as corrected checks, now 3), log
+every hop in the WO log with `date` stamps, keep tasks.md statuses one word.
+Then P6: run plan-check once more; dispatch test-verify (Sonnet) with the run
+log as baseline — it must run every set on BOTH images from the final tree
+(JVM; :play:connectedDebugAndroidTest whole set; :app:connectedDebugAndroidTest;
+reset script before/--check after; the release verifier + positive control on a
+fresh debug APK) — then traceability-auditor (Sonnet): PYTHONUTF8=1
+trace_check.py --wo WO-003 must be GREEN (32 IDs; it re-freezes the build-map
+v1.3 delta). Close: run_verifiers.py --wo, wo_metrics.py --wo --write (fill
+judgment rows by hand; windows absorb the two calendar days), DoD ticks,
+Station ledger, Metrics, Contract deltas, G4 under governance row 9 (decisions
+row), build-map #Solving/#GoHome/#PuzzleArt/#PuzzleMini → Built, proposals.md
+(3 corrected checks, the comma-list channel fact, the API-limit kills, the
+Light-mode harvest note), review-notes.md, KICKOFF "State after WO-003" + the
+WO-004 brief, AGENTS.md phase line, progress.md, the snapshot prompt. Stations
+as subagents (owner staffing: Opus/Sonnet; orchestrator model is the owner's
+choice today). End every turn with the one signal.
+```
+
 ## State after WO-002 (2026-10-11, closed 15:45)
 
 - **WO-002 #Content done** (`workorders/WO-002.md`, Full (b)): `:content` has

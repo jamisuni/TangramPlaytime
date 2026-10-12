@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Tangram Playtime</string>
+    <!-- REQ-043: the size marks on the tray triangles; the same letters in both languages (REQ-047 rule). -->
+    <string name="size_mark_small">S</string>
+    <string name="size_mark_medium">M</string>
+    <string name="size_mark_large">L</string>
 </resources>

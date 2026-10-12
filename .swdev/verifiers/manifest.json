@@ -1,0 +1,9 @@
+{
+  "budget_per_wo": {"count": 1, "lines": 150},
+  "verifiers": [
+    {"id": "V-01", "wo": "WO-003", "guardrail": "G-01, G-08", "channel": "toolchain",
+     "cmd": ["python", ".swdev/verifiers/v01_release_apk.py"],
+     "positive_control": ["python", ".swdev/verifiers/v01_release_apk.py", "--positive-control"],
+     "timeout": 600}
+  ]
+}
