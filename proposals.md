@@ -314,3 +314,76 @@ from starvation.
 - **Severity:** low to medium. The stale-pass class is medium: it has now
   occurred twice, and a stale pass on the death channel would have hidden
   a lost-progress defect. The rest are low.
+
+## 2026-10-17 — WO-005 #DevTools: two corrected checks, a build-map cell trace-check misread, a "must be absent" line with no token route
+
+- **Corrected check 1 (a device pin's tap point, contested by the
+  implementer and reversed on arbitration).**
+  `DevAidScreenKitTest.theDevButtonIsNeitherDrawnNorHitOnASolvedPuzzle…`
+  took the DEV button's bounds on one puzzle and tapped them on another,
+  solved puzzle. Each puzzle's tray height sets its board's bottom, and the
+  solved row replaces that tray strip, so the point fell in Retry's third,
+  which the touch order rightly serves first. **Miscalibration:** a
+  geometry point carried across two screens whose layout depends on the
+  content. **Proposal:** `task-decomposition.md` ("Read geometry from the
+  drawing") gets one clause: read a position on the screen it is used on,
+  and assert it lies in the region the test means before acting on it.
+  Codified for this project in `platform-notes/android.md` at this close.
+- **Corrected check 2 (code review S1: the release scan looked for names
+  only).** `ReleaseBuildKitTest` checked the aid's package, resource-name
+  prefix and service entry. An aid leaking under other names (its text,
+  the passcode) would have passed. It now also checks the REQ's own text
+  and the passcode, with positive controls. A raw byte search for "0417"
+  would have hit library vector paths in the release APK (`…C11.0417,8…`),
+  so the passcode check reads the dex string table exactly. **Proposal:**
+  the verifiers SKILL / guardrail-authoring "absent from the release
+  build" pattern names both kinds of marker: the code's names *and* the
+  content the REQ quotes; and "match a table entry, not raw bytes".
+- **trace-check read a code-home cell literally.** `build-map.md` had
+  ``play/` (`src/debug`)`` for #DevTools. `parse_build_map` kept the
+  parenthesis as part of the path, so every REQ-046 token under `play/`
+  would have failed the one-code-home rule. The planner found it by reading
+  the script; the cell became `` `play/` `` (notify-tier delta).
+  **Proposal:** `parse_build_map` takes the first backticked path in the
+  cell; or `templates/build-map.md` says "one path per cell, notes
+  elsewhere".
+- **A "must be absent from the release build" line has no token route but
+  a test that reads build outputs.** REQ-046.A4 is honestly proven only by
+  scanning the release APK. A verifier earns no trace-check token, and an
+  owner-evidence row is for what only a human can prove. The WO used a
+  tokened JVM test that reads both APKs, with a stale-APK refusal — which
+  in turn needed the JVM channel to build and repackage both APKs first,
+  and (measured) in **two** Gradle runs: in one run the test read the
+  release APK before `:app:packageRelease` had rewritten it.
+  **Proposal:** `traceability-rules.md` §2 lets a manifest verifier carry
+  an acceptance token (its positive control is the substance check); or the
+  verifiers SKILL documents the "tokened build-output test" pattern with
+  the two-run rule.
+- **The WO question about `product_globs` was wrong:** trace-check reads no
+  `product_globs`; only wo-metrics counts LOC with it. The WO asked whether
+  the orphan-code scan saw `play/src/debug`; the answer is that trace-check
+  has no orphan-code scan over product globs at all — the code reviewer is
+  the orphan check. **Proposal:** the guard.json template's comment on
+  `product_globs` says which tools read it.
+- **The bash approver's D4 denied `git archive` again** (the TASK-023 kit
+  author, wanting a clean copy of HEAD for a dry run). Same proposal as
+  WO-004's entry.
+- **A subagent killed by the API session limit mid-channel** (TASK-026,
+  HTTP 429 during a whole-play-set device run). Resuming the same agent
+  with its context intact after the reset lost nothing; the device run it
+  had moved to the background had finished on its own. The WO-003 note
+  stands: an orchestrator checks the tree and the kit hashes before
+  resuming.
+- **A launch missing from telemetry.** The WO-005 planner (`wo-planner`,
+  dispatched 09:42) has no `agent-launch` row in `.swdev/log/telemetry.jsonl`;
+  every other launch of the WO has one. The station ledger and the WO log
+  carry it, so the Metrics count 9, telemetry 8. **Proposal:** wo-metrics
+  reconciles the ledger against telemetry and prints the difference, so a
+  gap in the hook is visible instead of silently lowering the count.
+- **Light mode on a UI WO, second time.** The planner's seam table was the
+  design (as in WO-003) and carried the touch geometry and "what survives"
+  the WO-003 harvest asked for; no design-level defect surfaced later.
+- **Principle 16 again.** Same as WO-004.
+- **Severity:** low to medium. The build-map parser misread is medium (a
+  silent RED at the close gate, found only because the planner read the
+  script). The rest are low.

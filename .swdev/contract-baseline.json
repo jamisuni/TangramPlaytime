@@ -1,4 +1,7 @@
 {
+  "delta_refrozen": {
+    "build-map.md": "2026-10-17T13:11:33"
+  },
   "files": {
     "Requirements/changes/CHG-001.md": "91008df4f6acc2e146e348c139b803b8e12d78f570f3408281b0f564a651e537",
     "Requirements/changes/CHG-002.md": "5a2b442d48234a34ae87eaa2b14c43e31792b498558a49b749ba67751e45acdb",
@@ -57,7 +60,7 @@
     "Requirements/reqs/REQ-051.md": "5d807d05b6b66292f7d8cfa514b3ed577dbc3867b3a8a4e06697266be072d97d",
     "Tangrams/puzzle.schema.json": "1d6cba59f447e11a4132ba6460deb0cd94fa0210a71c9ee6671013b231b9c8d1",
     "architecture.md": "55c2645e8d93afff2bc8172e7b6e95bce8ff4a50f3d1f000e5510a61d4ffd619",
-    "build-map.md": "c3bd55dfbc4f874f2b4e8dcb5a56f379e11fb81a2bcbf692ba4344e2523084e8",
+    "build-map.md": "d15ab01089c54859e6ad73501c5998f25292db3cd765b4649bdc1fec895781d3",
     "contracts/src/main/kotlin/app/tangramplaytime/contracts/ILockEngine.kt": "5a6f1338c6b3a75cf7371206d9cf7e3e59e995ccbda96cb19319bfab05d5afe6",
     "contracts/src/main/kotlin/app/tangramplaytime/contracts/IProgressStore.kt": "409e6dadac310a74904141a62d4c5fda8b17bb35bb617de79775509cc0de8bc1",
     "contracts/src/main/kotlin/app/tangramplaytime/contracts/IPuzzleLibrary.kt": "99e1d759111377227f13e172bd9aa8a851a4bcaa7aea5614a60f9eae8beedabb",

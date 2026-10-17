@@ -14,6 +14,10 @@
 // a kit-owned in-memory `IProgressStore` (`KitDeviceStore`, design §4) and a controller over `Persistence` built
 // the way S-19 / S-1Δ / S-15Δ say (`Persistence.load` off the main thread, the controller on the main thread);
 // the top-bar, Restart and long-press helpers. No token lives in this file.
+//
+// Amended WO-005 (TASK-025; tasks.md § WO-005 S-10Δ2 and seam note 3): an optional `devAid`, given to `PlayScreen` in
+// `show()` and `recreate()`. It defaults to null, so every WO-003/004 test composes the screen exactly as WO-004 did and
+// none sees the aid; only the WO-005 tests pass one. No token lives in this file.
 package app.tangramplaytime.play
 
 import androidx.activity.ComponentActivity
@@ -136,6 +140,12 @@ internal const val KIT_TOL = 1e-6
 internal class KitScreen(
     val rule: ComposeContentTestRule,
     val controller: PlayController = kitController(),
+    /**
+     * The DEV aid `PlayScreen` is given (S-10Δ2 `devAid`, WO-005), in [show] and again in [recreate]: the same object
+     * across a recreation, as `DevAidHook.installed` is built once per process (S-25). Null (the default) composes the
+     * screen without an aid, exactly as WO-004 (S-10Δ2: "Without an aid, the screen is exactly WO-004's").
+     */
+    val devAid: DevAidHook? = null,
 ) {
     val density: Float get() = rule.density.density
 
@@ -144,7 +154,7 @@ internal class KitScreen(
     fun show(reducedMotion: Boolean = false) {
         rule.mainClock.autoAdvance = true
         rule.setContent {
-            PlayScreen(controller, kitPhoneLayout, kitTexts, reducedMotion, Modifier.fillMaxSize())
+            PlayScreen(controller, kitPhoneLayout, kitTexts, reducedMotion, Modifier.fillMaxSize(), devAid = devAid)
         }
         rule.waitForIdle()
         rule.mainClock.autoAdvance = false
@@ -170,7 +180,7 @@ internal class KitScreen(
         scenario.onActivity { activity ->
             activity.setContentView(
                 ComposeView(activity).apply {
-                    setContent { PlayScreen(controller, kitPhoneLayout, kitTexts, reducedMotion, Modifier.fillMaxSize()) }
+                    setContent { PlayScreen(controller, kitPhoneLayout, kitTexts, reducedMotion, Modifier.fillMaxSize(), devAid = devAid) }
                 },
             )
         }

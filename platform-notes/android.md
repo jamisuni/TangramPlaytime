@@ -44,6 +44,18 @@ duty of the station it names; none of it is methodology.
   :app:packageDebugAndroidTest --rerun`). `tools/process_death_check.sh`
   does this (WO-004 code review S2). A pass on an old APK is a pass for
   code nobody reviewed.
+- *(Project lessons, WO-005 close.)* **A test that reads build outputs
+  runs after them, in a separate Gradle run.** In one run with
+  `:app:packageRelease --rerun`, `:play:testDebugUnitTest` started while
+  `:app:lintVitalAnalyzeRelease` (which packaging waits on) still ran, and
+  read the old release APK. The JVM line is two runs: build and repackage
+  the APKs, then the tests.
+- **"Absent from the release build" scans for names and for content.**
+  Check the code's own markers (package, resource-name prefix, service
+  entry) **and** the content the REQ quotes (its text, its passcode), each
+  with a debug-APK positive control. Match a table entry (the dex string
+  table, the resource string pool), never raw bytes: "0417" occurs in
+  library vector paths of this release APK (`…C11.0417,8…`).
 
 ## Device hygiene
 
@@ -105,6 +117,12 @@ duty of the station it names; none of it is methodology.
   puzzle through the seams, or a kit-chosen host size. Otherwise the leg
   fails loudly. The only legitimate guarded skips are the ones the WO names
   (WO-004: `ProcessDeathKitTest#phase1` / `#phase2` without `deathPhase`).
+- *(Project lesson, WO-005.)* **Read a position on the screen you use it
+  on.** A point read on one puzzle and tapped on another moves with the
+  content: each puzzle's tray height sets the board's bottom, and a solved
+  puzzle's row replaces the tray strip. Read it after the navigation, and
+  assert it lies in the region the test means (inside `board`, outside
+  `solved-row`) before acting, failing loudly otherwise.
 - Channel: `-Pandroid.testInstrumentationRunnerArguments.class=A,B` through
   `cmd.exe //c` runs only `A`. Run one class per invocation, or omit the
   argument for a whole set. The connected-test XML folder is overwritten on

@@ -37,8 +37,10 @@
   ],
   "_comment_test_globs": "Product tests only, one test tree per module. tools/tests/test_prototype.py are the PROTOTYPE's browser tests (design input DI-1), deliberately not scanned.",
   "product_globs": [
-    "*/src/main/**"
+    "*/src/main/**",
+    "*/src/debug/**"
   ],
+  "_comment_product_globs": "WO-005 (decisions.md 2026-10-17 'Product LOC counts the debug source set'): the DEV aid (REQ-046) is product code in play/src/debug, counted by wo-metrics; trace-check does not read this key.",
   "verifiers": {
     "dir": ".swdev/verifiers",
     "manifest": ".swdev/verifiers/manifest.json",

@@ -868,3 +868,108 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   the WO-005 brief), AGENTS.md phase line. **G4 under row 9** (decision
   row): ready to merge; owner play-test recommended; the snapshot is the
   owner's.
+
+**Human input (verbatim, 2026-10-17 09:28):**
+
+> (Q1) yes just one press (Q2) k (Q3) k (Q4) k (Q5) k. (x) plz let me know what we have left... and what exactly is these developer tools
+
+**Summary (orchestrator):**
+- All five WO-004 checkpoint items answered, every default confirmed; no
+  build change. Recorded: `decisions.md` row 17 (2026-10-17), the WO's
+  checkpoint table and Metrics, KICKOFF and the AGENTS.md phase line; the
+  verbatim answer to the capture side as
+  `capture-outbox/src-draft-wo004-checkpoint-answers.md` (item 5 supports
+  the state-rules draft's proposed text). 26 outbox drafts now.
+- The WO-005 brief in KICKOFF now also points at the state-rules draft (its
+  "Solve this puzzle now" line).
+- Answered in chat: what is left (WO-005…WO-009, the puzzle batch, the
+  capture session) and what the developer tools are (the passcode-protected
+  solution reveal, test builds only).
+
+## 2026-10-17 — WO-005 #DevTools opened (P3, fresh orchestrator context)
+
+**Human input (verbatim):**
+
+> WE ARE IN PHASE P3 — WORK ORDER WO-005 #DevTools (TangramPlaytime, SWDev
+> v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+> files), then governance.md, architecture.md (v1.1), build-map.md (v1.4),
+> design-inputs.md §2, decisions.md (incl. the WO-004 rows of 2026-10-15 and
+> 2026-10-17), the last progress.md entry, KICKOFF.md "State after WO-004",
+> capture-outbox/chg-draft-req046-android-build-terms.md and
+> chg-draft-type006-missing-transitions.md (its "Solve this puzzle now" bullet),
+> platform-notes/android.md (incl. the WO-004 lesson lines).
+> WO-005 scope: #DevTools — #SolutionReveal (REQ-046 A1..A4): the passcode-
+> protected DEV aid in play/src/debug (a debug-only source set; absent from the
+> release build, G-08), drawn on the WO-004 Play screen: the DEV button, the
+> passcode prompt, "show the solution" (an overlay that stays on while browsing)
+> and "solve this puzzle now" (Solved through the controller and Persistence,
+> no best time); the DEV button hidden on a Solved puzzle; its place in the S-22
+> hit order. Depends on REQ-022 (built, WO-001).
+> Mode: decide from the four reasons (no new module — play/src/debug exists; no
+> governed interface changed; no persistence format change) — Light unless one
+> reason is written in the WO.
+> Verification channels at G3: JVM where the logic is pure; the dev image
+> Medium_Phone_API_37.0 AND the floor image Phone_API_26 (one emulator at a
+> time); the release verifier V-01 + positive control (A4: the release has no
+> DEV button). Device runs are judged by their XML, never by the exit code.
+> Checkpoint candidates (≤5, product-visible): the DEV button's place and look
+> (REQ-046 ASSUMPTION: bottom-left, small, dashed). Strings to review-notes.md.
+> Stations as subagents; the four scripts are duties. End every turn with the
+> one signal.
+
+**Summary (orchestrator, Opus 5.5; 09:37 → in progress):**
+- Read the kick-off set; framework v0.20 = project, no drift; HEAD 057492c
+  (the WO-004 snapshot; the post-commit checkpoint-answer bookkeeping is
+  still uncommitted — the owner's).
+- `workorders/WO-005.md` opened: **Light** (none of the four reasons);
+  scope REQ-046 A1..A4; five questions for the planner (the debug-only seam,
+  "solve now" and the state rules, the overlay, the DEV button and the
+  prompt, A4's oracle); hard-stop 1 named as not reached (the passcode is
+  printed in the REQ, guards nothing, debug builds only).
+- G3 proofs: JVM toolchain 81/0 (09:38); the dev image and the API 26
+  floor image each ran the app set, 5 passed + the 2 guarded skips
+  (09:39, 09:40). Run log `.swdev/run-log/WO-005.md`.
+- Planner dispatched 09:42 (Opus); back 10:15: four tasks (the JVM tests,
+  the aid's logic behind a debug-only door, the device tests, the screen
+  work), no parallel tasks, plan-check GREEN. Nine planner questions ruled
+  10:19, all accepted: eight `decisions.md` rows; the `#DevTools` code home
+  in `build-map.md` v1.5 fixed so trace-check can read it; the debug source
+  set counted as product code (`guard.json`).
+- Checkpoint items 1–4 asked 10:24 (the DEV pill, "solve now" plays the
+  normal win, the overlay under the pieces, the passcode box); defaults
+  stand 2026-10-20. The aid's 12 strings in `review-notes.md`.
+- Plan review 10:22: 0 Blockers, 3 Shoulds, carried in dispatch. **G3
+  approved 10:23** under row 7. P4: the JVM kit author and the device kit
+  author (drafting) dispatched 10:24.
+- JVM kit landed 10:51 (the passcode, "solve now" over all 13 puzzles, the
+  release-package scan with its control); its author found a build race,
+  so the JVM verdict line is now two Gradle runs. Device kit drafted 10:53,
+  revised on my rulings 11:03 (two cases built by the kit, not skipped).
+- The aid's logic landed 11:05; my own run green (play 94/0, contracts
+  2/0, V-01 + control); no aid text in the regular code. Device kit landed
+  11:07 (only the planned three compile errors). The screen work (DEV
+  button, overlay, passcode box, wiring) dispatched 11:07.
+- The screen implementer was cut off by the API session limit (~11:25);
+  resumed with its context 11:42. Back 12:06: both device sets on the dev
+  and the API 26 images, JVM 96/0, V-01 green — one device test failed,
+  the same on both images. Arbitrated 12:07 from the test source: the test
+  tapped a spot that, on a solved puzzle, lies on Retry, which correctly
+  comes first in the touch order. Worker wins; the product passes; the
+  device kit author is correcting the test (corrected check 1).
+- Test fixed 12:21 (its class 15/0 on the dev image); plan-check GREEN
+  with the whole kit compiled. Code review dispatched 12:21 (Sonnet, fresh).
+- Code review 12:27: 0 Blockers, 1 Should, 3 Notes; three deliberate breaks
+  caught. The Should (the release scan looked for names only) fixed by the
+  JVM kit author 12:33: it now also looks for "Wrong passcode." and the
+  passcode (corrected check 2).
+- Test & Verify 13:10: GREEN — every set on both images from the final
+  tree (play 94/0 on each, app 7 + 2 guarded skips on each, JVM 174/0,
+  release scan + V-01). I read the four device XMLs myself.
+- Traceability GREEN 4/4 (13:11); verifiers GREEN; metrics counted (window
+  rows corrected). Close 13:13: build-map `#DevTools` Built; proposals (2
+  corrected checks, the build-map parser, A4's token route, a missing
+  telemetry row), three platform-notes lessons, review-notes play-through,
+  KICKOFF "State after WO-005" + the WO-006 brief, AGENTS.md phase line.
+  **G4 under row 9:** ready to merge; this is the 1-in-5 spot-check WO, so
+  an owner play-test is recommended; checkpoint items 1–4 stand on their
+  defaults 2026-10-20; the snapshot commit is the owner's.

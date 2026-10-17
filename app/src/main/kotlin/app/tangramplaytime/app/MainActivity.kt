@@ -7,6 +7,8 @@
 // WO-004 TASK-022 · the rest of S-15Δ (designs/WO-004-design.md §2): `AppGraph.start` loads on IO; `PlayLoading`
 // shows until the controller exists, then `PlayScreen`; back closes the overview while it is open (REQ-050 rule);
 // `onStop` still sends a running drag home, on the nullable controller.
+// WO-005 TASK-026 · S-15Δ2 (tasks.md § WO-005 › Seams): `PlayScreen` is given `DevAidHook.installed` (REQ-046's door;
+// null in a release build, G-08).
 package app.tangramplaytime.app
 
 import android.content.res.Configuration
@@ -24,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import app.tangramplaytime.play.DevAidHook
 import app.tangramplaytime.play.PlayLoading
 import app.tangramplaytime.play.PlayScreen
 import app.tangramplaytime.play.PlayTexts
@@ -62,7 +65,7 @@ class MainActivity : ComponentActivity() {
                     PlayLoading(Modifier.fillMaxSize())
                 } else {
                     BackHandler(enabled = current.overviewOpen) { current.closeOverview() }
-                    PlayScreen(current, PlayLayouts.phone, texts, reducedMotion, Modifier.fillMaxSize())
+                    PlayScreen(current, PlayLayouts.phone, texts, reducedMotion, Modifier.fillMaxSize(), devAid = DevAidHook.installed)
                 }
             }
         }

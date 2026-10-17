@@ -14,6 +14,9 @@
 // drawn shape and the rest of the badge's area (order 3; decisions.md 2026-10-15 "The top bar, Restart and the
 // solved row, as drawn": "a piece's drawn shape beats it and it beats a piece's margin"). Order 1 (a running drag
 // owns every touch) is the router's; order 0 (the overview open) is TASK-021's.
+// WO-005 TASK-026 · S-22Δ2 (tasks.md § WO-005 › Seams, the touch geometry's hit order 3) · REQ-046 statement and rule
+// 5: the DEV button, while it is drawn, comes first in order 3 — it is drawn above every resting piece and badge, and
+// the visible thing wins (decisions.md 2026-10-17 "The DEV button, the overlay and the sheet, as placed").
 package app.tangramplaytime.play
 
 import androidx.compose.ui.geometry.Offset
@@ -48,14 +51,18 @@ internal enum class Control {
 
     /** The solved row's Next: the next puzzle in order (decisions.md 2026-10-15 "Browsing readings no REQ fixes"). */
     SOLVED_NEXT,
+
+    /** The DEV button of a debug build's testing aid (REQ-046; S-22Δ2): acted on at the lift, never dragged. */
+    DEV_BUTTON,
 }
 
 /**
  * The controls the screen shows in this frame besides the top bar's columns, which are there while a puzzle is
- * current (S-22): the Restart pill's slot (shown only In progress, REQ-025 rule) and whether the solved row is shown
- * (from the frame the picture is fully shown, REQ-026).
+ * current (S-22): the Restart pill's slot (shown only In progress, REQ-025 rule), whether the solved row is shown
+ * (from the frame the picture is fully shown, REQ-026), and the DEV button's slot while the screen has an aid and
+ * draws the button (S-22Δ2; null otherwise).
  */
-internal data class ShownControls(val restart: Slot?, val solvedRow: Boolean) {
+internal data class ShownControls(val restart: Slot?, val solvedRow: Boolean, val devButton: Slot? = null) {
     companion object {
         /** Neither the pill nor the solved row. */
         val NONE: ShownControls = ShownControls(restart = null, solvedRow = false)
@@ -80,9 +87,10 @@ internal sealed interface Hit {
 /** The touch routing's hit order, in one function. */
 internal object HitTest {
     /**
-     * The first hit at [at] (`play-screen` px). In order (S-22 hit order 2 and 3):
+     * The first hit at [at] (`play-screen` px). In order (S-22 hit order 2 and 3, with S-22Δ2):
      * 1. a top-bar column (‹, the counter, ›; full height, no gaps), or — while [shown] has the solved row — a third
      *    of the solved row (Retry, the inert best time, Next);
+     * 1a. the DEV button, while [shown] has its slot (its touch area is the drawn pill);
      * 2. a badge's visible 38 dp disc ([badgeSlots]: the tray badge, or the one next to the placed parallelogram);
      * 3. a piece's drawn shape: the parallelogram's miniature at rest in its cell, where the tray badge's area lies
      *    over it; a placed piece whose drawn shape contains the point — inside beats another piece's margin —
@@ -103,6 +111,8 @@ internal object HitTest {
             val third = geometry.solvedThirds.indexOfFirst { it.contains(at) }
             if (third >= 0) return Hit.OnControl(SOLVED_ROW[third])
         }
+        // 1a. the DEV button (S-22Δ2 hit order 3, first: drawn above every resting piece and badge)
+        if (shown.devButton?.contains(at) == true) return Hit.OnControl(Control.DEV_BUTTON)
         val badges = badgeSlots(controller, geometry)
         val trayBadge = badges.tray
         val boardBadge = badges.board

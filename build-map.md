@@ -1,6 +1,6 @@
 # Build map — TangramPlaytime
 
-**Status:** Signed off (G2)  ·  **Version:** 1.4  ·  **Last updated:** 2026-10-17
+**Status:** Signed off (G2)  ·  **Version:** 1.5  ·  **Last updated:** 2026-10-17
 **Approved by:** the orchestrator under governance row 4 (`ai+inform`), with `architecture.md` v1.0  ·  **Approved on:** 2026-10-11 (owner informed the same day)
 **Feature tree:** `Requirements/features.md` (SwReqCollector collection v1.2, locked 2026-10-01; G1 accepted for this project 2026-10-11)
 
@@ -35,7 +35,7 @@
 | #Layout | `app/` | Planned | — | TYPE-007 window class, phone/tablet layouts, insets, back button, touch targets |
 | #Content | `content/` | Built (WO-002) | (kernel) (via `ILockEngine`: piece congruence through `vertices`, overlap through `stillValid` — the engine is injected, `:content` main code depends on `:contracts` only) | `Tangrams/*.json` bundled as Java resources at build (WO-002 design), parser, load-time validity, ordering; `IPuzzleLibrary` implementation |
 | #Release | — | Planned | — | store listing, data safety, rating, icon (DI-9 in `app/src/main/res`), release verifier; owner-evidence rows |
-| #DevTools | `play/` (`src/debug`) | Planned | (kernel) (via `ILockEngine` solve) | REQ-046 debug-only; absent from release (G-08) |
+| #DevTools | `play/` | Built (WO-005) | (kernel) (via `ILockEngine`), #Content (via `IPuzzleLibrary`: the solution placements), #ResumePuzzle (via `IProgressStore`, through `:play`'s `Persistence`) | REQ-046 debug-only: the aid lives in `play/src/debug` (the `debug` build type), absent from release (G-08); `play/src/main` holds only the door `DevAidHook` (decisions.md 2026-10-17 "The DEV aid reaches the screen through one door"). The cell names the module alone because trace-check reads the code home literally (decisions.md 2026-10-17 "The #DevTools code home reads `play/`") |
 
 Not build units (no row): #Difficulty, #DifficultyChoice, #DifficultyRules, #TurnButtons (withdrawn REQs only); #PieceSets, #SafetyRope, #Accessibility (`idea`).
 
@@ -55,3 +55,4 @@ WO-001 #Locking (+ `:contracts`, `:kernel`) → WO-002 #Content → WO-003 #Solv
 | 1.2 | 2026-10-11 | `#Content` cross-feature deps `—` → `(kernel) (via ILockEngine)`; build status In progress (WO-002); notes updated (Java resources, not Android assets) | WO-002 design (reviewed): piece geometry comes through the seam instead of a second TYPE-001 shape table in `:content` (D1 value rules once) | orchestrator (notify-tier delta, WO-002 Contract deltas) |
 | 1.3 | 2026-10-11 | Rows `#GoHome`, `#PuzzleArt`, `#PuzzleMini` with code home `play/` (they inherited `kernel/` / `content/`); `#Solving` → In progress (WO-003); `#Locking` note narrowed | WO-003 scope: the carried screen-side lines (REQ-020.A2, REQ-039.A1, REQ-045.A2) are proven only in `play/`, and trace-check allows one code home per tag; the seam-side A1 tests stay as extra coverage (decisions.md 2026-10-11, WO-003). At the WO-003 close (2026-10-12): build status Built (WO-003) for `#Solving` (REQ-002 A2 → WO-009), `#GoHome`, `#PuzzleArt` (A1; A2 → WO-009), `#PuzzleMini`, `#LandingPreview`, `#CornerTeach` — same row | orchestrator (notify-tier delta, WO-003 Contract deltas) |
 | 1.4 | 2026-10-17 | `#Browsing` → Built (WO-004), its note names the screen-half tokens of REQ-040.A1 / REQ-041.A1; the `store/` note → built in WO-004 (ADR-003). No code home changed, no row added (design review F5(b) reversed: the `content/` tokens satisfy the one-code-home rule) | WO-004 close: 16/16 IDs green on JVM + dev image + floor image + the process-death channel (`reviews/WO-004-test-verify.md`) | orchestrator (notify-tier delta, WO-004 Contract deltas) |
+| 1.5 | 2026-10-17 | `#DevTools` code-home cell `` `play/` (`src/debug`) `` → `` `play/` `` (the debug source set moves to Notes); cross-feature deps gain #Content (`IPuzzleLibrary` solution placements) and #ResumePuzzle (`IProgressStore` through `Persistence`); build status In progress (WO-005). At the WO-005 close (2026-10-17): build status Built (WO-005) — same row | WO-005 planner question 1: trace-check's `parse_build_map` read the parenthesis as part of the path, so every REQ-046 token under `play/` would fail the one-code-home rule (decisions.md 2026-10-17) | orchestrator (notify-tier delta, WO-005 Contract deltas) |

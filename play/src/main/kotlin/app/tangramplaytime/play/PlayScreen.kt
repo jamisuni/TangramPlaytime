@@ -19,6 +19,11 @@
 // pieces nor size marks: its tray is replaced (REQ-026 rule), and its board is empty (S-21).
 // WO-004 TASK-021 · S-22's overview (`Overview`): drawn last, over the screen below the top bar, while the
 // controller's `overviewOpen` holds.
+// WO-005 TASK-026 · S-10Δ2 (tasks.md § WO-005 › Seams; the touch geometry's z-order) · REQ-046 through its one door
+// (`DevAidHook`, decisions.md 2026-10-17 "The DEV aid reaches the screen through one door"): with an aid, the button's
+// slot is published with the other controls each composition, the solution layer follows the silhouette, the button
+// follows the solved row, and the sheet comes last, below the top bar, while it is open. Without one (the default),
+// nothing of it is composed and the screen is exactly WO-004's.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
@@ -118,6 +123,8 @@ internal class ShownCues(pulse: Pulse?, shake: Shake?, celebration: Celebration?
  * @param texts the title language, the size-mark letters and the texts of the bar and the controls (S-11, S-11Δ, O-06).
  * @param reducedMotion the system's "remove animations" setting: no pop, no confetti, an unanimated pulse;
  *   the picture and the corner markers still appear (REQ-023 and REQ-051 rules).
+ * @param devAid the testing aid a debug build installs (REQ-046; S-10Δ2, `DevAidHook.installed` in the app), or null:
+ *   then the screen composes, hits and stands aside for nothing of it.
  */
 @Composable
 fun PlayScreen(
@@ -126,6 +133,7 @@ fun PlayScreen(
     texts: PlayTexts,
     reducedMotion: Boolean,
     modifier: Modifier = Modifier,
+    devAid: DevAidHook? = null,
 ) {
     val puzzle = controller.puzzle
     val state = controller.state
@@ -135,8 +143,8 @@ fun PlayScreen(
     val solve = solveVisual(controller, cues)
     val geometryNow = remember(controller) { mutableStateOf<ScreenGeometry?>(null) }
     val shownNow = remember(controller) { mutableStateOf(ShownControls.NONE) }
-    val router = remember(controller, visual, layout.floatOffsetDp) {
-        PointerRouter(controller, visual, { geometryNow.value }, { shownNow.value }, layout.floatOffsetDp)
+    val router = remember(controller, visual, layout.floatOffsetDp, devAid) {
+        PointerRouter(controller, visual, { geometryNow.value }, { shownNow.value }, layout.floatOffsetDp, devAid)
     }
     BoxWithConstraints(
         modifier
@@ -158,7 +166,9 @@ fun PlayScreen(
             // fully shown (at once for a puzzle opened already solved). The router hits exactly what is drawn.
             val restart = if (state == PuzzleState.IN_PROGRESS) rememberRestartSlot(geometry, texts.restart) else null
             val solvedRow = state == PuzzleState.SOLVED && solve.rowShown
-            val shown = ShownControls(restart, solvedRow)
+            // S-10Δ2: the DEV button's slot, at each composition, published with the other controls (S-22Δ2).
+            val devButton = devAid?.rememberButtonSlot(controller, geometry)
+            val shown = ShownControls(restart, solvedRow, devButton)
             SideEffect {
                 controller.boardDpPerUnit = (geometry.mapping.pxPerUnit / density).toDouble()
                 geometryNow.value = geometry
@@ -177,6 +187,8 @@ fun PlayScreen(
                 TopBar(geometry, texts.titleOf(puzzle), puzzle.rating, texts.counterOf(controller.puzzleNumber, controller.puzzleCount), stateWord)
                 BoardArea(geometry)
                 Silhouette(silhouetteSlot, silhouettePath)
+                // S-10Δ2: the aid's solution layer, right after the silhouette (under the pill and the pieces).
+                devAid?.SolutionLayer(controller, geometry)
                 restart?.let { RestartPill(it, texts.restart) }
                 if (solve.piecesShown) {
                     val tint = solve.popTint(reducedMotion)
@@ -209,6 +221,8 @@ fun PlayScreen(
                 }
                 badges.tray?.let { FlipBadge(PlayTags.FLIP_BADGE_TRAY, it, density) }
                 if (solvedRow) SolvedRow(geometry, texts, controller.bestSeconds)
+                // S-10Δ2: the DEV button, after the solved row and before the landing preview, while it is shown.
+                if (devAid != null && devButton != null) devAid.ButtonLayer(devButton)
                 PreviewLayer(controller, geometry.mapping)
                 DragLayer(controller, geometry, visual)
                 CornerPulse(controller, geometry, reducedMotion, cues)
@@ -218,6 +232,11 @@ fun PlayScreen(
                 if (controller.overviewOpen) {
                     val barBottom = geometry.topBar.top + geometry.topBar.height
                     Overview(controller, Slot(0, barBottom, widthPx, (heightPx - barBottom).coerceAtLeast(0)), texts)
+                }
+                // S-10Δ2: the aid's sheet last, over the screen below the top bar, while it is open (hit order 0).
+                if (devAid != null && devAid.sheetOpen) {
+                    val barBottom = geometry.topBar.top + geometry.topBar.height
+                    devAid.SheetLayer(controller, Slot(0, barBottom, widthPx, (heightPx - barBottom).coerceAtLeast(0)))
                 }
             }
         }

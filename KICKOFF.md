@@ -63,6 +63,65 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## State after WO-005 (2026-10-17, closed 13:13)
+
+- **WO-005 #DevTools is done** (`workorders/WO-005.md`, Light).
+  - **The DEV aid, debug builds only:**
+    - a small dashed "DEV" pill at the board's bottom-left, hidden on a solved puzzle;
+    - the passcode box over the board (the top bar visible, inert): "Wrong passcode." for anything but 0417, the empty entry too; unlocked until the app restarts;
+    - "Show the solution": each piece's place, see-through in its colour with its name, under the placed pieces, on while you browse until "Hide the solution";
+    - "Solve this puzzle now": the pieces placed through the controller's own actions, then the normal win; the best time stays "–"; a half-done puzzle is cleared first.
+  - **How it stays out of release:** all of it lives in `play/src/debug`; `src/main` holds one empty door, `DevAidHook`, which finds the aid with `ServiceLoader` (null in release). The aid's strings live in `play/src/debug/res`.
+  - **REQ-046.A4** is proven by `ReleaseBuildKitTest`, a JVM test reading both APKs (five markers: the aid's package, resource names, service entry, "Wrong passcode.", "0417"; the debug APK is its control). **The JVM line is two Gradle runs**: build and repackage the APKs, then the tests (a measured race otherwise).
+  - **Results:** 4/4 IDs green, every set on both images from the final tree: JVM 174; play device set 94/0 on the dev and floor images; app set 7 + 2 guarded skips on each; V-01. trace-check `--wo` GREEN; verifiers GREEN within budget. No line is `implemented (unverified)`.
+  - **Code review:** 0 B / 1 S / 3 N; three deliberate breaks all caught. Corrected checks 2 (a device pin's tap point — the implementer won the contest; the release scan widened to content markers). Product defects found 0.
+- **Carry into WO-006 #Layout + #Language + #Promise:**
+  - REQ-037's touch-size sweep skips the `dev-*` nodes (REQ-037's own rule exempts the #DevTools controls).
+  - The number keyboard pushes the passcode box up while it is open (seen in the debug app; `safeDrawingPadding`).
+  - From WO-004: the grid cells and the scrim have no screen-reader labels; the ‹ › 52 dp touch sweep.
+  - From WO-003: the title language follows the primary locale, while strings follow the whole locale list (`decisions.md` 2026-10-12, TASK-015 row).
+- **Carry into later WOs:**
+  - **WO-007:** an aid solve fires the normal `PickedUp` / `Turned` / `Locked` events in one burst — decide how sounds handle it.
+  - **WO-008 must-dos:** an aid solve never sets a best time (the REQ-046.A3 tests are the tripwire: the aid leaves time 0, so a naive rule would show "0:00"); and, from WO-004, which side guarantees a time the store's reader rejects is never written.
+  - **Next G2-route touch of `architecture.md`:** a one-line O-06 exception for the aid's strings (code review N2; recorded in `decisions.md` 2026-10-17 "The DEV aid's strings live with the aid").
+- **Checkpoint items 1–4** (the DEV pill · "solve now" plays the normal win · the overlay under the pieces · the passcode box and how long it stays unlocked): asked 2026-10-17, **defaults stand 2026-10-20** (`workorders/WO-005.md` § Checkpoint items).
+- **Lock behind build:** 26 outbox drafts await a capture session; this WO wrote and amended none. REQ-038.A1, REQ-019.A1–A4, REQ-002.A1 and REQ-014.A1 stay unverified as before.
+- **Owner steps:**
+  - Commit the WO-005 snapshot (prompted on the G4 surface).
+  - **This is the 1-in-5 spot-check WO:** play a debug build (`review-notes.md` 2026-10-17, "Try the DEV aid") and, if you like, look at the diff of `play/src/debug/.../devaid/` and `DevAidHook.kt`.
+  - Answer checkpoint items 1–4 if a default is wrong ("Q2 no" is enough).
+  - Run a capture session on `capture-outbox/` when convenient.
+
+## Paste this to start the WO-006 session (one orchestrator context per WO)
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-006 #Layout + #Language + #Promise
+(TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl. the
+"from P3 on" framework files), then governance.md, architecture.md (v1.1),
+build-map.md (v1.5), design-inputs.md §2, decisions.md (incl. the WO-005 rows
+of 2026-10-17), the last progress.md entry, KICKOFF.md "State after WO-005",
+capture-outbox/ (the REQ-006, REQ-047, REQ-048 and licence drafts),
+platform-notes/android.md (incl. the WO-005 lesson lines).
+WO-006 scope: #Layout (REQ-006) — #PhoneLayout (REQ-035), #TabletLayout
+(REQ-036), #TouchTargets (REQ-037); #Language (REQ-047); #Promise (REQ-001)
+with #NoMoney (REQ-008, REQ-009) and #DeviceOnly (REQ-010) — the TYPE-007
+window class and the phone/tablet layouts in :app (O-05), insets, back
+handling, the touch-target sweep (the dev-* nodes exempt by REQ-037's rule),
+the en/fi resources (English Contract, Finnish reference), the promise lines.
+REQ-009's free note sits on the settings screen (WO-007's) — say where it
+lands. Carried: the grid's screen-reader labels; the ‹ › 52 dp sweep; the
+keyboard under the DEV passcode box; the locale-list mix (KICKOFF).
+Mode: decide from the four reasons — Light unless one is written in the WO.
+Verification channels at G3: JVM where the logic is pure; the dev image
+Medium_Phone_API_37.0 AND the floor image Phone_API_26 (one emulator at a
+time) — and a tablet image if a REQ needs one (prove it reachable at G3 or
+record a waiver); the release verifier V-01 + positive control; the JVM line
+is two Gradle runs (APKs, then tests). Device runs are judged by their XML.
+Checkpoint candidates (≤5, product-visible). Strings to review-notes.md.
+Stations as subagents; the four scripts are duties. End every turn with the
+one signal.
+```
+
 ## State after WO-004 (2026-10-17, closed 09:25)
 
 - **WO-004 #Browsing + `:store` is done** (`workorders/WO-004.md`, Full (c)).
@@ -95,12 +154,11 @@ code, designs, decisions or reviews — comparing comes after, not during.
   - **WO-006:** the grid cells and the scrim have no screen-reader labels; the ‹ › 52 dp touch sweep (REQ-037).
   - Retire `PlayController`'s memory-only constructor when the WO-003 kits move to a store double (code review N3).
   - `ILockEngine.stillValid` sufficed for REQ-025 (WO-001 N3 closed, `decisions.md` 2026-10-15 "REQ-025's load check").
-- **Checkpoint items 1–5** (Restart one press · the solved row after the picture · best time "–" · the middle of the bar opens the grid · an emptied board stays In progress): unanswered, built on their defaults, which **stand 2026-10-18**.
-- **Lock behind build:** 25 outbox drafts still await a capture session. This WO wrote or amended none. REQ-038.A1 and REQ-019.A1–A4 stay unverified as before, and REQ-002.A1 and REQ-014.A1 too.
+- **Checkpoint items 1–5** (Restart one press · the solved row after the picture · best time "–" · the middle of the bar opens the grid · an emptied board stays In progress): **answered by the owner 2026-10-17, every default confirmed** (`decisions.md` row 17; `capture-outbox/src-draft-wo004-checkpoint-answers.md`).
+- **Lock behind build:** 26 outbox drafts await a capture session. This WO wrote one (`src-draft-wo004-checkpoint-answers.md`, after G4) and amended none. REQ-038.A1 and REQ-019.A1–A4 stay unverified as before, and REQ-002.A1 and REQ-014.A1 too.
 - **Owner steps:**
   - Commit the WO-004 snapshot (prompted on the G4 surface).
   - **Play the build** (`review-notes.md` 2026-10-17: browsing, the grid, Restart, the solved row, close and reopen).
-  - Answer a checkpoint item before 2026-10-18 only if a default is wrong.
   - Run a capture session on `capture-outbox/` when convenient.
 
 ## Paste this to start the WO-005 session (one orchestrator context per WO)
@@ -111,8 +169,9 @@ v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
 files), then governance.md, architecture.md (v1.1), build-map.md (v1.4),
 design-inputs.md §2, decisions.md (incl. the WO-004 rows of 2026-10-15 and
 2026-10-17), the last progress.md entry, KICKOFF.md "State after WO-004",
-capture-outbox/chg-draft-req046-android-build-terms.md, platform-notes/android.md
-(incl. the WO-004 lesson lines).
+capture-outbox/chg-draft-req046-android-build-terms.md and
+chg-draft-type006-missing-transitions.md (its "Solve this puzzle now" bullet),
+platform-notes/android.md (incl. the WO-004 lesson lines).
 WO-005 scope: #DevTools — #SolutionReveal (REQ-046 A1..A4): the passcode-
 protected DEV aid in play/src/debug (a debug-only source set; absent from the
 release build, G-08), drawn on the WO-004 Play screen: the DEV button, the

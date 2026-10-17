@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WO-005 TASK-024 · seam S-29 (tasks.md § WO-005 › Seams) · REQ-046 · architecture.md G-08, G-10;
+     decisions.md 2026-10-17 "The DEV aid's strings live with the aid": the debug build type only, every
+     name dev_aid_. English is the Contract wording: the first four are REQ-046's own words (the statement,
+     rule 1, A2, A3); the rest are adapted from DI-1's #devDlg. -->
+<resources>
+    <string name="dev_aid_button">DEV</string>
+    <string name="dev_aid_wrong_passcode">Wrong passcode.</string>
+    <string name="dev_aid_show">Show the solution</string>
+    <string name="dev_aid_solve">Solve this puzzle now</string>
+    <string name="dev_aid_title">Developer</string>
+    <string name="dev_aid_passcode_hint">Testing aid, not part of the game. Enter the passcode.</string>
+    <string name="dev_aid_cancel">Cancel</string>
+    <string name="dev_aid_ok">OK</string>
+    <string name="dev_aid_unlocked_hint">Unlocked until the app is restarted. The solution stays on while you browse puzzles.</string>
+    <string name="dev_aid_hide">Hide the solution</string>
+    <string name="dev_aid_no_best_time">A puzzle solved here does not set a best time.</string>
+    <string name="dev_aid_done">Done</string>
+</resources>

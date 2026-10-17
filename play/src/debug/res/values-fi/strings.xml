@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WO-005 TASK-024 · seam S-29 · REQ-046 · architecture.md G-10: Finnish is a reference translation, listed in
+     review-notes.md, never asserted by a test. The debug build type only (G-08). -->
+<resources>
+    <string name="dev_aid_button">DEV</string>
+    <string name="dev_aid_wrong_passcode">Väärä pääsykoodi.</string>
+    <string name="dev_aid_show">Näytä ratkaisu</string>
+    <string name="dev_aid_solve">Ratkaise tämä tehtävä nyt</string>
+    <string name="dev_aid_title">Kehittäjä</string>
+    <string name="dev_aid_passcode_hint">Testausapu, ei osa peliä. Anna pääsykoodi.</string>
+    <string name="dev_aid_cancel">Peruuta</string>
+    <string name="dev_aid_ok">OK</string>
+    <string name="dev_aid_unlocked_hint">Avattu, kunnes sovellus käynnistetään uudelleen. Ratkaisu pysyy näkyvissä, kun selaat tehtäviä.</string>
+    <string name="dev_aid_hide">Piilota ratkaisu</string>
+    <string name="dev_aid_no_best_time">Näin ratkaistu tehtävä ei saa parasta aikaa.</string>
+    <string name="dev_aid_done">Valmis</string>
+</resources>

@@ -24,6 +24,10 @@
 // touch until its finger lifts, so ‹ and › never act mid-drag.
 // WO-004 TASK-021 · S-22 hit order 0 (design §3, library fact 4): while the overview is open, every touch is left to
 // the overlay's `clickable`s, unconsumed, the top bar's included.
+// WO-005 TASK-026 · S-22Δ2 (tasks.md § WO-005 › Seams, the touch geometry) · REQ-046 rules 1 and 5: the router takes
+// the screen's `DevAidHook` (null without one). Hit order 0 also holds while the aid's sheet is open, so the sheet's
+// own `clickable`s and its field act and nothing under it does; the DEV button is a control like the others (it acts
+// at the lift within the slop, never drags, has no long press), and acting on it is `onButton()`.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -62,9 +66,10 @@ private enum class ControlEnd {
 }
 
 /**
- * Routes every touch of `play-screen` (the touch routing; S-22's hit order):
- * 0. While the grid overview is open, a new touch is the overlay's: the router neither consumes nor acts until its
- *    last finger lifts, on the top bar too (the bar stays drawn and inert; the overlay's `clickable`s act).
+ * Routes every touch of `play-screen` (the touch routing; S-22's hit order, with S-22Δ2):
+ * 0. While the grid overview or the aid's sheet is open, a new touch is the overlay's: the router neither consumes
+ *    nor acts until its last finger lifts, on the top bar too (the bar stays drawn and inert; the overlay's
+ *    `clickable`s act).
  * 1. While a drag runs, every further touch is a twist finger for that drag (S-7 → `twistDrag`), whatever it
  *    lands on — ‹, › and the counter included; lifting it keeps the turn reached. Every drag starts and ends
  *    inside the one gesture that owns every pointer until its primary finger lifts, so a new gesture never meets
@@ -94,8 +99,11 @@ private enum class ControlEnd {
  * and the glide every ended drag leaves behind.
  *
  * @param geometry the current layout, read at each touch (null before the first layout: touches do nothing).
- * @param shown the controls drawn now besides the top bar (the Restart pill, the solved row), read at each touch.
+ * @param shown the controls drawn now besides the top bar (the Restart pill, the solved row, the DEV button), read at
+ *   each touch.
  * @param floatOffsetDp how far the dragged piece's lowest point floats above the finger (S-5, REQ-014 ASSUMPTION).
+ * @param devAid the screen's testing aid (S-22Δ2), or null: then the router never stands aside for it and the DEV
+ *   button is never in [shown].
  */
 internal class PointerRouter(
     private val controller: PlayController,
@@ -103,6 +111,7 @@ internal class PointerRouter(
     private val geometry: () -> ScreenGeometry?,
     private val shown: () -> ShownControls,
     private val floatOffsetDp: Float,
+    private val devAid: DevAidHook?,
 ) {
     private var growJob: Job? = null
 
@@ -129,7 +138,8 @@ internal class PointerRouter(
                 // pass on descendants first, and a `clickable` cancels when its Final pass sees a change consumed (design
                 // §3, library fact 4). Returning here, `awaitEachGesture` waits for every pointer to lift without
                 // consuming; a tap on the scrim or a cell that closes the overview at its lift still acts on nothing here.
-                if (controller.overviewOpen) return@awaitEachGesture
+                // S-22Δ2: the aid's open sheet is such an overlay too (its scrim, pills and field act).
+                if (controller.overviewOpen || devAid?.sheetOpen == true) return@awaitEachGesture
                 first.consume()
                 val g = geometry() ?: return@awaitEachGesture
                 when (val hit = HitTest.at(first.position, g, controller, marginPx, shown())) {
@@ -194,7 +204,10 @@ internal class PointerRouter(
         }
     }
 
-    /** A control acted on at its lift (S-2Δ): ‹ `previous`, › and Next `next`, the counter `openOverview`, Restart, Retry; the best time is inert. */
+    /**
+     * A control acted on at its lift (S-2Δ): ‹ `previous`, › and Next `next`, the counter `openOverview`, Restart, Retry;
+     * the best time is inert; the DEV button is the aid's `onButton()` (S-22Δ2).
+     */
     private fun act(control: Control) {
         when (control) {
             Control.PREV -> controller.previous()
@@ -204,6 +217,7 @@ internal class PointerRouter(
             Control.RETRY -> controller.retry()
             Control.BEST_TIME -> Unit
             Control.SOLVED_NEXT -> controller.next()
+            Control.DEV_BUTTON -> devAid?.onButton()
         }
     }
 
