@@ -12,12 +12,18 @@
 // WO-003 code review F2 · the one-shot cues (`ShownCues`): the corner pulse (REQ-051 "pulse … once") and the
 // shake of a refused turn or mirror (REQ-016 "shake it once", REQ-018 rule) are played once per serial, never
 // again by a screen composed later over the same controller (an activity recreation).
+// WO-004 TASK-020 · S-22 (designs/WO-004-design.md §2 "Touch geometry"): the top bar's three full-height columns
+// (`TopBar`), the Restart pill above the silhouette and below the pieces, and the solved row over the tray strip
+// (`Controls`), with the controls the router may hit published each frame (`ShownControls`); the screen side of S-3Δ
+// (`ShownCues.celebrationSerial`, the timeline worked out by `solveVisual`). A Solved puzzle draws neither tray
+// pieces nor size marks: its tray is replaced (REQ-026 rule), and its board is empty (S-21).
+// WO-004 TASK-021 · S-22's overview (`Overview`): drawn last, over the screen below the top bar, while the
+// controller's `overviewOpen` holds.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -27,7 +33,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -39,10 +44,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import app.tangramplaytime.contracts.ILockEngine
 import app.tangramplaytime.contracts.PieceId
 import app.tangramplaytime.contracts.Placement
@@ -75,9 +76,6 @@ private const val BOARD_CORNER_DP = 26f
 private const val BOARD_FIT_WIDTH = 0.82f
 private const val BOARD_FIT_HEIGHT = 0.80f
 
-/** The title's text size, system font (ADR-005); DI-2 names none (decisions.md row of TASK-012). */
-private val TITLE_SIZE = 22.sp
-
 /** REQ-016 rule "shake it once": DI-1's shake, 360 ms, ±6 dp sideways (no REQ names the numbers; decisions row of TASK-013). */
 private const val SHAKE_MS = 360
 private const val SHAKE_AMPLITUDE_DP = 6f
@@ -91,25 +89,33 @@ private const val SHAKE_AMPLITUDE_DP = 6f
  * shown (an earlier screen played it, or its moment has passed), and a cue counts as shown once its animation
  * has ended; only a serial that differs is played. Snapshot state: a cue's node goes when it counts as shown.
  * Remembered with the controller, never saved, so a serial from another process's controller cannot match.
+ * WO-004 (S-3Δ): the celebration of a solve is such a cue too — one set before this screen composed (an activity
+ * recreation right after a solve) is never replayed: the puzzle stands at the end of its timeline from the first
+ * frame (REQ-026 A1; design "What survives").
  */
-internal class ShownCues(pulse: Pulse?, shake: Shake?) {
+internal class ShownCues(pulse: Pulse?, shake: Shake?, celebration: Celebration?) {
     /** The serial of the last pulse shown (or set before this screen composed), or null. */
     var pulseSerial: Int? by mutableStateOf(pulse?.serial)
 
     /** The serial of the last shake shown (or set before this screen composed), or null. */
     var shakeSerial: Int? by mutableStateOf(shake?.serial)
+
+    /** The serial of the last celebration shown (or set before this screen composed), or null (S-3Δ). */
+    var celebrationSerial: Int? by mutableStateOf(celebration?.serial)
 }
 
 /**
- * The Play screen (S-10): the top bar with the puzzle title, the board with the flat silhouette and the
- * locked pieces, and the tray with the puzzle's cells and miniatures; the dragged piece and the landing
- * preview while a drag runs. It fills [modifier]'s size, lays every zone out in px, sets
- * [PlayController.boardDpPerUnit] at every layout, routes every touch through one pointer handler on the
- * root (`PointerRouter`), and gives every node the tag, bounds and keys of the tag table.
+ * The Play screen (S-10): the top bar (‹, the counter with the title, the rating dots, "n / N" and the state word,
+ * ›), the board with the flat silhouette, the Restart pill while In progress and the locked pieces, and the tray
+ * with the puzzle's cells and miniatures — replaced by the solved row once a Solved puzzle's picture is fully
+ * shown; the dragged piece and the landing preview while a drag runs; the grid overview below the bar while it is
+ * open (S-22). It fills [modifier]'s size, lays every zone
+ * out in px, sets [PlayController.boardDpPerUnit] at every layout, routes every touch through one pointer handler
+ * on the root (`PointerRouter`), and gives every node the tag, bounds and keys of the tag table and S-13Δ.
  *
  * @param controller the state holder (S-1, S-2); its `engine` supplies every corner (O-01).
  * @param layout the zone values `:app` decided (S-5, O-05).
- * @param texts the title language and the size-mark letters (S-11, O-06).
+ * @param texts the title language, the size-mark letters and the texts of the bar and the controls (S-11, S-11Δ, O-06).
  * @param reducedMotion the system's "remove animations" setting: no pop, no confetti, an unanimated pulse;
  *   the picture and the corner markers still appear (REQ-023 and REQ-051 rules).
  */
@@ -125,12 +131,12 @@ fun PlayScreen(
     val state = controller.state
     val density = LocalDensity.current.density
     val visual = remember(controller) { DragVisual() }
-    val solve = remember(controller) { SolveVisual() }
-    val cues = remember(controller) { ShownCues(controller.pulse, controller.shake) }
-    SolveDriver(controller, solve)
+    val cues = remember(controller) { ShownCues(controller.pulse, controller.shake, controller.celebration) }
+    val solve = solveVisual(controller, cues)
     val geometryNow = remember(controller) { mutableStateOf<ScreenGeometry?>(null) }
+    val shownNow = remember(controller) { mutableStateOf(ShownControls.NONE) }
     val router = remember(controller, visual, layout.floatOffsetDp) {
-        PointerRouter(controller, visual, { geometryNow.value }, layout.floatOffsetDp)
+        PointerRouter(controller, visual, { geometryNow.value }, { shownNow.value }, layout.floatOffsetDp)
     }
     BoxWithConstraints(
         modifier
@@ -148,18 +154,30 @@ fun PlayScreen(
             val geometry = remember(widthPx, heightPx, density, layout, puzzle) {
                 ScreenGeometry.of(widthPx, heightPx, density, layout, puzzle)
             }
+            // S-22: the Restart pill only In progress (REQ-025 rule); the solved row from the frame the picture is
+            // fully shown (at once for a puzzle opened already solved). The router hits exactly what is drawn.
+            val restart = if (state == PuzzleState.IN_PROGRESS) rememberRestartSlot(geometry, texts.restart) else null
+            val solvedRow = state == PuzzleState.SOLVED && solve.rowShown
+            val shown = ShownControls(restart, solvedRow)
             SideEffect {
                 controller.boardDpPerUnit = (geometry.mapping.pxPerUnit / density).toDouble()
                 geometryNow.value = geometry
+                shownNow.value = shown
             }
             val silhouetteSlot = remember(puzzle, geometry.mapping) { Slot.around(SilhouettePath.boundsPx(puzzle.solution, geometry.mapping)) }
             val silhouettePath = remember(puzzle, geometry.mapping) { SilhouettePath.build(puzzle.solution, geometry.mapping) }
-            val trayPieces = controller.trayPieces
+            val trayPieces = if (state == PuzzleState.SOLVED) emptySet() else controller.trayPieces
             val badges = badgeSlots(controller, geometry)
+            val stateWord = when (state) {
+                PuzzleState.NEW -> null
+                PuzzleState.IN_PROGRESS -> texts.inProgress
+                PuzzleState.SOLVED -> texts.solved
+            }
             SlotLayout(Modifier.fillMaxSize()) {
-                TopBar(geometry.topBar, texts.titleOf(puzzle))
+                TopBar(geometry, texts.titleOf(puzzle), puzzle.rating, texts.counterOf(controller.puzzleNumber, controller.puzzleCount), stateWord)
                 BoardArea(geometry)
                 Silhouette(silhouetteSlot, silhouettePath)
+                restart?.let { RestartPill(it, texts.restart) }
                 if (solve.piecesShown) {
                     val tint = solve.popTint(reducedMotion)
                     for (placement in controller.placed) {
@@ -190,27 +208,43 @@ fun PlayScreen(
                     key(id) { SizeMark(id, letter, cell, density) }
                 }
                 badges.tray?.let { FlipBadge(PlayTags.FLIP_BADGE_TRAY, it, density) }
+                if (solvedRow) SolvedRow(geometry, texts, controller.bestSeconds)
                 PreviewLayer(controller, geometry.mapping)
                 DragLayer(controller, geometry, visual)
                 CornerPulse(controller, geometry, reducedMotion, cues)
                 solve.elapsedMs?.let { if (solve.confettiShown(reducedMotion)) Confetti(geometry, it) }
+                // S-22 "Overview": over everything below the top bar, which stays drawn (and inert: hit order 0). Its
+                // open state is the controller's, so a recreated screen shows it from the first frame ("What survives").
+                if (controller.overviewOpen) {
+                    val barBottom = geometry.topBar.top + geometry.topBar.height
+                    Overview(controller, Slot(0, barBottom, widthPx, (heightPx - barBottom).coerceAtLeast(0)), texts)
+                }
             }
         }
     }
 }
 
 /**
- * Where everything sits for one screen size, whole px of the `play-screen` node: the top bar, the board
- * and its mapping, the tray strip and its cells (S-6 with the screen's own size).
+ * Where everything sits for one screen size, whole px of the `play-screen` node: the top bar and its three
+ * columns (S-22), the board and its mapping, the tray strip and its cells (S-6 with the screen's own size), and
+ * the thirds the solved row splits the strip into (S-22).
  */
 internal class ScreenGeometry(
     val topBar: Slot,
+    /** ‹: x from 0 to 60 dp, the bar's full height (S-22). */
+    val navPrev: Slot,
+    /** ›: x from W − 60 dp to W, the bar's full height (S-22). */
+    val navNext: Slot,
+    /** The counter zone: everything between ‹ and ›, the bar's full height (S-22). */
+    val counter: Slot,
     val board: Slot,
     val mapping: BoardMapping,
     val tray: Slot,
     /** The miniatures' common scale, px per unit (REQ-013). */
     val trayPxPerUnit: Float,
     val cells: Map<PieceId, Slot>,
+    /** The tray strip in thirds, left to right: Retry, the best time, Next (S-22 "Solved row"). */
+    val solvedThirds: List<Slot>,
     /** The screen's density, px per dp, for the dp sizes of the decorations (the badge's 60 dp area, the marks, the markers). */
     val density: Float,
 ) {
@@ -218,6 +252,10 @@ internal class ScreenGeometry(
         fun of(widthPx: Int, heightPx: Int, density: Float, layout: PlayLayout, puzzle: PuzzleDefinition): ScreenGeometry {
             val topBarPx = (layout.topBarDp * density).roundToInt()
             val topBar = Slot(0, 0, widthPx, topBarPx)
+            val column = (NAV_COLUMN_DP * density).roundToInt().coerceAtMost(widthPx / 2)
+            val navPrev = Slot(0, 0, column, topBarPx)
+            val navNext = Slot(widthPx - column, 0, column, topBarPx)
+            val counter = Slot(column, 0, (widthPx - 2 * column).coerceAtLeast(0), topBarPx)
 
             val trayGeometry = TrayMetrics.layout(widthPx / density, heightPx / density, layout, puzzle.pieces)
             val trayTop = (heightPx - trayGeometry.heightDp * density).roundToInt().coerceIn(0, heightPx)
@@ -247,23 +285,9 @@ internal class ScreenGeometry(
                 originYPx = (board.topPx + (board.height - unitHeight * scale) / 2 - minY * scale).toFloat(),
                 pxPerUnit = scale,
             )
-            return ScreenGeometry(topBar, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, density)
-        }
-    }
-}
-
-/** The top bar on the paper, the title centred in it: a merged, inert text node (platform-notes § Compose test kit). */
-@Composable
-private fun TopBar(slot: Slot, title: String) {
-    Box(Modifier.slot(slot), contentAlignment = Alignment.Center) {
-        Box(Modifier.testTag(PlayTags.TITLE).semantics(mergeDescendants = true) {}) {
-            BasicText(
-                text = title,
-                style = TextStyle(fontSize = TITLE_SIZE, fontWeight = FontWeight.Bold, color = PlayPalette.silhouette),
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis,
-            )
+            val cuts = listOf(0, (widthPx / 3f).roundToInt(), (widthPx * 2 / 3f).roundToInt(), widthPx)
+            val thirds = (0 until 3).map { i -> Slot(cuts[i], tray.top, cuts[i + 1] - cuts[i], tray.height) }
+            return ScreenGeometry(topBar, navPrev, navNext, counter, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, thirds, density)
         }
     }
 }

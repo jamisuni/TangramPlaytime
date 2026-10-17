@@ -1,6 +1,7 @@
 // Acceptance kit (WO-003, TASK-011): the landing preview (tasks.md § WO-003 › Seams S-2 `updatePreview` /
 // `drop`, the tag table's `landing-preview` row). Every drag is by touch on `play-screen`; the preview's
 // keys are read against its box through the engine's corners before the drawing is blamed.
+// Amended WO-004 (TASK-019), no token moved: the REQ-021 A2 stroke sampler keeps off the Restart pill (cited where made).
 package app.tangramplaytime.play
 
 import androidx.compose.ui.geometry.Offset
@@ -205,16 +206,23 @@ class PreviewKitTest {
         assertTrue("$what: $piece's miniature $box is inside its cell $cell", cell.contains(box.topLeft) && cell.contains(box.bottomRight))
     }
 
-    /** No pixel of the preview stroke colour inside the silhouette, outside the dragged piece's box grown by 16 px. */
+    /**
+     * No pixel of the preview stroke colour inside the silhouette, outside the dragged piece's box grown by 16 px.
+     * Amended WO-004 (TASK-019): and outside the `restart` pill, which the drag start makes visible (In progress) at the
+     * board's top-left, drawn above the silhouette (S-22 "Restart … drawn above the silhouette and below the pieces";
+     * decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn"): its pixels are the pill's, not a preview.
+     */
     private fun assertNoPreviewStroke(p: PuzzleDefinition, piece: PieceId) {
         val board = kit.capture(PlayTags.BOARD)
         val origin = kit.bounds(PlayTags.BOARD).topLeft
         val dragBox = kit.bounds(PlayTags.dragPiece(piece)).translate(-origin).inflate(16f)
+        val pill = if (kit.exists(KitTag.RESTART)) kit.bounds(KitTag.RESTART).translate(-origin) else null
         val deep = kit.silhouetteMask(p).erode(3)
         var hits = 0
         var first = ""
         deep.forEachSet { x, y ->
             if (dragBox.contains(Offset(x.toFloat(), y.toFloat()))) return@forEachSet
+            if (pill != null && pill.contains(Offset(x.toFloat(), y.toFloat()))) return@forEachSet
             if (kitNear(board[x, y], PlayPalette.previewStroke, 24f / 255f)) { hits++; if (first.isEmpty()) first = "($x, $y)" }
         }
         assertEquals("preview-stroke pixels inside the silhouette with nothing in reach; first at $first", 0, hits)

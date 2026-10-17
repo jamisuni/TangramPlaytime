@@ -1,5 +1,6 @@
 // scaffolding — TASK-012's own disposable checks of the pure parts of S-11 / S-13 / S-14 (no token; the
-// acceptance verdict is the device kit's BoardTrayKitTest).
+// acceptance verdict is the device kit's BoardTrayKitTest). WO-004 TASK-020 grew it for S-11Δ and S-13Δ (the
+// verdict there is the device kit's TopBarKitTest, ResumeScreenKitTest and SolvedViewKitTest).
 package app.tangramplaytime.play.scaffolding
 
 import androidx.compose.ui.geometry.Offset
@@ -8,6 +9,7 @@ import app.tangramplaytime.contracts.Point
 import app.tangramplaytime.play.BoardMapping
 import app.tangramplaytime.play.PlayTags
 import app.tangramplaytime.play.PlayTexts
+import app.tangramplaytime.play.counterOf
 import app.tangramplaytime.play.titleOf
 import app.tangramplaytime.content.PuzzleLibraries
 import app.tangramplaytime.kernel.LockEngine
@@ -45,8 +47,33 @@ class ScreenSeamScaffoldTest {
     @Test
     fun theTitleIsTheRequestedLanguageWithAnEnglishFallback() {
         val puzzle = PuzzleLibraries.bundled(LockEngine()).puzzles.first()
-        assertEquals(puzzle.titles.getValue("en"), PlayTexts("S", "M", "L", "en").titleOf(puzzle))
-        assertEquals(puzzle.titles.getValue("fi"), PlayTexts("S", "M", "L", "fi").titleOf(puzzle))
-        assertEquals(puzzle.titles.getValue("en"), PlayTexts("S", "M", "L", "sv").titleOf(puzzle))
+        assertEquals(puzzle.titles.getValue("en"), texts("en").titleOf(puzzle))
+        assertEquals(puzzle.titles.getValue("fi"), texts("fi").titleOf(puzzle))
+        assertEquals(puzzle.titles.getValue("en"), texts("sv").titleOf(puzzle))
     }
+
+    // WO-004 TASK-020 (S-11Δ, S-13Δ): the counter's text and the new tag strings.
+
+    @Test
+    fun theCounterReadsTheNumberOutOfTheTotal() {
+        assertEquals("3 / 13", texts("en").counterOf(3, 13))
+    }
+
+    @Test
+    fun theWoFourTagsAreTheDesignsStrings() {
+        assertEquals(
+            listOf("nav-prev", "nav-next", "counter", "rating", "state-word", "restart", "solved-row", "retry", "best-time", "solved-next", "overview", "overview-done", "overview-cell-cat", "play-loading"),
+            listOf(
+                PlayTags.NAV_PREV, PlayTags.NAV_NEXT, PlayTags.COUNTER, PlayTags.RATING, PlayTags.STATE_WORD, PlayTags.RESTART,
+                PlayTags.SOLVED_ROW, PlayTags.RETRY, PlayTags.BEST_TIME, PlayTags.SOLVED_NEXT, PlayTags.OVERVIEW,
+                PlayTags.OVERVIEW_DONE, PlayTags.overviewCell("cat"), PlayTags.PLAY_LOADING,
+            ),
+        )
+    }
+
+    private fun texts(language: String) = PlayTexts(
+        sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = language,
+        restart = "Restart", retry = "Retry", next = "Next", bestTime = "Best time", noTime = "–",
+        inProgress = "in progress", solved = "solved", counterFormat = "%1\$d / %2\$d", allPuzzles = "All puzzles", done = "Done",
+    )
 }

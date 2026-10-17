@@ -251,3 +251,66 @@ from starvation.
 - **Severity:** medium. Class B hid two real product defects behind a
   green kit, and class C's root cause is an orchestrator duty. The rest
   are low.
+
+## 2026-10-17 — WO-004 close: two corrected checks, a stale-pass class seen twice, a pause across two days
+
+- **Corrected check 1 (design review F5(b), reversed on arbitration).**
+  The design reviewer asked for a `build-map.md` row, because REQ-040.A1
+  and REQ-041.A1 gained screen tests under `play/` and `app/`. trace-check's
+  rule 3 fails only when no covering test lives under the code home. The
+  `content/` tokens are there, so no row was needed. **Miscalibration:**
+  the reviewer read "one code home per tag" as "every test under the home".
+  **Proposal:** `traceability-rules.md` §5 rule 3 gets one sentence: extra
+  tokens outside the home are allowed; the rule asks for one inside it.
+- **Corrected check 2 (a kit pin that could not fail where it ran).** The
+  pin `TopBarKitTest.aPieceDrawnOverTheRestartPill…` searched the bundled
+  puzzles for a case and skipped by `assumeTrue` when none existed. On the
+  dev phone none can exist: the 577 dp board keeps every silhouette at
+  least 57.7 dp below the board's top, and the pill ends at 58 dp. The
+  connected runner wrote the skip into the XML as a `<failure>` while
+  Gradle exited 0. The fix is a kit-constructed case: a kit-owned puzzle,
+  shown at a kit-chosen height. **Proposal:** `task-decomposition.md`
+  ("Assert only what is mandated" / fixtures) gets one line. A fixture
+  search that can come back empty on a WO channel is a check that cannot
+  fail: construct the case, or fail loudly. Codified for this project in
+  `platform-notes/android.md`.
+- **A pass that can be stale, seen twice (WO-003 N2, WO-004 code review
+  S2).** WO-003's verifier read an APK nothing tied to the tree. WO-004's
+  process-death harness installed whatever APKs sat in `build/outputs`.
+  The harness now refuses APKs older than any source or build input. Two
+  more facts came out of the fix:
+  - Gradle leaves an up-to-date APK unwritten, so the channel line must
+    force `packageDebug` and `packageDebugAndroidTest`.
+  - Under `-q`, a failed install (`INSTALL_FAILED_ALREADY_EXISTS`) exits 0
+    with no XML. Test & Verify caught it only because the XML was missing.
+
+  **Proposal (repeats WO-003's, now with a second case):**
+  `run_verifiers.py` checks, generically, that each artifact a manifest
+  entry names is newer than the newest input. The test-verify station file
+  then gets one rule: judge a device run by its XML (exists, fresh,
+  counts), never by an exit code.
+- **The bash approver's D4 denies read-only git.** `git check-attr` (from
+  the TASK-022 implementer, checking `.gitattributes`) and `git archive`
+  (TASK-018, to a scratch folder) were denied as history writes. Both
+  read history and write nothing to it. **Proposal:** add `check-attr`,
+  `cat-file` and `ls-tree` to the read list in `swdev_bash_approve.py`;
+  `archive` stays a judgment call.
+- **Mid-WO pause across two days.** The owner paused at 21:32 and the
+  WO resumed 33 h later in a fresh context. It worked because of the
+  KICKOFF "PAUSED" note, the WO log, the run log and recomputing the kit
+  hashes (17/17 unchanged). The paused session's scratchpad (every XML the
+  i20 row cites) was gone. **Proposal:** the hand-over recipe (WO-003's
+  2026-10-12 entry) adds that XMLs cited across a pause are copied under
+  `.swdev/run-log/` or re-run, because scratchpads die with the session.
+- **A seam-table gap found by a UI implementer.** S-1Δ named no read for
+  the puzzle list the grid must draw, so the TASK-021 implementer added one
+  internal read. It was ruled a gap closed in place, and the design was
+  written back. **Proposal:** the design-author station file gets one
+  checklist line: for each screen, list the data it draws and the seam
+  read that gives it.
+- **Principle 16 again.** Every turn that ended while a station ran in the
+  background ended with "All ready" as the least-wrong signal. Still
+  unresolved (2026-10-11 entry).
+- **Severity:** low to medium. The stale-pass class is medium: it has now
+  occurred twice, and a stale pass on the death channel would have hidden
+  a lost-progress defect. The rest are low.

@@ -1,16 +1,19 @@
 // WO-003 TASK-012 · seam S-13 (tasks.md § WO-003 › Seams; the tag table) · the test tags both device kits
 // find on the unmerged semantics tree. Every tag is declared here, including the ones whose nodes
 // TASK-013 (drag, preview) and TASK-014 (decorations, pulse, celebration, picture) add.
+// WO-004 TASK-020 · seam S-13Δ (designs/WO-004-design.md §2): the top bar, Restart, the solved row, the grid
+// overview and the loading paper. Every S-13Δ tag is declared here now, including the overview's, whose nodes
+// TASK-021 adds. A control's bounds are its touch area (S-13Δ).
 package app.tangramplaytime.play
 
 import app.tangramplaytime.contracts.PieceId
 
-/** The Play screen's test tags (S-13). The per-piece functions append the piece's name. */
+/** The Play screen's test tags (S-13, S-13Δ). The per-piece functions append the piece's name. */
 object PlayTags {
     /** The screen root; every test touch is injected here. Carries `PuzzleIdKey` and `PuzzleStateKey`. */
     const val SCREEN: String = "play-screen"
 
-    /** The puzzle title: a merged, inert text node. */
+    /** The puzzle title: a merged, inert text node inside `counter` (seam note 4). */
     const val TITLE: String = "title"
 
     /** The board area; carries `BoardMappingKey`. */
@@ -43,6 +46,45 @@ object PlayTags {
     /** The solved picture (REQ-023); bounds = the silhouette's box. */
     const val SOLVED_PICTURE: String = "solved-picture"
 
+    /** ‹ (REQ-024): the top bar's left column, from the screen edge to 60 dp, full height (S-22). */
+    const val NAV_PREV: String = "nav-prev"
+
+    /** › (REQ-024, REQ-050 long press): the top bar's right column, the last 60 dp, full height (S-22). */
+    const val NAV_NEXT: String = "nav-next"
+
+    /** The counter zone between ‹ and ›, full height; a press opens the grid (REQ-050). It does not merge its descendants (seam note 4). */
+    const val COUNTER: String = "counter"
+
+    /** The rating dots inside `counter` (REQ-024 rule); carries `RatingKey`. */
+    const val RATING: String = "rating"
+
+    /** The state word inside `counter`, In progress and Solved only (REQ-024 rule): a merged, inert text node. */
+    const val STATE_WORD: String = "state-word"
+
+    /** The Restart pill, shown only In progress (REQ-025); bounds = the pill. A merged display container. */
+    const val RESTART: String = "restart"
+
+    /** The solved row that replaces the tray (REQ-026); bounds = the tray strip. */
+    const val SOLVED_ROW: String = "solved-row"
+
+    /** Retry, the solved row's first third (REQ-026); bounds = that third. A merged display container. */
+    const val RETRY: String = "retry"
+
+    /** The best time, the solved row's middle third, inert (REQ-026); bounds = that third. A merged display container. */
+    const val BEST_TIME: String = "best-time"
+
+    /** Next, the solved row's last third (REQ-026); bounds = that third. A merged display container. */
+    const val SOLVED_NEXT: String = "solved-next"
+
+    /** The grid overview (REQ-050; its nodes are TASK-021's). */
+    const val OVERVIEW: String = "overview"
+
+    /** The grid overview's Done (REQ-050; TASK-021). A merged display container. */
+    const val OVERVIEW_DONE: String = "overview-done"
+
+    /** The loading paper shown before a puzzle is current (S-23). */
+    const val PLAY_LOADING: String = "play-loading"
+
     /** One cell per piece of the puzzle while it is unsolved; bounds = the S-6 cell. */
     fun trayCell(id: PieceId): String = "tray-cell-${id.name}"
 
@@ -60,4 +102,7 @@ object PlayTags {
 
     /** The dragged piece; bounds = the drawn shape's box. */
     fun dragPiece(id: PieceId): String = "drag-piece-${id.name}"
+
+    /** One grid cell per puzzle (REQ-050; TASK-021); carries `PuzzleIdKey` and `PuzzleStateKey` (S-14Δ). */
+    fun overviewCell(id: String): String = "overview-cell-$id"
 }

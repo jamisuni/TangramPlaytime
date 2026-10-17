@@ -14,6 +14,16 @@
 // arrives with the lift, before any frame drew it, is never searched (REQ-014 A1's draft bound: the piece is
 // drawn at the finger of the current frame). N4 · the first-down-during-a-drag branch (`twistOnly`) is gone:
 // every drag starts and ends inside one `gesture`, which owns every pointer until its primary finger lifts.
+// WO-004 TASK-020 · S-22 (designs/WO-004-design.md §2 "Hit order", "Taps and the long press"; §3 library fact 5):
+// a touch that lands on a control (‹, ›, the counter, the Restart pill, a third of the solved row) never drags; it
+// acts at the lift within the 12 dp slop, whatever its duration, and moving the slop or more cancels it (as on the
+// flip badge; decisions.md 2026-10-15 "Browsing readings no REQ fixes"). On › only, a finger held within the slop
+// for 500 ms runs `nextUnsolved()` then, and its lift does nothing (REQ-050 rule "at least 500 ms"). The hold is
+// timed by `withTimeoutOrNull` on the pointer node's own clock — uptime on a device, the test rule's `mainClock`
+// under test — so nothing sleeps and no wall clock is read (G-14). Hit order 1 holds as before: a drag owns every
+// touch until its finger lifts, so ‹ and › never act mid-drag.
+// WO-004 TASK-021 · S-22 hit order 0 (design §3, library fact 4): while the overview is open, every touch is left to
+// the overlay's `clickable`s, unconsumed, the top bar's included.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -36,18 +46,40 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.atan2
 
+/** REQ-050 rule "Long press: at least 500 ms": › held this long within the slop runs `nextUnsolved()` (S-22). */
+internal const val LONG_PRESS_MS = 500L
+
+/** How a touch on a control ended before any hold fired. */
+private enum class ControlEnd {
+    /** Lifted within the slop: the control acts. */
+    LIFTED,
+
+    /** Moved the slop or more: cancelled; its lift does nothing. */
+    SLID,
+
+    /** A pointer cancel: nothing. */
+    CANCELLED,
+}
+
 /**
- * Routes every touch of `play-screen` (the touch routing):
+ * Routes every touch of `play-screen` (the touch routing; S-22's hit order):
+ * 0. While the grid overview is open, a new touch is the overlay's: the router neither consumes nor acts until its
+ *    last finger lifts, on the top bar too (the bar stays drawn and inert; the overlay's `clickable`s act).
  * 1. While a drag runs, every further touch is a twist finger for that drag (S-7 → `twistDrag`), whatever it
- *    lands on; lifting it keeps the turn reached. Every drag starts and ends inside the one gesture that owns
- *    every pointer until its primary finger lifts, so a new gesture never meets a running drag.
- * 2. Otherwise a new touch belongs to the first hit of [HitTest] (the badges, the tray cells and the placed
- *    pieces in the order decisions.md 2026-10-12 sets → nothing).
- * 3. A touch that ends having moved less than the slop (S-8) is a tap: `pressBadge`, `tapTray` or `tapBoard`.
+ *    lands on — ‹, › and the counter included; lifting it keeps the turn reached. Every drag starts and ends
+ *    inside the one gesture that owns every pointer until its primary finger lifts, so a new gesture never meets
+ *    a running drag.
+ * 2. Otherwise a new touch belongs to the first hit of [HitTest] (a top-bar column or a third of the solved row;
+ *    then the badges, the drawn pieces, the Restart pill, the rest of the badge areas, the tray cells and the
+ *    pieces' margins → nothing).
+ * 3. A touch on a control never drags: it acts at the lift within the slop (S-8), whatever its duration; moved
+ *    the slop or more it does nothing; on ›, held 500 ms within the slop, it runs `nextUnsolved()` at once and its
+ *    lift does nothing ([control]).
+ * 4. Any other touch that ends having moved less than the slop is a tap: `pressBadge`, `tapTray` or `tapBoard`.
  *    From the move that reaches the slop it is a drag: `startDrag`, then `moveDrag` with the piece's lowest
  *    point `floatOffsetDp` above the finger and `overBoard` = the finger is over the board. A touch that
  *    starts on a badge never drags: moved past the slop, it does nothing at all.
- * 4. A release calls `drop()`; a pointer cancel calls `goHome()`.
+ * 5. A release calls `drop()`; a pointer cancel calls `goHome()`.
  *
  * The hand reaches the controller once per displayed frame (REQ-021 rules "updated at most once per displayed
  * frame" and "the same search as the drop"): the moves and twist steps that arrive between two frames are held
@@ -62,12 +94,14 @@ import kotlin.math.atan2
  * and the glide every ended drag leaves behind.
  *
  * @param geometry the current layout, read at each touch (null before the first layout: touches do nothing).
+ * @param shown the controls drawn now besides the top bar (the Restart pill, the solved row), read at each touch.
  * @param floatOffsetDp how far the dragged piece's lowest point floats above the finger (S-5, REQ-014 ASSUMPTION).
  */
 internal class PointerRouter(
     private val controller: PlayController,
     private val visual: DragVisual,
     private val geometry: () -> ScreenGeometry?,
+    private val shown: () -> ShownControls,
     private val floatOffsetDp: Float,
 ) {
     private var growJob: Job? = null
@@ -90,23 +124,98 @@ internal class PointerRouter(
             val animations = this
             awaitEachGesture {
                 val first = awaitFirstDown(requireUnconsumed = false)
+                // Routing 0 (S-22 hit order 0): a touch that starts while the overview is open is the overlay's, from its
+                // down to its last lift, on the top bar too — the router neither consumes nor acts. Compose runs the Main
+                // pass on descendants first, and a `clickable` cancels when its Final pass sees a change consumed (design
+                // §3, library fact 4). Returning here, `awaitEachGesture` waits for every pointer to lift without
+                // consuming; a tap on the scrim or a cell that closes the overview at its lift still acts on nothing here.
+                if (controller.overviewOpen) return@awaitEachGesture
                 first.consume()
                 val g = geometry() ?: return@awaitEachGesture
-                gesture(first, g, slopPx, marginPx, floatPx, animations)
+                when (val hit = HitTest.at(first.position, g, controller, marginPx, shown())) {
+                    is Hit.OnControl -> control(first, hit.control, slopPx)
+                    else -> gesture(first, hit, g, slopPx, floatPx, animations)
+                }
             }
         }
     }
 
-    /** One touch from its down to its up or cancel, with the twist fingers that join it while it drags. */
+    /**
+     * Routing 3, one touch on [control] from its down to its up (S-22 "Taps and the long press"): it never drags.
+     * A lift within the slop acts ([act]); a move of the slop or more cancels it, and a pointer cancel does nothing.
+     * On › the wait for the lift is bounded by [LONG_PRESS_MS] on the pointer node's clock: when it runs out with
+     * the finger still down within the slop, `nextUnsolved()` runs then, and the lift does nothing.
+     */
+    private suspend fun AwaitPointerEventScope.control(first: PointerInputChange, control: Control, slopPx: Float) {
+        val classifier = TouchClassifier(slopPx).apply { down(first.position.x, first.position.y) }
+        val end = if (control == Control.NEXT) {
+            withTimeoutOrNull(LONG_PRESS_MS) { awaitControlEnd(first.id, classifier) }
+        } else {
+            awaitControlEnd(first.id, classifier)
+        }
+        when (end) {
+            null -> {
+                controller.nextUnsolved()
+                awaitLift(first.id)
+            }
+            ControlEnd.LIFTED -> act(control)
+            ControlEnd.SLID -> awaitLift(first.id)
+            ControlEnd.CANCELLED -> Unit
+        }
+    }
+
+    /** Waits for the control touch [id] to lift, to move the slop, or to be cancelled; every change is consumed. */
+    private suspend fun AwaitPointerEventScope.awaitControlEnd(id: PointerId, classifier: TouchClassifier): ControlEnd {
+        while (true) {
+            val event = awaitPointerEvent()
+            var end: ControlEnd? = null
+            for (change in event.changes) {
+                if (change.id == id && end == null) {
+                    end = when {
+                        // A pointer cancel arrives as an up already consumed; a real lift does not (routing 5).
+                        change.changedToUpIgnoreConsumed() -> if (change.isConsumed) ControlEnd.CANCELLED else ControlEnd.LIFTED
+                        change.pressed && classifier.move(change.position.x, change.position.y) -> ControlEnd.SLID
+                        else -> null
+                    }
+                }
+                change.consume()
+            }
+            if (end != null) return end
+        }
+    }
+
+    /** Consumes every change until the finger [id] is up (a fired long press, a control slid off): nothing acts. */
+    private suspend fun AwaitPointerEventScope.awaitLift(id: PointerId) {
+        while (true) {
+            val event = awaitPointerEvent()
+            event.changes.forEach { it.consume() }
+            val primary = event.changes.firstOrNull { it.id == id }
+            if (primary == null || !primary.pressed) return
+        }
+    }
+
+    /** A control acted on at its lift (S-2Δ): ‹ `previous`, › and Next `next`, the counter `openOverview`, Restart, Retry; the best time is inert. */
+    private fun act(control: Control) {
+        when (control) {
+            Control.PREV -> controller.previous()
+            Control.NEXT -> controller.next()
+            Control.COUNTER -> controller.openOverview()
+            Control.RESTART -> controller.restart()
+            Control.RETRY -> controller.retry()
+            Control.BEST_TIME -> Unit
+            Control.SOLVED_NEXT -> controller.next()
+        }
+    }
+
+    /** One touch on the board or the tray from its down to its up or cancel, with the twist fingers that join it while it drags. */
     private suspend fun AwaitPointerEventScope.gesture(
         first: PointerInputChange,
+        hit: Hit?,
         g: ScreenGeometry,
         slopPx: Float,
-        marginPx: Float,
         floatPx: Float,
         animations: CoroutineScope,
     ) {
-        val hit = HitTest.at(first.position, g, controller, marginPx)
         val classifier = TouchClassifier(slopPx).apply { down(first.position.x, first.position.y) }
         var finger = first.position
         var dragging = false
@@ -200,6 +309,7 @@ internal class PointerRouter(
             is Hit.Badge -> controller.pressBadge()
             is Hit.Tray -> controller.tapTray(hit.piece)
             is Hit.Board -> controller.tapBoard(hit.placement.piece)
+            is Hit.OnControl -> Unit // never reached: a control touch is routed to `control`
         }
     }
 
@@ -213,6 +323,7 @@ internal class PointerRouter(
         stopFrames()
         when (hit) {
             is Hit.Badge -> return false // never reached: a badge touch is stopped before a drag can start
+            is Hit.OnControl -> return false // never reached: a control touch is routed to `control` and never drags
             is Hit.Tray -> {
                 val piece = hit.piece
                 val turn = controller.trayTurn(piece)

@@ -63,6 +63,76 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## State after WO-004 (2026-10-17, closed 09:25)
+
+- **WO-004 #Browsing + `:store` is done** (`workorders/WO-004.md`, Full (c)).
+  - **Browsing on the Play screen (`:play`):**
+    - the top bar: ‹ › (wrapping) and the counter (name, rating dots, "n / N", state word);
+    - a long press on › jumps to the next unsolved puzzle;
+    - Restart, shown only while a puzzle is In progress;
+    - the Retry · best time · Next row, shown once the picture has faded in;
+    - the grid overview below the bar, with the bar inert while it is open;
+    - the loading paper.
+  - **The celebration is a consumed controller cue** (WO-003 N1 closed).
+  - **`:store`** implements `IProgressStore` as ADR-003: one JSON document `noBackupFilesDir/progress.json`, rewritten atomically, any unreadable state = a fresh install. **ADR-003 is now in `architecture.md` v1.1** (the G2 route, row 4). `PlayController` saves through `Persistence` (the cache + one FIFO writer).
+  - **`:app`** loads the bundle and the store off the main thread (WO-003 F3 closed). Back closes the grid.
+  - **`tools/process_death_check.sh`** proves the board survives a real process death. It refuses stale APKs, so run it after the forced Gradle line in the briefs' channel table: `:app:packageDebug --rerun :app:packageDebugAndroidTest --rerun`.
+  - **Results:** 16/16 IDs green, every set on both images from the final tree:
+    - JVM 157;
+    - play device set 79/0 on the dev and floor images;
+    - app set 5 + 2 guarded skips on each image;
+    - the death pair with its control and negative run on each image;
+    - V-01.
+  - trace-check `--wo` GREEN; verifiers GREEN within budget. No line is `implemented (unverified)`.
+  - **Code review:** 0 B / 2 S / 5 N; two deliberate breaks of the code were both caught by the kit. Corrected checks 2; product defects found 0.
+- **Carry into WO-005 #DevTools:**
+  - REQ-046's aid touches WO-004's screen. Its overlay "stays on while the player browses" (‹ ›, the long press, the grid), the DEV button is hidden on a Solved puzzle, and "solve now" must go through the controller and `Persistence`: state Solved, no best time.
+  - The hit order (S-22) gains the DEV button.
+  - Pending draft: `chg-draft-req046-android-build-terms.md` (what "prototype / test build" means on Android).
+  - Release safety: V-01's canary check already proves `play/src/debug` is absent from release (REQ-046.A4's reading is the WO's to state).
+- **Carry into later WOs:**
+  - **WO-008 must-do** (`decisions.md` 2026-10-17, code review S1): its design states which side guarantees that a time the store's reader rejects (a negative time after a clock change) is never written. Otherwise the next launch reads the whole file as a fresh install and the first save erases every puzzle's progress.
+  - **WO-006:** the grid cells and the scrim have no screen-reader labels; the ‹ › 52 dp touch sweep (REQ-037).
+  - Retire `PlayController`'s memory-only constructor when the WO-003 kits move to a store double (code review N3).
+  - `ILockEngine.stillValid` sufficed for REQ-025 (WO-001 N3 closed, `decisions.md` 2026-10-15 "REQ-025's load check").
+- **Checkpoint items 1–5** (Restart one press · the solved row after the picture · best time "–" · the middle of the bar opens the grid · an emptied board stays In progress): unanswered, built on their defaults, which **stand 2026-10-18**.
+- **Lock behind build:** 25 outbox drafts still await a capture session. This WO wrote or amended none. REQ-038.A1 and REQ-019.A1–A4 stay unverified as before, and REQ-002.A1 and REQ-014.A1 too.
+- **Owner steps:**
+  - Commit the WO-004 snapshot (prompted on the G4 surface).
+  - **Play the build** (`review-notes.md` 2026-10-17: browsing, the grid, Restart, the solved row, close and reopen).
+  - Answer a checkpoint item before 2026-10-18 only if a default is wrong.
+  - Run a capture session on `capture-outbox/` when convenient.
+
+## Paste this to start the WO-005 session (one orchestrator context per WO)
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-005 #DevTools (TangramPlaytime, SWDev
+v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+files), then governance.md, architecture.md (v1.1), build-map.md (v1.4),
+design-inputs.md §2, decisions.md (incl. the WO-004 rows of 2026-10-15 and
+2026-10-17), the last progress.md entry, KICKOFF.md "State after WO-004",
+capture-outbox/chg-draft-req046-android-build-terms.md, platform-notes/android.md
+(incl. the WO-004 lesson lines).
+WO-005 scope: #DevTools — #SolutionReveal (REQ-046 A1..A4): the passcode-
+protected DEV aid in play/src/debug (a debug-only source set; absent from the
+release build, G-08), drawn on the WO-004 Play screen: the DEV button, the
+passcode prompt, "show the solution" (an overlay that stays on while browsing)
+and "solve this puzzle now" (Solved through the controller and Persistence,
+no best time); the DEV button hidden on a Solved puzzle; its place in the S-22
+hit order. Depends on REQ-022 (built, WO-001).
+Mode: decide from the four reasons (no new module — play/src/debug exists; no
+governed interface changed; no persistence format change) — Light unless one
+reason is written in the WO.
+Verification channels at G3: JVM where the logic is pure; the dev image
+Medium_Phone_API_37.0 AND the floor image Phone_API_26 (one emulator at a
+time); the release verifier V-01 + positive control (A4: the release has no
+DEV button). Device runs are judged by their XML, never by the exit code.
+Checkpoint candidates (≤5, product-visible): the DEV button's place and look
+(REQ-046 ASSUMPTION: bottom-left, small, dashed). Strings to review-notes.md.
+Stations as subagents; the four scripts are duties. End every turn with the
+one signal.
+```
+
 ## State after WO-003 (2026-10-12, closed 20:43)
 
 - **WO-003 #Solving is done** (`workorders/WO-003.md`, Light).
@@ -132,6 +202,45 @@ time; both proven in WO-003), the release verifier V-01 with its positive
 control; a migration/persistence test per governance row 11.
 Checkpoint candidates (≤5, product-visible). Stations as subagents; the four
 scripts are duties. End every turn with the one signal.
+```
+
+## WO-004 — PAUSED (2026-10-15 21:32; the owner: "plz dont start new tuff anymore after this implementer.. time to keep break") — DONE 2026-10-17 (resumed 06:46 in a fresh Opus context, closed 09:25)
+
+**Where WO-004 #Browsing + `:store` stands (P4, dispatch step 4 of 7 done):**
+- **G3 approved** 2026-10-15 19:52, Full (c). Design `designs/WO-004-design.md` (Reviewed; design review 0 B / 5 S), plan `tasks.md` § WO-004 (TASK-016…022), briefs `workorders/WO-004-briefs.md` (the dispatch-order and channel tables at the top; one brief per task).
+- **Tasks:** TASK-016 (JVM kit) done · TASK-017 (`:store` file store) in review · TASK-018 (`Persistence` + controller) in review · TASK-019 (device kit) done · TASK-020 (top bar, Restart, solved row, long press, loading paper) in review · **TASK-021 (the grid overview) and TASK-022 (`:app` wiring + `tools/process_death_check.sh`) not started.**
+- **Evidence** (`.swdev/run-log/WO-004.md`): JVM green (r1 20:48; i20 21:29: store 12, play 79, content 64, contracts 2); dev image: ResumeScreen 5/0, SolvedView 5/0, the six WO-003 classes 51/0, TopBar 12/1 (i20). Floor image not yet run on WO-004 code (TASK-021, TASK-022, Test & Verify).
+- **One open kit finding, not yet routed:** `TopBarKitTest.aPieceDrawnOverTheRestartPillWinsTheTouchAndThePillBeatsAPiecesMargin` (untokened, S-22 hit order 3) skips by `assumeTrue` on the dev screen — no bundled puzzle draws a placed piece over the pill there, so the pin cannot fail where it runs (the connected XML records the skip as a `<failure>`). Route it to the TASK-019 kit author (fresh context: the earlier one lives in this ended session) for a constructed case or an honest placement of the pin — a corrected check if the kit changes — **before** TASK-021.
+- **Corrected checks so far: 1** (design review F5(b) reversed on trace-check's code). Disputes 0. Recirculations: design-review → design author ×1 (+ two write-backs), plan-review → planner ×1. Hard-stops 0.
+- **Checkpoint items 1–5** asked 2026-10-15, defaults stand 2026-10-18 (`workorders/WO-004.md` § Checkpoint items).
+- **Kit hashes at landing** (an implementer never edits these; recompute at every hand-back): WO-004 log 20:23 (JVM kit) and 20:49 (device kit).
+- **Emulator:** `Medium_Phone_API_37.0` was running as `emulator-5554` at the pause (it may be gone — `adb devices`, reboot headless). One at a time.
+- **Owner steps:** none required. A snapshot commit of the mid-WO tree is optional (nothing is closed; the kit's red window is closed for `:play`, still open for `:app` androidTest until TASK-022).
+
+**Paste this to resume WO-004 (fresh orchestrator context):**
+
+```text
+WE ARE IN PHASE P4 — RESUMING WORK ORDER WO-004 #Browsing + store/ (TangramPlaytime,
+SWDev v0.20, intake path C) in a fresh orchestrator context. Read AGENTS.md first
+(incl. the "from P3 on" framework files), then KICKOFF.md "WO-004 — PAUSED",
+workorders/WO-004.md (§ Log is the narrative), tasks.md § WO-004,
+workorders/WO-004-briefs.md (the two tables at the top), .swdev/run-log/WO-004.md,
+decisions.md (the 2026-10-15 rows), the last progress.md entry, review-notes.md,
+platform-notes/android.md.
+State: TASK-016/019 done; TASK-017/018/020 in review; TASK-021 (overview) and
+TASK-022 (:app wiring + the process-death check) not started. First: route the
+open kit finding (TopBarKitTest hit-order-3 pin skips on the dev screen) to a
+fresh acceptance-test-author with its TASK-019 brief + the finding; then TASK-021,
+then TASK-022, each from its brief (slice-implementer, Opus), recomputing the kit
+hashes at every hand-back and logging every hop with `date` stamps. Then
+plan-check again (kit compiled), code-reviewer (Sonnet, fresh), test-verify
+(Sonnet: every set on BOTH images from the final tree, the death pair + its
+positive control on both, V-01 + positive control), traceability-auditor
+(PYTHONUTF8=1 trace_check.py --wo WO-004, 16 IDs), and the close (run_verifiers
+--wo, wo_metrics --wo --write, ledger, Contract deltas, ADR-003 via the G2 route,
+G4 under row 9, KICKOFF "State after WO-004" + the WO-005 brief, AGENTS.md phase
+line, proposals.md, progress.md, the snapshot prompt). Stations as subagents. End
+every turn with the one signal.
 ```
 
 ## WO-003 — MID-WO HAND-OVER (2026-10-12 18:28; the owner moved the orchestrator off Fable for credits) — DONE 2026-10-12 (resumed 18:30 in an Opus context, closed 20:43)

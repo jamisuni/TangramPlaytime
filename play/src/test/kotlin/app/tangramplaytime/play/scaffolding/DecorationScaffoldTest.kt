@@ -1,7 +1,8 @@
 // scaffolding — TASK-014's own disposable checks of the pure parts of the decorations and the solve: the
 // size-mark letters, the badge areas and their precedence in the hit test, the pulse keyframes and the solve
 // timeline's arithmetic (no token; the acceptance verdict is the device kit's DecorationKitTest,
-// CornerPulseKitTest and SolvedPictureKitTest).
+// CornerPulseKitTest and SolvedPictureKitTest). WO-004 TASK-020 updated it for S-11Δ (the `PlayTexts` literal),
+// S-22 (`HitTest.at` takes the controls shown; none here) and S-3Δ (`SolveVisual` is one frame's value).
 package app.tangramplaytime.play.scaffolding
 
 import androidx.compose.ui.geometry.Offset
@@ -20,6 +21,7 @@ import app.tangramplaytime.play.PlayController
 import app.tangramplaytime.play.PlayLayout
 import app.tangramplaytime.play.PlayTexts
 import app.tangramplaytime.play.ScreenGeometry
+import app.tangramplaytime.play.ShownControls
 import app.tangramplaytime.play.SolveVisual
 import app.tangramplaytime.play.artColour
 import app.tangramplaytime.play.badgeSlots
@@ -45,7 +47,11 @@ class DecorationScaffoldTest {
         sideMarginDp = 8f,
         topBarDp = 66f,
     )
-    private val texts = PlayTexts("S", "M", "L", "en")
+    private val texts = PlayTexts(
+        sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = "en",
+        restart = "Restart", retry = "Retry", next = "Next", bestTime = "Best time", noTime = "–",
+        inProgress = "in progress", solved = "solved", counterFormat = "%1\$d / %2\$d", allPuzzles = "All puzzles", done = "Done",
+    )
     private val density = 2.625f
 
     @Test
@@ -82,14 +88,14 @@ class DecorationScaffoldTest {
             val r = tray.discRadius
             assertTrue("$widthPx: the whole disc ${tray.disc} r $r lies inside the area ${tray.area}", tray.disc.x - r >= tray.area.left && tray.disc.x + r <= tray.area.left + tray.area.width && tray.disc.y - r >= tray.area.top && tray.disc.y + r <= tray.area.top + tray.area.height)
             assertTrue("disc centre ${tray.disc} in the cell's top-right quarter $cell", tray.disc.x > cell.left + cell.width * 0.5f && tray.disc.y < cell.top + cell.height * 0.5f)
-            assertEquals("the disc's centre is the badge", Hit.Badge(onBoard = false), HitTest.at(tray.disc, g, controller, margin))
-            assertEquals("the disc's edge is the badge", Hit.Badge(onBoard = false), HitTest.at(Offset(tray.disc.x - r + 1f, tray.disc.y), g, controller, margin))
+            assertEquals("the disc's centre is the badge", Hit.Badge(onBoard = false), HitTest.at(tray.disc, g, controller, margin, ShownControls.NONE))
+            assertEquals("the disc's edge is the badge", Hit.Badge(onBoard = false), HitTest.at(Offset(tray.disc.x - r + 1f, tray.disc.y), g, controller, margin, ShownControls.NONE))
             // Decisions.md 2026-10-12 (fix batch): the visible thing wins in the tray too — disc → the PG miniature's
             // drawn shape → the rest of the area → the rest of the cell.
             val mini = trayMiniaturePx(engine, PieceId.PG, controller.trayTurn(PieceId.PG), controller.trayMirrored(PieceId.PG), g)!!
             val middle = Offset(mini.sumOf { it.x.toDouble() }.toFloat() / mini.size, mini.sumOf { it.y.toDouble() }.toFloat() / mini.size)
             assertTrue("$widthPx: the miniature's middle $middle lies in the badge area ${tray.area}", tray.area.contains(middle))
-            assertEquals("$widthPx: the miniature's middle is the PG", Hit.Tray(PieceId.PG), HitTest.at(middle, g, controller, margin))
+            assertEquals("$widthPx: the miniature's middle is the PG", Hit.Tray(PieceId.PG), HitTest.at(middle, g, controller, margin, ShownControls.NONE))
             var drawnInArea = 0
             var bareInArea = 0
             for (y in tray.area.top until tray.area.top + tray.area.height step 4) for (x in tray.area.left until tray.area.left + tray.area.width step 4) {
@@ -99,18 +105,18 @@ class DecorationScaffoldTest {
                     insidePolygon(q, mini) -> Hit.Tray(PieceId.PG).also { drawnInArea++ }
                     else -> Hit.Badge(onBoard = false).also { bareInArea++ }
                 }
-                assertEquals("$widthPx: $q in the badge area", expected, HitTest.at(q, g, controller, margin))
+                assertEquals("$widthPx: $q in the badge area", expected, HitTest.at(q, g, controller, margin, ShownControls.NONE))
             }
             assertTrue("$widthPx: the area holds drawn ($drawnInArea) and bare ($bareInArea) samples", drawnInArea > 0 && bareInArea > 0)
-            assertEquals("the PG cell's bottom-left corner is the PG", Hit.Tray(PieceId.PG), HitTest.at(Offset(cell.leftPx + 1f, cell.topPx + cell.height - 1f), g, controller, margin))
+            assertEquals("the PG cell's bottom-left corner is the PG", Hit.Tray(PieceId.PG), HitTest.at(Offset(cell.leftPx + 1f, cell.topPx + cell.height - 1f), g, controller, margin, ShownControls.NONE))
             for (id in listOf(PieceId.LT2, PieceId.MT, PieceId.ST1, PieceId.SQ)) {
                 val c = g.cells.getValue(id)
                 for (q in listOf(Offset(c.leftPx + 1f, c.topPx + c.height - 1f), Offset(c.leftPx + 1f, c.topPx + 1f), Offset(c.leftPx + c.width - 1f, c.topPx + c.height - 1f))) {
-                    assertEquals("$widthPx: $q in the $id cell is its piece's", Hit.Tray(id), HitTest.at(q, g, controller, margin))
+                    assertEquals("$widthPx: $q in the $id cell is its piece's", Hit.Tray(id), HitTest.at(q, g, controller, margin, ShownControls.NONE))
                 }
             }
             val gapAbove = Offset(tray.disc.x, cell.topPx - 2f)
-            assertFalse("the row gap above the PG cell is not the badge", HitTest.at(gapAbove, g, controller, margin) is Hit.Badge)
+            assertFalse("the row gap above the PG cell is not the badge", HitTest.at(gapAbove, g, controller, margin, ShownControls.NONE) is Hit.Badge)
         }
     }
 
@@ -140,32 +146,38 @@ class DecorationScaffoldTest {
 
     @Test
     fun theSolveTimelineFollowsTheReqTwentyThreeNumbers() {
-        val solve = SolveVisual()
+        // WO-004 TASK-020: `SolveVisual` is one frame's value now (S-3Δ's driver works it out in the composition).
+        var solve = SolveVisual.UNSOLVED
         assertNull(solve.pictureAlpha)
         assertTrue(solve.piecesShown)
         assertFalse(solve.confettiShown(reducedMotion = false))
-        solve.elapsedMs = 0f
+        assertFalse("no solved row unsolved", solve.rowShown)
+        solve = SolveVisual(0f)
         assertEquals(0f, solve.popBump(reducedMotion = false), 1e-6f)
         assertEquals(0f, solve.popBump(reducedMotion = true), 1e-6f)
-        solve.elapsedMs = POP_MS / 2f
+        solve = SolveVisual(POP_MS / 2f)
         assertEquals(1f, solve.popBump(reducedMotion = false), 1e-6f)
         assertEquals(0f, solve.popBump(reducedMotion = true), 1e-6f)
-        solve.elapsedMs = (FADE_DELAY_MS - 1).toFloat()
+        solve = SolveVisual((FADE_DELAY_MS - 1).toFloat())
         assertNull("no picture before 600 ms", solve.pictureAlpha)
         assertTrue(solve.confettiShown(reducedMotion = false))
         assertFalse(solve.confettiShown(reducedMotion = true))
-        solve.elapsedMs = FADE_DELAY_MS.toFloat()
+        solve = SolveVisual(FADE_DELAY_MS.toFloat())
         assertEquals(0f, solve.pictureAlpha!!, 1e-6f)
         assertTrue(solve.piecesShown)
-        solve.elapsedMs = (FADE_DELAY_MS + FADE_MS / 2).toFloat()
+        solve = SolveVisual((FADE_DELAY_MS + FADE_MS / 2).toFloat())
         assertEquals(0.5f, solve.pictureAlpha!!, 1e-6f)
-        solve.elapsedMs = (FADE_DELAY_MS + FADE_MS).toFloat()
+        assertFalse("no solved row mid-fade", solve.rowShown)
+        solve = SolveVisual((FADE_DELAY_MS + FADE_MS).toFloat())
         assertEquals(1f, solve.pictureAlpha!!, 1e-6f)
         assertFalse("the pieces go once the picture is fully shown", solve.piecesShown)
-        solve.elapsedMs = (CONFETTI_MS - 1).toFloat()
+        assertTrue("the solved row from the frame the picture is fully shown", solve.rowShown)
+        solve = SolveVisual((CONFETTI_MS - 1).toFloat())
         assertTrue(solve.confettiShown(reducedMotion = false))
-        solve.elapsedMs = CONFETTI_MS.toFloat()
+        solve = SolveVisual.AT_END
         assertFalse(solve.confettiShown(reducedMotion = false))
+        assertTrue("a Solved puzzle at its end shows the row", solve.rowShown)
+        assertFalse("and no piece", solve.piecesShown)
     }
 
     @Test

@@ -1,6 +1,6 @@
 # Build map — TangramPlaytime
 
-**Status:** Signed off (G2)  ·  **Version:** 1.3  ·  **Last updated:** 2026-10-12
+**Status:** Signed off (G2)  ·  **Version:** 1.4  ·  **Last updated:** 2026-10-17
 **Approved by:** the orchestrator under governance row 4 (`ai+inform`), with `architecture.md` v1.0  ·  **Approved on:** 2026-10-11 (owner informed the same day)
 **Feature tree:** `Requirements/features.md` (SwReqCollector collection v1.2, locked 2026-10-01; G1 accepted for this project 2026-10-11)
 
@@ -27,7 +27,7 @@
 | #SolvedCheck | `kernel/` | Built (WO-001) | — | REQ-022: `ILockEngine.isSolved`, JVM-tested here (architecture.md §3: the solved check is `:kernel`'s); the solved *picture* and view are #SolvedPicture / #SolvedView (`play/`). Row added 2026-10-11 — without it the tag inherited `play/` from #Solving and trace-check read the kernel test as directory theater |
 | #LandingPreview | `play/` | Built (WO-003) | (kernel) (via `ILockEngine`) | the dashed outline is UI; the search is the kernel's |
 | #CornerTeach | `play/` | Built (WO-003) | (kernel) (via `ILockEngine` "went home") | REQ-051 pulse |
-| #Browsing | `play/` | Planned | #Content (via `IPuzzleLibrary`), #ResumePuzzle (via `IProgressStore`) | ‹ › top bar, resume/restart, solved view, long press, grid overview |
+| #Browsing | `play/` | Built (WO-004) | #Content (via `IPuzzleLibrary`), #ResumePuzzle (via `IProgressStore`) | ‹ › top bar, resume/restart, solved view, long press, grid overview; the `:app` wiring loads the bundle and the store off the main thread. REQ-040.A1 / REQ-041.A1 keep their `content/` tokens (the code home), the `play/` and `app/` tokens are the screen half (WO-004 design §4 "Tokens") |
 | #PlayTime | `kernel/` | Planned | #ResumePuzzle (via `IProgressStore`) | TYPE-005 active-second accounting, today/all-time, puzzle and best time (REQ-029, 030) |
 | #TimerDisplay | `play/` | Planned | — | REQ-031 timer on the board |
 | #Settings | `app/` | Planned | #PlayTime, #ResumePuzzle (via `IProgressStore`) | settings screen, sound toggle + playback + haptic, reset with confirmation |
@@ -39,7 +39,7 @@
 
 Not build units (no row): #Difficulty, #DifficultyChoice, #DifficultyRules, #TurnButtons (withdrawn REQs only); #PieceSets, #SafetyRope, #Accessibility (`idea`).
 
-The persistence component `store/` (`IProgressStore` implementation) has no `#Tag` of its own: it is the code home for the *storage half* of #ResumePuzzle, #PlayTime and #Settings and is built in WO-004 (Full, reason c — a new persistence format).
+The persistence component `store/` (`IProgressStore` implementation) has no `#Tag` of its own: it is the code home for the *storage half* of #ResumePuzzle, #PlayTime and #Settings and is **built in WO-004** (Full, reason c — a new persistence format; ADR-003: `FileProgressStore`, one JSON document `noBackupFilesDir/progress.json`, all members implemented; #PlayTime and #Settings add their callers in WO-008 / WO-007).
 
 ## 2. Work-order order (owner's kickoff order, KICKOFF.md; `priority: none`)
 
@@ -54,3 +54,4 @@ WO-001 #Locking (+ `:contracts`, `:kernel`) → WO-002 #Content → WO-003 #Solv
 | 1.1 | 2026-10-11 | `#SolvedCheck` row (code home `kernel/`); `#Locking` and `#SolvedCheck` build status Built (WO-001); REQ-020.A2 noted as WO-003's | WO-001: the tag had inherited `play/`; the component map already placed the solved check in `:kernel` | orchestrator (notify-tier delta, WO-001 Contract deltas) |
 | 1.2 | 2026-10-11 | `#Content` cross-feature deps `—` → `(kernel) (via ILockEngine)`; build status In progress (WO-002); notes updated (Java resources, not Android assets) | WO-002 design (reviewed): piece geometry comes through the seam instead of a second TYPE-001 shape table in `:content` (D1 value rules once) | orchestrator (notify-tier delta, WO-002 Contract deltas) |
 | 1.3 | 2026-10-11 | Rows `#GoHome`, `#PuzzleArt`, `#PuzzleMini` with code home `play/` (they inherited `kernel/` / `content/`); `#Solving` → In progress (WO-003); `#Locking` note narrowed | WO-003 scope: the carried screen-side lines (REQ-020.A2, REQ-039.A1, REQ-045.A2) are proven only in `play/`, and trace-check allows one code home per tag; the seam-side A1 tests stay as extra coverage (decisions.md 2026-10-11, WO-003). At the WO-003 close (2026-10-12): build status Built (WO-003) for `#Solving` (REQ-002 A2 → WO-009), `#GoHome`, `#PuzzleArt` (A1; A2 → WO-009), `#PuzzleMini`, `#LandingPreview`, `#CornerTeach` — same row | orchestrator (notify-tier delta, WO-003 Contract deltas) |
+| 1.4 | 2026-10-17 | `#Browsing` → Built (WO-004), its note names the screen-half tokens of REQ-040.A1 / REQ-041.A1; the `store/` note → built in WO-004 (ADR-003). No code home changed, no row added (design review F5(b) reversed: the `content/` tokens satisfy the one-code-home rule) | WO-004 close: 16/16 IDs green on JVM + dev image + floor image + the process-death channel (`reviews/WO-004-test-verify.md`) | orchestrator (notify-tier delta, WO-004 Contract deltas) |

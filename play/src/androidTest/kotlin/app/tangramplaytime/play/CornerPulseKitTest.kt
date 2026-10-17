@@ -2,6 +2,7 @@
 // `drop` / `goHome`, S-3 `Pulse`, the tag table's `corner-pulse` and `corner-marker` rows; decisions.md
 // "When the REQ-051 pulse fires"). Every drop is by touch on `play-screen`; the pulse's timing is driven
 // through `mainClock`; the markers' CentreKey is read against their bounds through BoardMapping.
+// Amended WO-004 (TASK-019), no token moved: the REQ-051 A2 snapshot is taken In progress (cited where it is made).
 package app.tangramplaytime.play
 
 import androidx.activity.ComponentActivity
@@ -12,6 +13,7 @@ import app.tangramplaytime.contracts.PieceId
 import app.tangramplaytime.contracts.Point
 import app.tangramplaytime.contracts.PuzzleDefinition
 import app.tangramplaytime.contracts.PuzzleKind
+import app.tangramplaytime.contracts.PuzzleState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -99,11 +101,25 @@ class CornerPulseKitTest {
         // the first warm-up: the same middle drop; from the release through the next second, no `corner-pulse`
         // or `corner-marker` node, the texts and the tagged nodes (apart from the dropped piece's own) are the
         // same as before the drag, and the piece is back in its cell.
+        // Amended WO-004 (TASK-019): the first tray drag of a New puzzle moves it to In progress (TYPE-006), which now adds
+        // the `restart` pill and the `state-word` with their texts to the screen (S-22 "Restart"; S-13Δ; decisions.md
+        // 2026-10-15 "The top bar, Restart and the solved row, as drawn": Restart shown only In progress, a state word for
+        // In progress). Those belong to the drag start, not to the drop, so the warm-up is put In progress first through
+        // S-2 — a drag of another piece started and sent home on the main thread, nothing placed, no pulse (S-2 `goHome`) —
+        // and the snapshot is taken then. The comparison itself is unchanged.
         kit.show()
         val p = kitFirst(PuzzleKind.WARMUP)
         kit.open(p.id)
         val piece = PieceId.ST1
         val cell = kit.bounds(PlayTags.trayCell(piece))
+        kit.onMain {
+            check(kit.controller.startDrag(PieceId.LT1, Point(0.0, 0.0))) { "kit: startDrag(LT1) refused" }
+            kit.controller.goHome()
+        }
+        kit.frames()
+        kit.advance(300)
+        check(kit.key(PlayTags.SCREEN, PlaySemantics.PuzzleStateKey) == PuzzleState.IN_PROGRESS) { "kit: ${p.id} is not In progress after the set-up drag" }
+        check(kit.exists(KitTag.RESTART)) { "kit: no `restart` pill In progress, so the snapshot would not hold it" }
         val own = setOf(PlayTags.trayPiece(piece), PlayTags.trayGhost(piece), PlayTags.dragPiece(piece))
         val (tagsBefore, textsBefore) = kit.tagsAndTexts()
         val middle = middleWithNoLock(p, piece)

@@ -2,6 +2,9 @@
 // § WO-003 › Seams S-11, S-12, the tag table's `flip-badge-*`, `size-mark-*` and `tray-ghost-*` rows;
 // decisions.md "Where the flip badge is"). The badge is pressed by touch; a placed piece is set up through
 // S-2 where the line is not about the gesture. Pixels are read against the geometry of the node's keys.
+// Amended WO-004 (TASK-019), no token moved: the board samplers that run In progress (the badge's ink, the disc finder)
+// keep the Restart pill's pixels out (cited where made). The tray captures are taken while the tray is shown and are
+// unchanged: the solved row replaces the tray only once a puzzle is Solved.
 package app.tangramplaytime.play
 
 import androidx.compose.ui.geometry.Offset
@@ -135,7 +138,11 @@ class DecorationKitTest {
             val dy = max(0f, max(pg.top - badge.center.y, badge.center.y - pg.bottom)); hypot(dx, dy)
         }
         assertTrue("${placedCase.id}: the board badge's centre is next to the placed PG (gap $gap px, badge ${badge.width} × ${badge.height})", gap <= max(badge.width, badge.height))
-        assertDrawnSomething("${placedCase.id}: board badge", PlayTags.BOARD, badge, listOf(PlayPalette.board, PlayPalette.paper, PlayPalette.silhouette, PlayPalette.piece(PieceId.PG)))
+        // Amended WO-004 (TASK-019): with the PG placed the puzzle is In progress, and the Restart pill is drawn at the
+        // board's top-left (S-22 "Restart"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn");
+        // its pixels are not the badge's, so the pill's node is left out of the badge's area here.
+        val pill = if (kit.exists(KitTag.RESTART)) listOf(kit.bounds(KitTag.RESTART)) else emptyList()
+        assertDrawnSomething("${placedCase.id}: board badge", PlayTags.BOARD, badge, listOf(PlayPalette.board, PlayPalette.paper, PlayPalette.silhouette, PlayPalette.piece(PieceId.PG)), exclude = pill)
     }
 
     @Test // pin: decisions.md "no badge while the piece is being dragged (it is in neither place)"; REQ-018 rule "touch area is at least 60 dp across"; no token
@@ -811,13 +818,42 @@ class DecorationKitTest {
             if (y > 0) seed(i - w)
             if (y < h - 1) seed(i + w)
         }
+        val enclosed = BooleanArray(w * h) { i -> !accent[i] && !reached[i] }
+        // Amended WO-004 (TASK-019): In progress the Restart pill is drawn at the board's top-left, above the silhouette
+        // (S-22 "Restart"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn"). Where it lies in
+        // the region, its own outline or label can enclose pixels too (the pill's inside, a letter's counter). An enclosed
+        // component lying wholly inside the `restart` node is the pill's, never the disc's, and is not counted.
+        if (captureTag == PlayTags.BOARD && kit.exists(KitTag.RESTART)) {
+            val pill = kit.bounds(KitTag.RESTART)
+            val component = IntArray(w * h)
+            for (start in 0 until w * h) {
+                if (!enclosed[start]) continue
+                var n = 0
+                var allInPill = true
+                component[n++] = start
+                enclosed[start] = false
+                var k = 0
+                while (k < n) {
+                    val i = component[k++]
+                    val x = i % w
+                    val y = i / w
+                    if (!pill.contains(Offset(captureBounds.left + x0 + x + 0.5f, captureBounds.top + y0 + y + 0.5f))) allInPill = false
+                    for (j in listOf(if (x > 0) i - 1 else -1, if (x < w - 1) i + 1 else -1, if (y > 0) i - w else -1, if (y < h - 1) i + w else -1)) {
+                        if (j >= 0 && !accent[j] && !reached[j] && enclosed[j]) { enclosed[j] = false; component[n++] = j }
+                    }
+                }
+                // Restore the component unless it is the pill's (marked by `reached`, so the scan below skips it).
+                for (m in 0 until n) if (allInPill) reached[component[m]] = true
+            }
+            for (i in 0 until w * h) enclosed[i] = !accent[i] && !reached[i]
+        }
         var minX = Int.MAX_VALUE
         var minY = Int.MAX_VALUE
         var maxX = -1
         var maxY = -1
         var inside = 0
         for (i in 0 until w * h) {
-            if (accent[i] || reached[i]) continue
+            if (!enclosed[i]) continue
             val x = i % w
             val y = i / w
             inside++
@@ -935,12 +971,13 @@ class DecorationKitTest {
         }
     }
 
-    /** Something is drawn in [area]: pixels that are none of [backgrounds]. */
-    private fun assertDrawnSomething(what: String, captureTag: String, area: Rect, backgrounds: List<androidx.compose.ui.graphics.Color>) {
+    /** Something is drawn in [area]: pixels that are none of [backgrounds], outside every [exclude] rectangle. */
+    private fun assertDrawnSomething(what: String, captureTag: String, area: Rect, backgrounds: List<androidx.compose.ui.graphics.Color>, exclude: List<Rect> = emptyList()) {
         val capture = kit.capture(captureTag)
         val origin = kit.bounds(captureTag).topLeft
         var ink = 0
         for (y in area.top.toInt()..area.bottom.toInt()) for (x in area.left.toInt()..area.right.toInt()) {
+            if (exclude.any { it.contains(Offset(x + 0.5f, y + 0.5f)) }) continue
             val cx = (x - origin.x).toInt()
             val cy = (y - origin.y).toInt()
             if (cx !in 0 until capture.width || cy !in 0 until capture.height) continue

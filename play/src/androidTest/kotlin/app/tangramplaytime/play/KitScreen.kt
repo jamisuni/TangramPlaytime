@@ -9,6 +9,11 @@
 // - the controller is driven on the main thread only (`runOnIdle`);
 // - pixels come from `captureToImage()` on `board` or `tray`, read against the geometry (the solution
 //   polygons through `BoardMapping`, `ILockEngine.vertices` through the node's keys) before a drawing is blamed.
+//
+// Amended WO-004 (TASK-019; designs/WO-004-design.md §2): the S-11Δ literal; the S-13Δ tag strings (`KitTag`);
+// a kit-owned in-memory `IProgressStore` (`KitDeviceStore`, design §4) and a controller over `Persistence` built
+// the way S-19 / S-1Δ / S-15Δ say (`Persistence.load` off the main thread, the controller on the main thread);
+// the top-bar, Restart and long-press helpers. No token lives in this file.
 package app.tangramplaytime.play
 
 import androidx.activity.ComponentActivity
@@ -37,15 +42,27 @@ import app.tangramplaytime.content.PuzzleLibraries
 import app.tangramplaytime.contracts.ArtLayer
 import app.tangramplaytime.contracts.ArtShape
 import app.tangramplaytime.contracts.ILockEngine
+import app.tangramplaytime.contracts.IProgressStore
 import app.tangramplaytime.contracts.IPuzzleLibrary
 import app.tangramplaytime.contracts.LockResult
 import app.tangramplaytime.contracts.PieceId
 import app.tangramplaytime.contracts.Placement
+import app.tangramplaytime.contracts.PlayTimes
 import app.tangramplaytime.contracts.Point
 import app.tangramplaytime.contracts.PuzzleDefinition
 import app.tangramplaytime.contracts.PuzzleKind
+import app.tangramplaytime.contracts.PuzzleProgress
+import app.tangramplaytime.contracts.PuzzleState
+import app.tangramplaytime.contracts.Settings
 import app.tangramplaytime.contracts.Turn
 import app.tangramplaytime.kernel.LockEngine
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import java.util.Collections
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.ceil
@@ -78,8 +95,26 @@ internal val kitPhoneLayout: PlayLayout = PlayLayout(
     topBarDp = 66f,
 )
 
-/** S-11 kit literal. */
-internal val kitTexts: PlayTexts = PlayTexts(sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = "en")
+/**
+ * S-11 kit literal, grown by S-11Δ (designs/WO-004-design.md §2: "Kit literal: "Restart", "Retry", "Next", "Best time",
+ * "–", "in progress", "solved", "%1$d / %2$d", "All puzzles", "Done""; design §3 "`KitScreen.kt`'s `PlayTexts` literal grows").
+ */
+internal val kitTexts: PlayTexts = PlayTexts(
+    sizeSmall = "S",
+    sizeMedium = "M",
+    sizeLarge = "L",
+    titleLanguage = "en",
+    restart = "Restart",
+    retry = "Retry",
+    next = "Next",
+    bestTime = "Best time",
+    noTime = "–",
+    inProgress = "in progress",
+    solved = "solved",
+    counterFormat = "%1\$d / %2\$d",
+    allPuzzles = "All puzzles",
+    done = "Done",
+)
 
 /** S-1: a fresh controller over the real engine and the bundled puzzles — the fresh start. */
 internal fun kitController(onEvent: (PlayEvent) -> Unit = {}): PlayController = PlayController(kitLibrary, kitEngine, onEvent)
@@ -427,6 +462,379 @@ internal class KitScreen(
         val b = bounds(PlayTags.BOARD)
         return kitRasterise(solutionPolygonsInBoardPx(p), b.width.roundToInt(), b.height.roundToInt())
     }
+
+    // ── WO-004 (TASK-019): the top bar, the controls, the long press ──
+
+    /** The puzzle `play-screen` shows (S-14 `PuzzleIdKey`). */
+    fun shownId(): String = key(PlayTags.SCREEN, PlaySemantics.PuzzleIdKey)
+
+    /** The shown puzzle's TYPE-006 state (S-14 `PuzzleStateKey`), the product's claim: cross-checked where a line rests on it. */
+    fun shownState(): PuzzleState = key(PlayTags.SCREEN, PlaySemantics.PuzzleStateKey)
+
+    /**
+     * A still tap at the centre of [tag]'s bounds — S-13Δ: "A control's bounds are its touch area" — then one more frame
+     * (a control acts at the lift, decisions.md 2026-10-15 "Browsing readings no REQ fixes"; the next frame composes it).
+     */
+    fun press(tag: String) {
+        tap(bounds(tag).center)
+        frames()
+    }
+
+    /**
+     * A finger put down at [at] and held still for [ms] on the paused clock; it stays down. The hold's timeout runs on the
+     * pointer node's clock, which is `mainClock` under the test rule (design §3, library fact 5), so nothing sleeps.
+     */
+    fun holdDown(at: Offset, ms: Long) {
+        touch { down(at) }
+        frames()
+        advance(ms)
+    }
+
+    /** Lifts the one finger that is down, then one frame. */
+    fun lift() {
+        touch { up() }
+        frames()
+    }
+
+    /** Every node with a text in [tag]'s unmerged subtree, with that text (seam note 4: texts are merged, inert nodes). */
+    fun textNodesUnder(tag: String): List<Pair<SemanticsNode, String>> {
+        val out = ArrayList<Pair<SemanticsNode, String>>()
+        fun walk(n: SemanticsNode) {
+            n.config.getOrNull(SemanticsProperties.Text)?.let { t -> out += n to t.joinToString("") { it.text } }
+            n.children.forEach { walk(it) }
+        }
+        walk(node(tag))
+        return out
+    }
+
+    /** Every node of the unmerged tree whose test tag starts with [prefix], with its tag. */
+    fun nodesWithTagPrefix(prefix: String): List<Pair<String, SemanticsNode>> {
+        val out = ArrayList<Pair<String, SemanticsNode>>()
+        fun walk(n: SemanticsNode) {
+            n.config.getOrNull(SemanticsProperties.TestTag)?.let { if (it.startsWith(prefix)) out += it to n }
+            n.children.forEach { walk(it) }
+        }
+        walk(rule.onRoot(useUnmergedTree = true).fetchSemanticsNode())
+        return out
+    }
+
+    /** The node's unclipped bounds in `play-screen` px (its position and size, whatever a scroll container clips). */
+    fun unclippedBounds(n: SemanticsNode): Rect {
+        val o = n.positionInRoot - screenOrigin()
+        return Rect(o.x, o.y, o.x + n.size.width, o.y + n.size.height)
+    }
+
+    /**
+     * The state word the top bar shows, or "" when it shows none (decisions.md 2026-10-15 "The top bar, Restart and the
+     * solved row, as drawn": "a state word for In progress and Solved, with none for New"; S-13Δ `state-word`).
+     */
+    fun stateWord(): String = if (exists(KitTag.STATE_WORD)) text(KitTag.STATE_WORD) else ""
+
+    /**
+     * Asserts that the screen shows the puzzle [id]: `play-screen`'s PuzzleIdKey (the product's claim), cross-checked
+     * against the drawing — the title's text (S-11: `titles[titleLanguage]`), the `silhouette` node's box against [id]'s
+     * solution outline through BoardMapping (tag table), and the "n / N" text inside `counter` (seam note 4; S-11Δ
+     * `counterFormat`; n is [id]'s position in ‹ › order, REQ-040).
+     */
+    fun assertShows(id: String, what: String) {
+        val shown = shownId()
+        if (shown != id) throw AssertionError("$what: `play-screen` shows $shown (${kitNumberOf(shown)} / ${kitLibrary.puzzles.size}), expected $id (${kitNumberOf(id)} / ${kitLibrary.puzzles.size})")
+        val p = kitLibrary.byId(id) ?: throw AssertionError("$what: $id is not a bundled puzzle")
+        val title = text(PlayTags.TITLE)
+        if (title != p.titles.getValue(kitTexts.titleLanguage)) throw AssertionError("$what: the title reads '$title', expected '${p.titles.getValue(kitTexts.titleLanguage)}' ($id)")
+        val all = p.solution.flatMap { it.polygon }
+        val expected = Rect(toPx(Point(all.minOf { it.x }, all.minOf { it.y })), toPx(Point(all.maxOf { it.x }, all.maxOf { it.y })))
+        kitAssertBoxNear("$what: `silhouette` box vs $id's solution outline", expected, bounds(PlayTags.SILHOUETTE), 2f)
+        val number = kitCounterText(id)
+        val texts = textNodesUnder(KitTag.COUNTER).map { it.second }
+        if (number !in texts) throw AssertionError("$what: no '$number' text inside `counter` (its texts: $texts)")
+    }
+
+    /**
+     * A point of the `restart` pill (S-13Δ: its bounds are its touch area) clear of everything S-22's hit order puts
+     * before it or level with it: outside every board piece's drawn shape grown by 12 dp (REQ-015's margin) and outside
+     * the board badge's area. The point of the pill farthest from the pieces.
+     */
+    fun restartTapPoint(): Offset {
+        val pill = bounds(KitTag.RESTART)
+        val shapes = PieceId.entries.filter { exists(PlayTags.boardPiece(it)) }
+            .map { boardPolygonPx(PlayTags.boardPiece(it)).map { o -> Point(o.x.toDouble(), o.y.toDouble()) } }
+        val badge = if (exists(PlayTags.FLIP_BADGE_BOARD)) bounds(PlayTags.FLIP_BADGE_BOARD) else null
+        var best: Offset? = null
+        var bestClear = -1f
+        val step = dp(2f)
+        var y = pill.top + 2f
+        while (y <= pill.bottom - 2f) {
+            var x = pill.left + 2f
+            while (x <= pill.right - 2f) {
+                val q = Offset(x, y)
+                x += step
+                if (badge != null && badge.contains(q)) continue
+                val pq = Point(q.x.toDouble(), q.y.toDouble())
+                val clear = shapes.minOfOrNull { if (kitInside(pq, it)) -1.0 else kitDistToBoundary(pq, it) }?.toFloat() ?: Float.MAX_VALUE
+                if (clear > bestClear) { best = q; bestClear = clear }
+            }
+            y += step
+        }
+        val found = best
+        check(found != null && bestClear > dp(12f)) { "kit: no point of the `restart` pill $pill is clear of the pieces' 12 dp margins (best ${bestClear / density} dp)" }
+        return found
+    }
+
+    /** Every piece of [p] is in the tray, its miniature inside its own cell, nothing of it on the board (tag table). */
+    fun assertAllInTray(p: PuzzleDefinition, what: String) {
+        for (piece in p.pieces) {
+            val homes = homesOf(piece)
+            if (homes != listOf(PlayTags.trayPiece(piece))) throw AssertionError("$what: $piece is at $homes, not in the tray")
+            val cell = bounds(PlayTags.trayCell(piece))
+            val box = bounds(PlayTags.trayPiece(piece))
+            if (!(cell.contains(box.topLeft) && cell.contains(box.bottomRight))) throw AssertionError("$what: $piece's miniature $box is not inside its cell $cell")
+        }
+    }
+
+    /** The board as `board-piece` nodes show it: each one's piece, turn, mirror and centre (S-14 keys), in piece order. */
+    fun boardFromNodes(): List<Placement> = PieceId.entries.filter { exists(PlayTags.boardPiece(it)) }.map {
+        val tag = PlayTags.boardPiece(it)
+        Placement(key(tag, PlaySemantics.PieceKey), key(tag, PlaySemantics.TurnKey), key(tag, PlaySemantics.MirroredKey), key(tag, PlaySemantics.CentreKey))
+    }
+
+    /**
+     * The keys of every `board-piece` node read against the drawing: the node's box is the box of the engine's corners at
+     * its keys (tag table: bounds follow the drawing), and the pixels 3 px inside that polygon are the piece's colour
+     * (S-12 `PlayPalette.piece`), away from the board badge (drawn over pieces).
+     */
+    fun assertBoardDrawnAtItsKeys(what: String) {
+        val board = capture(PlayTags.BOARD)
+        val boardBounds = bounds(PlayTags.BOARD)
+        val avoid = listOfNotNull(if (exists(PlayTags.FLIP_BADGE_BOARD)) bounds(PlayTags.FLIP_BADGE_BOARD) else null)
+        for (piece in PieceId.entries) {
+            val tag = PlayTags.boardPiece(piece)
+            if (!exists(tag)) continue
+            val poly = boardPolygonPx(tag)
+            kitAssertBoxNear("$what: `$tag` box vs the engine's corners at its keys", kitBox(poly), bounds(tag), 2f)
+            val samples = kitInteriorSamples(poly, 3f, avoid, within = boardBounds)
+            if (samples.size < 8) throw AssertionError("$what: only ${samples.size} interior samples of $piece (kit fixture)")
+            val colour = PlayPalette.piece(piece)
+            val wrong = samples.filter { s -> !kitNear(board[(s.x - boardBounds.left).toInt(), (s.y - boardBounds.top).toInt()], colour, 16f / 255f) }
+            if (wrong.isNotEmpty()) {
+                val s = wrong.first()
+                throw AssertionError("$what: ${wrong.size} of ${samples.size} pixels 3 px inside $piece's polygon are not ${kitHex(colour)}; first $s = ${kitHex(board[(s.x - boardBounds.left).toInt(), (s.y - boardBounds.top).toInt()])}")
+            }
+        }
+    }
+}
+
+// ── WO-004 (TASK-019): tags, numbers, the store double, a controller over Persistence ─────────────────
+
+/**
+ * The S-13Δ tag strings. The design's seam row fixes the strings (designs/WO-004-design.md §2 S-13Δ), not the names of
+ * `PlayTags`' members, so the kit spells them itself. S-13Δ: "A control's bounds are its touch area."
+ */
+internal object KitTag {
+    const val NAV_PREV = "nav-prev"
+    const val NAV_NEXT = "nav-next"
+    const val COUNTER = "counter"
+    const val RATING = "rating"
+    const val STATE_WORD = "state-word"
+    const val RESTART = "restart"
+    const val SOLVED_ROW = "solved-row"
+    const val RETRY = "retry"
+    const val BEST_TIME = "best-time"
+    const val SOLVED_NEXT = "solved-next"
+    const val OVERVIEW = "overview"
+    const val OVERVIEW_DONE = "overview-done"
+    const val OVERVIEW_CELL_PREFIX = "overview-cell-"
+    const val PLAY_LOADING = "play-loading"
+
+    fun overviewCell(id: String): String = OVERVIEW_CELL_PREFIX + id
+}
+
+/** The 1-based position of [id] in ‹ › order (REQ-040; `IPuzzleLibrary.puzzles`), 0 when it is not listed. */
+internal fun kitNumberOf(id: String): Int = kitLibrary.puzzles.indexOfFirst { it.id == id } + 1
+
+/** The puzzle after [id] in ‹ › order, wrapping (REQ-024 rule: "The list wraps"). */
+internal fun kitAfter(id: String): PuzzleDefinition = kitLibrary.puzzles[kitNumberOf(id) % kitLibrary.puzzles.size]
+
+/** The puzzle before [id] in ‹ › order, wrapping (REQ-024 rule: "‹ on the first puzzle shows the last"). */
+internal fun kitBefore(id: String): PuzzleDefinition = kitLibrary.puzzles[(kitNumberOf(id) - 2 + kitLibrary.puzzles.size) % kitLibrary.puzzles.size]
+
+/** The "n / N" text for [id]: S-11Δ `counterFormat` ("%1$d / %2$d") with its position and the library's size. */
+internal fun kitCounterText(id: String): String = kitTexts.counterFormat.format(kitNumberOf(id), kitLibrary.puzzles.size)
+
+/**
+ * The kit's in-memory `IProgressStore` (designs/WO-004-design.md §4: the controller kits run over a kit-owned double; the
+ * file store is the oracle of governance row 11 and of the death pair only). It keeps what it is given (IProgressStore
+ * KDoc: "The store keeps what it is given"), reads a puzzle without an entry as `PuzzleProgress.FRESH` (KDoc of
+ * `progress`), and logs every `saveProgress` in order. Thread-safe: `Persistence`'s writer calls it off the main thread
+ * while the test thread reads it.
+ */
+internal class KitDeviceStore(
+    seed: Map<String, PuzzleProgress> = emptyMap(),
+    lastOpened: String? = null,
+) : IProgressStore {
+    private val lock = Any()
+    private val puzzles = LinkedHashMap(seed)
+    private var last: String? = lastOpened
+    private var times: PlayTimes = PlayTimes.NONE
+    private var prefs: Settings = Settings()
+    private val saveLog = ArrayList<Pair<String, PuzzleProgress>>()
+
+    /** Every saved puzzle's progress now (a copy). */
+    fun snapshot(): Map<String, PuzzleProgress> = synchronized(lock) { LinkedHashMap(puzzles) }
+
+    /** [id]'s saved progress now, `PuzzleProgress.FRESH` when none is saved. */
+    fun progressNow(id: String): PuzzleProgress = synchronized(lock) { puzzles[id] ?: PuzzleProgress.FRESH }
+
+    /** The last-opened id saved now. */
+    fun lastOpenedNow(): String? = synchronized(lock) { last }
+
+    /** Every `saveProgress` call so far, in order. */
+    fun saves(): List<Pair<String, PuzzleProgress>> = synchronized(lock) { ArrayList(saveLog) }
+
+    override suspend fun progress(puzzleId: String): PuzzleProgress = progressNow(puzzleId)
+
+    override suspend fun saveProgress(puzzleId: String, progress: PuzzleProgress) {
+        synchronized(lock) {
+            puzzles[puzzleId] = progress
+            saveLog += puzzleId to progress
+        }
+    }
+
+    override suspend fun allProgress(): Map<String, PuzzleProgress> = snapshot()
+
+    override suspend fun playTimes(): PlayTimes = synchronized(lock) { times }
+
+    override suspend fun savePlayTimes(times: PlayTimes) {
+        synchronized(lock) { this.times = times }
+    }
+
+    override suspend fun settings(): Settings = synchronized(lock) { prefs }
+
+    override suspend fun saveSettings(settings: Settings) {
+        synchronized(lock) { prefs = settings }
+    }
+
+    override suspend fun lastOpenedPuzzleId(): String? = lastOpenedNow()
+
+    override suspend fun saveLastOpenedPuzzleId(id: String) {
+        synchronized(lock) { last = id }
+    }
+
+    /** KDoc: every puzzle FRESH and the play times NONE afterwards; settings and the last-opened id kept. */
+    override suspend fun resetAll() {
+        synchronized(lock) {
+            puzzles.clear()
+            times = PlayTimes.NONE
+        }
+    }
+}
+
+/** How long a kit load or flush may take before the test fails instead of hanging (nothing here sleeps). */
+internal const val KIT_DEVICE_IO_TIMEOUT_MS: Long = 20_000L
+
+/** A controller over `Persistence` over the kit's [store] (S-19, S-1Δ), with the `Persistence` it saves through. */
+internal class KitPersisted(
+    val store: KitDeviceStore,
+    val persistence: Persistence,
+    val controller: PlayController,
+    private val failures: MutableList<Throwable>,
+) {
+    /**
+     * S-19 `flush()`: returns once every queued write has reached [store]. Called from the test thread, never the main
+     * one. A failure on the writer's scope (recorded by its handler) fails the test here rather than vanishing.
+     */
+    fun flush() {
+        runBlocking { withTimeout(KIT_DEVICE_IO_TIMEOUT_MS) { persistence.flush() } }
+        val seen = synchronized(failures) { failures.toList() }
+        if (seen.isNotEmpty()) throw AssertionError("Persistence's writer failed before the flush: ${seen.first()}", seen.first())
+    }
+}
+
+/**
+ * Builds a controller the way the app does (S-15Δ: the load on IO, the controller on Main; S-19 `Persistence.load`; S-1Δ
+ * `PlayController(library, engine, persistence, onEvent)`): `Persistence.load` over [store] off the main thread, on a
+ * supervisor scope on a background dispatcher whose failures are recorded, then the controller on the main thread, over
+ * the real engine and the bundled puzzles.
+ */
+internal fun kitControllerOver(rule: ComposeContentTestRule, store: KitDeviceStore, onEvent: (PlayEvent) -> Unit = {}): KitPersisted {
+    val failures = Collections.synchronizedList(ArrayList<Throwable>())
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, t -> failures += t })
+    val persistence = runBlocking(Dispatchers.IO) { withTimeout(KIT_DEVICE_IO_TIMEOUT_MS) { Persistence.load(store, scope) } }
+    val controller = rule.runOnUiThread { PlayController(kitLibrary, kitEngine, persistence, onEvent) }
+    return KitPersisted(store, persistence, controller, failures)
+}
+
+/**
+ * A full-set puzzle and three of its solution locks, in an order the engine places them in, for a "come back to the
+ * same three" fixture that can show a lost mirror (REQ-025 rule: "Saved per piece: tray or board, position, turn,
+ * mirror"): the first non-mini puzzle whose parallelogram is mirrored in its solution and comes among the first three
+ * locks when it is tried first; else the first full-set puzzle's first three solution locks.
+ */
+internal fun kitThreeToLeave(): Pair<PuzzleDefinition, List<Placement>> {
+    for (p in kitLibrary.puzzles.filter { it.kind != PuzzleKind.MINI && PieceId.PG in it.pieces }) {
+        if (!kitPoseOf(PieceId.PG, p.solution.single { it.piece == PieceId.PG }.polygon).mirrored) continue
+        val order = listOf(PieceId.PG) + p.solution.map { it.piece }.filter { it != PieceId.PG }
+        val all = kitSolutionLocks(p, p.pieces.size, order = order)
+        if (all.indexOfFirst { it.piece == PieceId.PG } in 0..2) return p to all.take(3)
+    }
+    android.util.Log.i("KitScreen", "no puzzle locks a mirrored parallelogram among three; the three-piece fixture shows no mirror")
+    val p = kitFirst(PuzzleKind.FULL)
+    return p to kitSolutionLocks(p, 3)
+}
+
+/**
+ * A `dpPerUnit` for engine searches made before a screen exists. A search from a piece's exact solution pose does not
+ * depend on it: the lock distance is never below 0.65 units (TYPE-004), wider than the 0.16-unit band in which the
+ * winning candidate is chosen, so every candidate that can win is in reach at any scale.
+ */
+internal const val KIT_ANY_DP = 100.0
+
+/**
+ * Up to [count] of [p]'s pieces at their stored solution poses, placed in [order] as the engine allows (each one the
+ * `Locked` result of `findLock` from its exact pose against the ones before it, and equal to that pose): saved placements
+ * that are valid locks, so `stillValid` keeps every one (REQ-025 rule; ILockEngine KDoc). [skip] pieces are never used.
+ */
+internal fun kitSolutionLocks(
+    p: PuzzleDefinition,
+    count: Int,
+    order: List<PieceId> = p.solution.map { it.piece },
+    skip: Set<PieceId> = emptySet(),
+): List<Placement> {
+    val out = ArrayList<Placement>()
+    var progress = true
+    while (out.size < count && progress) {
+        progress = false
+        for (piece in order) {
+            if (out.size >= count) break
+            if (piece in skip || out.any { it.piece == piece }) continue
+            val pose = kitPoseOf(piece, p.solution.single { it.piece == piece }.polygon)
+            val exact = Placement(piece, pose.turn, pose.mirrored, pose.centre)
+            val lock = kitEngine.findLock(p, out, piece, pose.turn, pose.mirrored, pose.centre, KIT_ANY_DP)
+            if (lock is LockResult.Locked && kitSamePlacement(lock.placement, exact)) {
+                out += lock.placement
+                progress = true
+            }
+        }
+    }
+    return out
+}
+
+/** [p]'s pieces ordered bottom first (by the lowest point of their solution polygon, y down): placements far from the board's top-left. */
+internal fun kitBottomFirst(p: PuzzleDefinition): List<PieceId> = p.solution.sortedByDescending { s -> s.polygon.maxOf { it.y } }.map { it.piece }
+
+/** A Solved puzzle's saved progress (IProgressStore KDoc of `placed`: empty when Solved), with a time and a best time. */
+internal fun kitSolvedProgress(time: Int = 61, best: Int? = 61): PuzzleProgress = PuzzleProgress(PuzzleState.SOLVED, emptyList(), time, best)
+
+/** An In-progress puzzle's saved progress over [placed]. */
+internal fun kitInProgress(placed: List<Placement>, time: Int = 0, best: Int? = null): PuzzleProgress = PuzzleProgress(PuzzleState.IN_PROGRESS, placed, time, best)
+
+/**
+ * The picture's colours that no `PlayPalette` colour is within [tol] of (S-12: `:play` has no other colour literal; art
+ * colours come from `ArtStyle`): what only a drawn picture paints — the REQ-050 rule's "Solved as its picture".
+ */
+internal fun kitDistinctArtColours(art: ArtLayer, tol: Float = 24f / 255f): List<Color> {
+    val palette = listOf(PlayPalette.silhouette, PlayPalette.board, PlayPalette.tray, PlayPalette.paper, PlayPalette.accent, PlayPalette.previewStroke)
+    return kitArtColours(art).filter { c -> palette.none { kitNear(it, c, tol) } }.distinctBy { kitHex(it) }
 }
 
 // ── Puzzle geometry (the kit's own reading of the solution; px only through BoardMapping) ─────────────

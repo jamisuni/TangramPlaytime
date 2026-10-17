@@ -13,11 +13,7 @@ package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -40,7 +36,6 @@ import app.tangramplaytime.contracts.ArtLayer
 import app.tangramplaytime.contracts.ArtShape
 import app.tangramplaytime.contracts.ArtStyle
 import app.tangramplaytime.contracts.Point
-import app.tangramplaytime.contracts.PuzzleState
 import kotlin.math.PI
 import kotlin.math.sin
 
@@ -66,18 +61,14 @@ private const val DEFAULT_STROKE_UNITS = 0.05
 private const val OUTLINE_STROKE_DP = 1.2f
 
 /**
- * Where the open puzzle is on the celebration's timeline: [elapsedMs] since the last lock, on the frame
- * clock, or null while the puzzle is unsolved. The screen reads it for the pop, the picture's fade, when the
- * board pieces stop being drawn and how long the confetti lasts. A puzzle opened already solved jumps to
- * the end at once: the picture is shown, nothing celebrates (REQ-023 is about the moment of solving).
+ * Where the open puzzle is on the celebration's timeline in this frame: [elapsedMs] since the last lock, on the
+ * frame clock, or null while the puzzle is unsolved. The screen reads it for the pop, the picture's fade, when the
+ * board pieces stop being drawn, how long the confetti lasts and when the solved row appears. A Solved puzzle whose
+ * celebration is not playing stands at the end ([AT_END]): the picture is shown, nothing celebrates (REQ-023 is
+ * about the moment of solving). WO-004 TASK-020: one value per frame, worked out in the composition by
+ * `solveVisual` (`Celebration.kt`; S-3Δ), so a Solved puzzle is at its end in the very first frame it is drawn.
  */
-internal class SolveVisual {
-    /** Milliseconds since the last lock, or null while unsolved. */
-    var elapsedMs: Float? by mutableStateOf(null)
-
-    /** The puzzle id last composed unsolved: a solve of that puzzle is live and celebrates. */
-    var unsolvedSeen: String? = null
-
+internal class SolveVisual(val elapsedMs: Float?) {
     /** The pop's brightness bump, 0..1, for this frame; 0 with reduced motion (REQ-023 rule). */
     fun popBump(reducedMotion: Boolean): Float {
         val e = elapsedMs ?: return 0f
@@ -104,29 +95,20 @@ internal class SolveVisual {
 
     /** The share of the piece colour replaced by `PlayPalette.board` in this frame of the pop. */
     fun popTint(reducedMotion: Boolean): Float = popBump(reducedMotion) * POP_LIGHTEN
-}
 
-/**
- * Drives [solve] from the controller's state: when the open puzzle turns Solved in this composition, the
- * timeline runs from 0 to [CONFETTI_MS] on the frame clock (the first frame after the solve is 0); a puzzle
- * that is unsolved clears it; a puzzle opened already solved is placed at the end.
- */
-@Composable
-internal fun SolveDriver(controller: PlayController, solve: SolveVisual) {
-    val id = controller.puzzle.id
-    val solved = controller.state == PuzzleState.SOLVED
-    LaunchedEffect(id, solved) {
-        if (!solved) {
-            solve.elapsedMs = null
-            solve.unsolvedSeen = id
-            return@LaunchedEffect
-        }
-        if (solve.unsolvedSeen != id) {
-            solve.elapsedMs = CONFETTI_MS.toFloat()
-            return@LaunchedEffect
-        }
-        solve.elapsedMs = 0f
-        onFrames(CONFETTI_MS) { solve.elapsedMs = it * CONFETTI_MS }
+    /**
+     * The solved row replaces the tray from the frame the picture is fully shown (S-22 "Solved row"; decisions.md
+     * 2026-10-15 "The top bar, Restart and the solved row, as drawn"; WO-004 checkpoint item 2), so at once for a
+     * Solved puzzle standing at its end.
+     */
+    val rowShown: Boolean get() = (pictureAlpha ?: 0f) >= 1f
+
+    companion object {
+        /** An unsolved puzzle: no timeline. */
+        val UNSOLVED: SolveVisual = SolveVisual(null)
+
+        /** A Solved puzzle whose celebration is not playing: the end of the timeline. */
+        val AT_END: SolveVisual = SolveVisual(CONFETTI_MS.toFloat())
     }
 }
 

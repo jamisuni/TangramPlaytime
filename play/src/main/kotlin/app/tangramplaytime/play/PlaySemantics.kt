@@ -1,5 +1,7 @@
 // WO-003 TASK-012 · seam S-14 (tasks.md § WO-003 › Seams; the tag table's Keys column) · the semantics
 // keys both device kits read with `config.getOrNull`, and the board's px ↔ puzzle-unit mapping.
+// WO-004 TASK-020 · seam S-14Δ (designs/WO-004-design.md §2): `RatingKey`. The overview cells reuse
+// `PuzzleIdKey` and `PuzzleStateKey` (TASK-021).
 package app.tangramplaytime.play
 
 import androidx.compose.ui.geometry.Offset
@@ -55,6 +57,9 @@ object PlaySemantics {
     /** The open puzzle's TYPE-006 state, on `play-screen`. */
     val PuzzleStateKey: SemanticsPropertyKey<PuzzleState> = SemanticsPropertyKey("PlayPuzzleState")
 
+    /** The open puzzle's rating, 1..5 (S-14Δ; REQ-024 rule "its difficulty dots"), on `rating`. */
+    val RatingKey: SemanticsPropertyKey<Int> = SemanticsPropertyKey("PlayRating")
+
     /** Receiver extension for [PieceKey]. */
     var SemanticsPropertyReceiver.piece: PieceId by PieceKey
 
@@ -78,4 +83,7 @@ object PlaySemantics {
 
     /** Receiver extension for [PuzzleStateKey]. */
     var SemanticsPropertyReceiver.puzzleState: PuzzleState by PuzzleStateKey
+
+    /** Receiver extension for [RatingKey]. */
+    var SemanticsPropertyReceiver.rating: Int by RatingKey
 }

@@ -5,4 +5,17 @@
     <string name="size_mark_small">S</string>
     <string name="size_mark_medium">M</string>
     <string name="size_mark_large">L</string>
+    <!-- WO-004 (S-11Δ): REQ-025 Restart; REQ-026 the solved row; REQ-024 the top bar's number and state; REQ-050 the grid. -->
+    <string name="restart">Restart</string>
+    <string name="retry">Retry</string>
+    <string name="next">Next</string>
+    <string name="best_time">Best time</string>
+    <!-- The best time while none is stored (decisions.md 2026-10-15: "–" until WO-008 computes times). -->
+    <string name="no_time">–</string>
+    <string name="state_in_progress">in progress</string>
+    <string name="state_solved">solved</string>
+    <!-- The top bar's number out of the total: %1$d the puzzle's number, %2$d how many there are. -->
+    <string name="counter_format">%1$d / %2$d</string>
+    <string name="all_puzzles">All puzzles</string>
+    <string name="done">Done</string>
 </resources>

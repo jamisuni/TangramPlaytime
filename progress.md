@@ -698,3 +698,173 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   message: `WO-003 #Solving closed: Play screen in :play behind
   ILockEngine/IPuzzleLibrary, :app wiring, kit 32/32 on JVM + API 37 +
   API 26, release verifier V-01, build-map v1.3`.
+
+## 2026-10-15 — WO-004 #Browsing + store/ opened (P3, fresh orchestrator context)
+
+**Human input (verbatim):**
+
+> WE ARE IN PHASE P3 — WORK ORDER WO-004 #Browsing + store/ (TangramPlaytime,
+> SWDev v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on"
+> framework files), then governance.md, architecture.md, build-map.md,
+> design-inputs.md §2, decisions.md (incl. the WO-003 rows), the last
+> progress.md entry, KICKOFF.md "State after WO-003", capture-outbox/ (the
+> REQ-025 and TYPE-006 drafts), platform-notes/android.md (incl. the WO-003
+> lesson lines in § Compose test kit).
+> WO-004 scope: #Browsing — #PuzzleNav (REQ-024), #ResumePuzzle (REQ-025),
+> #SolvedView (REQ-026), #PuzzleOverview (REQ-050), the parent REQ-003 — on
+> the Play screen of :play (the top bar's ‹ › and counter, Restart / Retry,
+> the grid), plus the store/ module implementing IProgressStore (notify tier)
+> so PlayController's in-memory state (S-1…S-3) is persisted, and the
+> re-covered screen halves of REQ-040.A1, REQ-041.A1, REQ-045.A1. Carried from
+> WO-003: load the bundle and the store off the main thread (F3); the
+> celebration's trigger as a consumed controller cue (N1). Timers are WO-008's
+> (REQ-030 stays out).
+> Mode: Full, reason (c) a new persistence format (build-map.md: store/ is
+> built in WO-004) — design-author → design-reviewer first. The design names
+> the touch geometry and what survives an activity recreation (proposals.md
+> 2026-10-12).
+> Verification channels at G3: JVM (store/, the controller), the dev image
+> Medium_Phone_API_37.0 AND the floor image Phone_API_26 (one emulator at a
+> time; both proven in WO-003), the release verifier V-01 with its positive
+> control; a migration/persistence test per governance row 11.
+> Checkpoint candidates (≤5, product-visible). Stations as subagents; the four
+> scripts are duties. End every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; 18:38 → in progress):**
+- Read AGENTS.md, the framework's session-start and P3 files, governance (in
+  force), architecture v1.0, build-map v1.3, design-inputs §2, decisions.md,
+  the WO-003 close entry, KICKOFF "State after WO-003", the three REQ-025 /
+  TYPE-006 drafts, android.md, the in-scope REQs and TYPE-006, the frozen
+  `IProgressStore`. Framework v0.20 = project, no drift. HEAD 19806a8.
+- `workorders/WO-004.md` opened: 16 acceptance IDs (REQ-003, 024, 025, 026,
+  050 + the re-covered REQ-040.A1, 041.A1, 045.A1); **Full (c)**.
+- **G3 proofs:** toolchain green 18:39 (store 1, contracts 2, play 45);
+  floor `Phone_API_26` app set 2/0 (18:41); dev `Medium_Phone_API_37.0` 2/0
+  (18:42), left running. Run log `.swdev/run-log/WO-004.md`.
+- **Design Author dispatched** 18:40 (Opus).
+
+**Continuation (18:43 → 19:47, no new human input):**
+- **Design → forward 19:01** (Opus): `designs/WO-004-design.md`; ADR-003 =
+  one JSON document rewritten atomically, unreadable/unknown version = fresh
+  install; eight `decisions.md` rows; no contract delta.
+- **Design review 19:18** (Opus 5.5): 0 B / 5 S, every library fact holds
+  against the real code. Triage: F1–F4, F5(a) accepted (the save boundary,
+  the death pair judged from output, one store instance, the grid below the
+  top bar); **F5(b) reversed** on trace-check's code (corrected check 1).
+  Same author fixed it in place 19:22 (three more rows).
+- **Checkpoint items 1–5 asked** 19:23 (Restart one press · solved row
+  after the picture · best time "–" · the middle of the bar opens the grid
+  · emptied board stays in progress); defaults stand 2026-10-18.
+- **Planner → forward 19:44** (Opus): TASK-016…022 (017 ∥ 018), briefs
+  55 KB; plan-check GREEN (my re-run 19:45, the known cross-product warning).
+  Five questions ruled: three design write-backs (design author resumed),
+  the device-hygiene after-step (reset then `--check`), two proposals.
+- Next: plan review → G3 → the JVM kit, then the two store tasks.
+
+**Continuation (19:47 → 20:50, no new human input):**
+- Plan review 19:49 (Sonnet): 0 B / 3 S, all fixed by the planner 19:51;
+  plan-check GREEN. **G3 approved 19:52** under row 7 (`decisions.md`).
+- **TASK-016 JVM kit landed 20:23** (Opus): 35 tests, 14 tokened, the
+  store's row-11 pins (19 corrupt variants, failed write keeps the file).
+- **TASK-017 `:store` 20:31** (Opus): `FileProgressStore` (atomic
+  whole-file replace), `ProgressStores.onDevice`; store kit 10/0.
+- **TASK-019 device-kit draft 20:37** (Opus, scratchpad): 16 IDs; flagged
+  the pulse markers vs the Restart pill → ruled: markers above the pill.
+- **TASK-018 `Persistence` + controller 20:48** (Opus): JVM 73 + 2 green;
+  orchestrator run r1 green (store 12, play 73, content 64, contracts 2).
+- Six implementer decisions recorded as `decisions.md` rows.
+- Device kit landing now; then TASK-020 (top bar, Restart, solved row).
+
+**Human input (verbatim, 21:14):**
+
+> plz dont start new tuff anymore after this implementer.. time to keep break
+
+**Summary (orchestrator):**
+- Device kit landed 20:49 (12 files, the declared red window only); TASK-020
+  (top bar, Restart, solved row, long press, loading paper) dispatched 20:50
+  and still running.
+- Owner pause: no new station after TASK-020. Its hand-back gets the receive
+  check and the log row; then a resume note in KICKOFF.md and stop.
+
+**Continuation (21:14 → 21:35) — paused:**
+- **TASK-020 → forward 21:32** (Opus): the top bar, Restart, the solved row,
+  the long press and the loading paper. Dev image: ResumeScreen 5/0,
+  SolvedView 5/0, the six WO-003 classes 51/0, TopBar 12/1. TopBar's four
+  tokens are green; its one pin skips because no puzzle on this screen puts
+  a piece over the Restart pill. That pin is open for the kit author.
+- JVM green (store 12, play 79, content 64, contracts 2); every kit hash is
+  unchanged; three decision rows; ten strings in `review-notes.md`.
+- **Not dispatched (owner pause):** the kit finding, TASK-021 (the grid),
+  TASK-022 (`:app` wiring + the process-death check), review, verification
+  and close. Resume prompt: KICKOFF.md "WO-004 — PAUSED"; AGENTS.md phase
+  line updated. Emulator `Medium_Phone_API_37.0` left running.
+
+## 2026-10-17 — WO-004 resumed (P4, fresh orchestrator context)
+
+**Human input (verbatim):**
+
+> WE ARE IN PHASE P4 — RESUMING WORK ORDER WO-004 #Browsing + store/ (TangramPlaytime,
+> SWDev v0.20, intake path C) in a fresh orchestrator context. Read AGENTS.md first
+> (incl. the "from P3 on" framework files), then KICKOFF.md "WO-004 — PAUSED",
+> workorders/WO-004.md (§ Log is the narrative), tasks.md § WO-004,
+> workorders/WO-004-briefs.md (the two tables at the top), .swdev/run-log/WO-004.md,
+> decisions.md (the 2026-10-15 rows), the last progress.md entry, review-notes.md,
+> platform-notes/android.md.
+> State: TASK-016/019 done; TASK-017/018/020 in review; TASK-021 (overview) and
+> TASK-022 (:app wiring + the process-death check) not started. First: route the
+> open kit finding (TopBarKitTest hit-order-3 pin skips on the dev screen) to a
+> fresh acceptance-test-author with its TASK-019 brief + the finding; then TASK-021,
+> then TASK-022, each from its brief (slice-implementer, Opus), recomputing the kit
+> hashes at every hand-back and logging every hop with `date` stamps. Then
+> plan-check again (kit compiled), code-reviewer (Sonnet, fresh), test-verify
+> (Sonnet: every set on BOTH images from the final tree, the death pair + its
+> positive control on both, V-01 + positive control), traceability-auditor
+> (PYTHONUTF8=1 trace_check.py --wo WO-004, 16 IDs), and the close (run_verifiers
+> --wo, wo_metrics --wo --write, ledger, Contract deltas, ADR-003 via the G2 route,
+> G4 under row 9, KICKOFF "State after WO-004" + the WO-005 brief, AGENTS.md phase
+> line, proposals.md, progress.md, the snapshot prompt). Stations as subagents. End
+> every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; 06:46 → in progress):**
+- Read the resume set; framework v0.20 = project, no drift; HEAD 19806a8.
+- Kit hashes 17 of 17 unchanged since landing. The emulator was gone;
+  `Medium_Phone_API_37.0` rebooted headless (06:49).
+- The open kit finding (the Restart-pill touch pin that skips on the dev
+  screen) sent to a fresh kit author 06:50.
+- Kit author back 07:13: the case cannot exist on the full-size dev phone
+  (the board is too tall for a piece to reach the pill), so the pin now
+  builds its own puzzle at a smaller screen height; TopBar 12/0 on the dev
+  image, nothing skipped. Corrected check 2.
+- TASK-021 (the puzzle grid) dispatched 07:14; back 08:01: the grid of
+  every puzzle below the top bar, the bar inert while it is open. Its test
+  6/0; the whole Play-screen set 79/0 on the dev phone and 79/0 on the
+  oldest supported Android (API 26). Kit untouched. One gap in the seam
+  table closed with an internal read (decision row; design write-back
+  queued); one drawing-detail row.
+- TASK-022 (the app wiring + the app-killed check) dispatched 08:02; back
+  08:18: the app loads off the main thread and shows the screen once ready;
+  back closes the grid; `tools/process_death_check.sh` proves a placed
+  board survives the app being killed, on both phones (plus a control that
+  must fail and a run that must not count a skipped phase). Release check
+  V-01 green. Two decision rows.
+- Design write-back (fresh design author) 08:21; my own run r2 green (JVM,
+  release check, the app-killed check on the dev phone); plan-check GREEN
+  with the kit compiled. Code review dispatched 08:22 (Sonnet, fresh).
+- Code review 08:32: 0 Blockers, 2 Shoulds, 5 Notes; it broke the code on
+  purpose twice and the tests caught both. Ruled: the "unreadable file is
+  overwritten" risk accepted for now and made a must-do for WO-008 (play
+  time); the app-killed check could judge an old build, so it now refuses
+  stale builds (fixed by the same implementer 08:39; channel line amended;
+  two decision rows; design written back twice).
+- Test & Verify dispatched 08:39 (Sonnet): every set on both phones from
+  the final tree. Back 09:15: GREEN. Play set 79/0 on both phones, app set
+  green on both (plus the two by-design skips), the app-killed check right
+  on both, release check V-01 green.
+- Close 09:17–09:25: build-map v1.4 (#Browsing Built); **ADR-003 written
+  into `architecture.md` v1.1 through the G2 route** (row 4, the unlocked
+  hatch opened and closed, the baseline re-frozen); traceability audit GREEN
+  16/16; verifiers GREEN; metrics counted; three lessons into
+  platform-notes; proposals, review-notes, KICKOFF (State after WO-004 +
+  the WO-005 brief), AGENTS.md phase line. **G4 under row 9** (decision
+  row): ready to merge; owner play-test recommended; the snapshot is the
+  owner's.

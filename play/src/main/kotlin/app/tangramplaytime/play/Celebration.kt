@@ -3,11 +3,21 @@
 // `:app`'s, O-07, WO-007) · the confetti is drawn, not a dependency (D5): rectangles in the TYPE-001 piece
 // colours thrown up from the board's middle and falling under gravity, each corner computed in px (G-17: no
 // canvas scale or rotate) · its clock is the solve timeline of `SolveVisual` (Compose's frame clock).
+// WO-004 TASK-020 · the screen side of S-3Δ (designs/WO-004-design.md §2 `Celebration`; §3 "Never show a solved
+// puzzle's piece positions"; "What survives") · decisions.md 2026-10-12 "One-shot cues are shown once per
+// controller" and "Carried to WO-004 #Browsing" (2): the celebration is the controller's `Celebration` cue, played
+// once per serial (`ShownCues.celebrationSerial`); otherwise a Solved puzzle stands at the end of its timeline from
+// the first frame it is drawn (REQ-026 A1, REQ-023).
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -16,6 +26,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.platform.testTag
 import app.tangramplaytime.contracts.PieceId
+import app.tangramplaytime.contracts.PuzzleState
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
@@ -51,6 +62,42 @@ private class Flake(
     val h: Float,
     val colour: Color,
 )
+
+/** The clock of the celebration playing now (S-3Δ): the serial it plays and how far it has run on the frame clock. */
+internal class CelebrationClock {
+    /** The serial whose timeline [elapsedMs] measures, or null before the first one played. */
+    var serial: Int? by mutableStateOf(null)
+
+    /** Milliseconds since the first frame after that solve. */
+    var elapsedMs: Float by mutableFloatStateOf(0f)
+}
+
+/**
+ * The open puzzle's place on the celebration's timeline in this frame (S-3Δ), worked out in the composition:
+ * - unsolved: no timeline;
+ * - Solved with a [Celebration] of this puzzle whose serial [cues] does not count as shown: it plays, once, from 0
+ *   in the frame after the solve to [CONFETTI_MS] on the frame clock, and then counts as shown;
+ * - any other Solved puzzle — opened already solved, its celebration over, or one already set when this screen
+ *   first composed (an activity recreation, [ShownCues]) — stands at the end at once, in the first frame: the
+ *   picture fully shown, no piece drawn, no confetti, the solved row shown.
+ */
+@Composable
+internal fun solveVisual(controller: PlayController, cues: ShownCues): SolveVisual {
+    val clock = remember(controller) { CelebrationClock() }
+    if (controller.state != PuzzleState.SOLVED) return SolveVisual.UNSOLVED
+    val celebration = controller.celebration
+    if (celebration == null || celebration.puzzleId != controller.puzzle.id || celebration.serial == cues.celebrationSerial) {
+        return SolveVisual.AT_END
+    }
+    val serial = celebration.serial
+    LaunchedEffect(serial) {
+        clock.elapsedMs = 0f
+        clock.serial = serial
+        onFrames(CONFETTI_MS) { clock.elapsedMs = it * CONFETTI_MS }
+        cues.celebrationSerial = serial
+    }
+    return SolveVisual(if (clock.serial == serial) clock.elapsedMs else 0f)
+}
 
 /** The same shower every time: a fixed seed, so a run is reproducible (no wall clock, no system random). */
 private fun flakes(): List<Flake> {

@@ -33,6 +33,17 @@ duty of the station it names; none of it is methodology.
 - **The run log is the baseline:** the orchestrator records each suite run
   as command · hash of the test tree · hash of the product tree · result
   XML; Test & Verify re-runs only what changed (`test-verify.md`).
+- *(Project lessons, WO-004 close.)* **Judge a device run by its XML,
+  never by Gradle's exit code.** The XML must exist, be stamped after the
+  command started and carry the expected counts. Under `-q`, an
+  `INSTALL_FAILED_ALREADY_EXISTS` exits 0 and writes no XML. The fix is
+  `adb uninstall` of both packages, a clean `--check`, then a re-run.
+- **A harness that installs build outputs refuses stale ones.** Gradle
+  leaves an up-to-date APK unwritten, so an mtime check needs the channel
+  line to force the package tasks (`:app:packageDebug --rerun
+  :app:packageDebugAndroidTest --rerun`). `tools/process_death_check.sh`
+  does this (WO-004 code review S2). A pass on an old APK is a pass for
+  code nobody reviewed.
 
 ## Device hygiene
 
@@ -87,6 +98,13 @@ duty of the station it names; none of it is methodology.
   number in a brief or a decision row's prose. Clip every pixel sampler to
   its own capture. WO-003: a sampler read past its capture, and the badge
   disc was assumed to sit at its node's centre.
+- *(Project lesson, WO-004.)* **A pin that skips where it runs cannot
+  fail.** The connected runner writes an `assumeTrue` skip into the XML as
+  a `<failure>` while Gradle exits 0. When the bundled content cannot reach
+  a case at a channel's screen size, the kit constructs it: a kit-owned
+  puzzle through the seams, or a kit-chosen host size. Otherwise the leg
+  fails loudly. The only legitimate guarded skips are the ones the WO names
+  (WO-004: `ProcessDeathKitTest#phase1` / `#phase2` without `deathPhase`).
 - Channel: `-Pandroid.testInstrumentationRunnerArguments.class=A,B` through
   `cmd.exe //c` runs only `A`. Run one class per invocation, or omit the
   argument for a whole set. The connected-test XML folder is overwritten on

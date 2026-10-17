@@ -29,6 +29,8 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
+    // Persistence's one FIFO writer (designs/WO-004-design.md §2 S-19; architecture.md §5 allows kotlinx.coroutines).
+    implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.junit)
     // The real lock engine (WO-001) and the bundled puzzle library (WO-002) for the JVM kit only; main
     // code depends on :contracts alone and gets both injected by :app (G-12; tasks.md § WO-003 TASK-010).

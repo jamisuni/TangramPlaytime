@@ -500,8 +500,11 @@ class PlayControllerKitTest {
 
     // decision decisions.md line 29 — "A tray piece's tap-turn or flip is not persisted; only board
     // placements are saved". seam S-2 `open` — "State and placements are kept in memory per puzzle id
-    // across opens (a Solved puzzle keeps its final placements …). Tray turns and mirror reset to S-9 on
-    // every open"; "false and no change for an unknown id, G-15". Pin, no token.
+    // across opens … Tray turns and mirror reset to S-9 on every open"; "false and no change for an unknown
+    // id, G-15". Amended at WO-004 (TASK-016; tasks.md § WO-004 intro, "In-tree tests this WO changes"):
+    // S-2's "a Solved puzzle keeps its final placements" is superseded by designs/WO-004-design.md §2 S-21
+    // ("NEW or SOLVED: an empty board", on every open) and §3 ("A Solved puzzle opens with an empty board").
+    // This controller is the memory-only one (S-1Δ: the secondary constructor passes null). Pin, no token.
     @Test
     fun eachPuzzleKeepsItsStateAndBoardAcrossOpensWhileTrayTurnsAndTheMirrorReset() {
         val a = kitPuzzleOf(PuzzleKind.WARMUP)
@@ -545,17 +548,16 @@ class PlayControllerKitTest {
         assertEquals("${b.id}: state kept", PuzzleState.IN_PROGRESS, c.state)
         assertEquals("${b.id}: board kept", keptB, c.placed)
 
-        // A Solved puzzle keeps its final placements.
+        // A Solved puzzle stays Solved and opens with an empty board (S-21).
         kitOpen(c, mini.id)
         kitPlan(mini).forEach { kitPlace(c, it) }
         assertEquals(PuzzleState.SOLVED, c.state)
-        val final = c.placed.toList()
+        assertEquals("fixture: the final placements are on the board at the solve", mini.pieces, c.placed.map { it.piece }.toSet())
         assertTrue(c.open(a.id))
         assertTrue(c.open(mini.id))
         c.boardDpPerUnit = KIT_DP_PER_UNIT
         assertEquals("${mini.id}: still solved", PuzzleState.SOLVED, c.state)
-        assertEquals("${mini.id}: its final placements", final, c.placed)
-        assertTrue("${mini.id}: nothing in the tray", c.trayPieces.isEmpty())
+        assertEquals("${mini.id}: an empty board (S-21)", emptyList<Placement>(), c.placed)
 
         // An unknown id: false, and nothing changes.
         val before = kitSnapshot(c)

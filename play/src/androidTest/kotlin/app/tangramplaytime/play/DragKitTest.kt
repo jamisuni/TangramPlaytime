@@ -5,6 +5,8 @@
 // line; pins of a rule, a seam row or a decision carry no token.
 // REQ-014 A1 is tested as the one-frame bound of capture-outbox/chg-draft-req014-a1-without-delay.md
 // (decisions.md "REQ-002 A1 and REQ-014 A1 carry implemented (unverified)").
+// Amended WO-004 (TASK-019), no token moved: the REQ-020 A2 snapshot is taken In progress, and the margin fixture of
+// REQ-015 A2 keeps off the Restart pill (each amendment cites its row where it is made).
 package app.tangramplaytime.play
 
 import androidx.activity.ComponentActivity
@@ -18,6 +20,7 @@ import app.tangramplaytime.contracts.Placement
 import app.tangramplaytime.contracts.Point
 import app.tangramplaytime.contracts.PuzzleDefinition
 import app.tangramplaytime.contracts.PuzzleKind
+import app.tangramplaytime.contracts.PuzzleState
 import app.tangramplaytime.contracts.Turn
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -629,10 +632,24 @@ class DragKitTest {
         // message." Oracle: the texts and content descriptions of every node, and the set of tagged nodes
         // apart from the dropped piece's own, are the same before the drag, at the release, during the
         // return and after it (brief: compared before and after the drop).
+        // Amended WO-004 (TASK-019): the first tray drag of a New puzzle moves it to In progress (TYPE-006), which now adds
+        // the `restart` pill and the `state-word` with their texts to the screen (S-22 "Restart"; S-13Δ; decisions.md
+        // 2026-10-15 "The top bar, Restart and the solved row, as drawn": Restart shown only In progress, a state word for
+        // In progress). Those belong to the drag start, not to the missed drop, so the puzzle is put In progress first
+        // through S-2 — a drag of another piece started and sent home on the main thread, nothing placed — and the
+        // snapshot is taken then. The comparison itself is unchanged.
         kit.show()
         val p = kitFirst(PuzzleKind.FULL)
         kit.open(p.id)
         val piece = PieceId.SQ
+        kit.onMain {
+            check(kit.controller.startDrag(PieceId.LT1, Point(0.0, 0.0))) { "kit: startDrag(LT1) refused" }
+            kit.controller.goHome()
+        }
+        kit.frames()
+        kit.advance(300)
+        check(kit.key(PlayTags.SCREEN, PlaySemantics.PuzzleStateKey) == PuzzleState.IN_PROGRESS) { "kit: ${p.id} is not In progress after the set-up drag" }
+        check(kit.exists(KitTag.RESTART)) { "kit: no `restart` pill In progress, so the snapshot would not hold it" }
         val own = setOf(PlayTags.trayPiece(piece), PlayTags.trayGhost(piece), PlayTags.dragPiece(piece))
         val (tagsBefore, textsBefore) = kit.tagsAndTexts()
         val middle = kitMiddleWithNoLock(p, piece, kit.key(PlayTags.trayPiece(piece), PlaySemantics.TurnKey), false, kit.onMain { kit.controller.boardDpPerUnit })
@@ -719,9 +736,15 @@ class DragKitTest {
         throw AssertionError("kit: ST1 locks alone at its solution pose in no bundled puzzle")
     }
 
-    /** The first edge midpoint of [poly] moved [distPx] outward (away from the centre) that lies on the board. */
+    /**
+     * The first edge midpoint of [poly] moved [distPx] outward (away from the centre) that lies on the board.
+     * Amended WO-004 (TASK-019): and outside the `restart` pill, which is drawn In progress at the board's top-left and
+     * comes before a piece's margin in the touch order (S-22 hit order 3 "a piece's drawn shape → the Restart pill → … → a
+     * cell or a margin"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn").
+     */
     private fun pointOutside(poly: List<Offset>, distPx: Float): Offset {
         val board = kit.bounds(PlayTags.BOARD)
+        val pill = if (kit.exists(KitTag.RESTART)) kit.bounds(KitTag.RESTART) else null
         val cx = poly.sumOf { it.x.toDouble() } / poly.size
         val cy = poly.sumOf { it.y.toDouble() } / poly.size
         for (i in poly.indices) {
@@ -735,7 +758,7 @@ class DragKitTest {
             ny /= len
             if ((mid.x - cx) * nx + (mid.y - cy) * ny < 0) { nx = -nx; ny = -ny }
             val q = Offset(mid.x + nx * distPx, mid.y + ny * distPx)
-            if (board.contains(q)) return q
+            if (board.contains(q) && (pill == null || !pill.contains(q))) return q
         }
         throw AssertionError("kit: no edge of the placed ST1 has an outward point on the board")
     }

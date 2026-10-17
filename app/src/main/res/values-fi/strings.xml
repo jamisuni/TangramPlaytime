@@ -5,4 +5,15 @@
     <string name="size_mark_small">S</string>
     <string name="size_mark_medium">M</string>
     <string name="size_mark_large">L</string>
+    <!-- WO-004 (S-11Δ): reference translations (G-10), listed in review-notes.md; never asserted by a test. -->
+    <string name="restart">Aloita alusta</string>
+    <string name="retry">Uudestaan</string>
+    <string name="next">Seuraava</string>
+    <string name="best_time">Paras aika</string>
+    <string name="no_time">–</string>
+    <string name="state_in_progress">kesken</string>
+    <string name="state_solved">ratkaistu</string>
+    <string name="counter_format">%1$d / %2$d</string>
+    <string name="all_puzzles">Kaikki tehtävät</string>
+    <string name="done">Valmis</string>
 </resources>
