@@ -55,3 +55,8 @@
 {"ts": "2026-10-18T19:03:58", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
 {"ts": "2026-10-18T19:04:00", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
 {"ts": "2026-10-18T19:04:03", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-18T20:04:46", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-18T20:04:48", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-18T20:04:51", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-18T20:04:53", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-18T20:04:56", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}

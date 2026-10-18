@@ -63,6 +63,31 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## WO-010 — PAUSED (2026-10-18 20:54; the owner: "plz pause when getting change") — in P3, planner running at the pause
+
+- **Where it stands** (`workorders/WO-010.md` Log, rows of 2026-10-18 20:00…20:54; `.swdev/run-log/WO-010.md`): opened 20:00, Light. **Done:** scope and the provenance reading (`decisions.md` 2026-10-18 rows "Scope of WO-010 …", "The figures' source and licence are credited in `ASSET-LICENCES.md` …"); **`architecture.md` v1.2** through the G2 route (G-16 GPL-3.0 puzzle figures credited; the O-06 DEV-aid line), baseline re-frozen 20:05; **every G3 channel proven** (Python tools 13/13, JVM 243/0, V-01 3/3 + control 2/2, dev / floor / tablet 2/0 each). **The planner came back during the pause (21:06) and is received** (WO log 21:07): `tasks.md` § WO-010 (TASK-033…042, 10 / 4 `[P]`) + `workorders/WO-010-briefs.md`; plan-check GREEN (re-run by the orchestrator), trace-check `--wo` GREEN 11/11. **About 93 figures import, not ~144** (42 fail the locked rules, 9 duplicates). Checkpoint items 3–4 asked (turned copies; the measured rating), defaults stand 2026-10-21. **Not started:** the rulings on the planner's readings R1–R10 (WO log 21:07 lists them; each a `decisions.md` row), plan review, G3, everything after.
+- **Resume here:** rule R1–R10 (read `tasks.md` § WO-010 › Seams; accept, amend or send back to the planner) and write their `decisions.md` rows — then the plan review (`plan-reviewer`), G3 (row 7), P4. Put the device-time figure (play set ≈ 2–2.5 h per image) on the G3 surface.
+- **If the planner's hand-back is in the WO log** (a row after 20:54): receive-check it — `tasks.md` § WO-010 and `workorders/WO-010-briefs.md` exist, re-run `plan_check.py --wo WO-010` yourself (same line?), read its readings and checkpoint candidates and write the `decisions.md` rows — then the plan review (`plan-reviewer`), G3 (row 7), P4. *(Done 21:07 for the receive check; the rulings remain.)*
+- **If it is not** (the session closed while it ran): look for a partial `tasks.md` § WO-010 or briefs file. Dispatch a fresh `wo-planner` with the brief text in the WO log 20:27 row's sense — the same "Read exactly" list (`workorders/WO-010.md` whole, the REQ files, the drafts, DI-10's two collections, the test tree for question 7) — plus "the files may hold a partial plan by an earlier planner: finish or replace it".
+- **Devices:** all emulators stopped at the pause (the tablet 20:54). Boot detached; wrap every adb / Gradle device call in `timeout` (the void floor boot 20:07–20:24: a serial clash left `adb shell` hanging).
+- **Rulings to know:** the 2026-10-18 WO-010 rows of `decisions.md`; `architecture.md` v1.2 change-log row; the run log's preview-file finding (a re-render rewrites every committed preview — CRLF, no C2PA metadata — question 8).
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-010 content batch, RESUMED after a pause
+(TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl. the
+"from P3 on" framework files), then governance.md, workorders/WO-010.md (whole,
+Log to the last row), architecture.md v1.2 (G-05, G-16, O-06), build-map.md,
+design-inputs.md (DI-5, DI-10, §2 items 9, 14–16), the WO-010 rows of
+decisions.md (2026-10-17, 2026-10-18), .swdev/run-log/WO-010.md, the last
+progress.md entry, KICKOFF.md "WO-010 — PAUSED", platform-notes/android.md.
+The planner's hand-back is received (WO log 21:07): first rule its readings
+R1–R10 against tasks.md § WO-010 › Seams and write the decisions.md rows.
+Then plan review, G3 (row 7), and P4: the kit author and the implementers, code
+review, Test & Verify on the floor, dev and tablet images (the floor first,
+the whole sets once), trace-check, verifiers, wo-metrics, close. Stations as
+subagents; the four scripts are duties. End every turn with the one signal.
+```
+
 ## State after WO-006 (2026-10-18, closed 19:10)
 
 - **WO-006 #Layout + #Language + #Promise is done** (`workorders/WO-006.md`, Light).

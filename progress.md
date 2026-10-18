@@ -1245,3 +1245,106 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   `proposals.md`; seven lines in `platform-notes/android.md`; play-test
   items in `review-notes.md`; KICKOFF "State after WO-006" → next WO-010.
   Snapshot commit prompted to the owner.
+
+## 2026-10-18 — The WO-006 resume prompt pasted after the close (fresh context)
+
+**Human input (verbatim, 19:2x):**
+
+> WE ARE IN PHASE P4 — WORK ORDER WO-006 #Layout + #Language + #Promise, RESUMED
+> after a second pause (TangramPlaytime, SWDev v0.20, intake path C). Read
+> AGENTS.md first (incl. the "from P3 on" framework files), then governance.md,
+> workorders/WO-006.md (Log to the last row), tasks.md § WO-006,
+> workorders/WO-006-briefs.md (header, dispatch order, channel table),
+> .swdev/run-log/WO-006.md, the WO-006 rows of decisions.md (2026-10-17 and
+> 2026-10-18), the last progress.md entry, KICKOFF.md "WO-006 — PAUSED again",
+> platform-notes/android.md. First settle the kit recirculation as KICKOFF says
+> (accept its hand-back if logged, else re-dispatch a fresh acceptance-test-author
+> on the partial fix); TASK-031 is accepted from the fixed kit's green runs on the
+> dev, tablet and floor images. Then TASK-032 (slice-implementer, strongest model),
+> plan-check, code review, Test & Verify on the three images (the floor's
+> root-route steps), trace-check, verifiers, wo-metrics, close (next brief:
+> WO-010). Boot the dev image first and check `tools/device_reset.sh --check` is
+> clean. Stations as subagents; the four scripts are duties. End every turn with
+> the one signal.
+
+**Summary (orchestrator, Opus 5.5; 19:23):**
+- Framework v0.20 = project, no drift.
+- Nothing to resume: WO-006 closed at G4 19:10 (WO log Metrics, KICKOFF
+  "State after WO-006", AGENTS.md current phase) and the owner committed
+  the snapshot (`2ccea13`). The tree is clean apart from the hook logs.
+- Every step the paste asks for is already done and logged in the entry
+  above. Nothing dispatched, no emulator booted, no file touched except
+  this entry.
+- Next is WO-010 (the content batch), and it has its own P3 prompt
+  (KICKOFF "Next after WO-006 — WO-010"). Asked the owner whether to
+  start it in this context.
+
+## 2026-10-18 — WO-010 content batch opened (P3, same context — it had done no WO work)
+
+**Human input (verbatim, 20:0x):**
+
+> WE ARE IN PHASE P3 — WORK ORDER WO-010 content batch: new puzzles from
+> TangramCollections (TangramPlaytime, SWDev v0.20, intake path C). Read
+> AGENTS.md first (incl. the "from P3 on" framework files), then governance.md,
+> architecture.md (v1.1; G-05, G-16, O-06), build-map.md, design-inputs.md
+> (DI-5, DI-10, §2 items 14–16), decisions.md (the WO-010 rows of 2026-10-17 and
+> 2026-10-18, the content rows of 2026-10-11), the last progress.md entry,
+> KICKOFF.md "Next after WO-006 — WO-010", workorders/WO-010.md (the stub, its
+> answered checkpoint items and § Constraints' risks),
+> capture-outbox/src-draft-tangramcollections-puzzles.md,
+> src-draft-wo010-checkpoint-answers.md and chg-draft-licence-notice-and-assets.md,
+> Spec/03-puzzle-format.md, Tangrams/README.md, platform-notes/android.md.
+> WO-010 scope: first amend architecture.md G-16 (GPL-3.0 puzzle figures,
+> credited) and add the O-06 exception for the DEV aid's strings through the
+> G2 route (row 4). Then convert every figure of
+> C:/GitHub/AI/TangramCollections/collections/convex-13 and
+> android-tangram-131 (read-only) that passes and is not a duplicate into
+> Tangrams/*.json (tangram-puzzle/1, polygon form) — kind, rating, en title
+> (fi reference), a picture drawn for this project, provenance + licence,
+> ASSET-LICENCES.md credits, reviewedByHuman false — with the Python
+> validator + renderer + preview sheet and the Kotlin load check green, and
+> every kit that iterates the bundled puzzles green. Measure the start-up
+> load and the grid with the full bundle. Owner rules 6–7 bind.
+> Mode: decide from the four reasons — Light unless one is written in the WO.
+> Verification channels at G3: the Python tool channel; JVM (the two-run line);
+> the device sets on the dev image Medium_Phone_API_37.0 AND the floor image
+> Phone_API_26 AND the tablet image Medium_Tablet_API_37.0 (a standing channel
+> since WO-006: the app set; the floor first, the whole sets once);
+> V-01 + positive control. Puzzle titles to review-notes.md. Stations as
+> subagents; the four scripts are duties. End every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; 20:00 → 20:27):**
+- Read the WO-010 set. Light (no new module, nothing governed changed,
+  no format change, no hard-stop domain). Scope = WO-002's ten lines +
+  "every picture inside its outline"; written into `workorders/WO-010.md`
+  with ten questions for the planner.
+- Found: the locked puzzle format allows only `author` and
+  `reviewedByHuman` under `provenance`, so each figure's source and
+  licence are credited in `ASSET-LICENCES.md` instead — the owner's own
+  words; no format change (`decisions.md`).
+- G2 route done: `architecture.md` v1.2 (G-16: GPL-3.0 puzzle figures,
+  credited, pictures our own; O-06: the DEV aid's strings line); hatch
+  opened and closed, baseline re-frozen 20:05.
+- G3 channels proven: Python tools (13/13), JVM 243/0, V-01 3/3 + control
+  2/2, dev / floor / tablet images 2/0 each (one void floor boot: a
+  serial clash hung adb; restarted). Run log `.swdev/run-log/WO-010.md`.
+- 20:27 `wo-planner` dispatched; next: plan-check, plan review, G3.
+
+**Human input (verbatim, 20:5x):**
+
+> plz pause when getting change
+
+**Summary (orchestrator, 20:54):**
+- Pausing at the next safe point, the planner's hand-back; no further
+  station will be dispatched. At 20:54 the planner had written nothing yet.
+- Recorded now so a closed session loses nothing: WO log PAUSED row,
+  KICKOFF "WO-010 — PAUSED" (where it stands, both resume cases, the
+  paste-in prompt), AGENTS.md current phase. Tablet emulator stopped.
+- 21:06 the planner came back; received 21:07: 10 tasks (4 picture
+  batches in parallel), plan check GREEN (re-run), traceability GREEN
+  11/11. About 93 figures import, not ~144: 42 break the game's locked
+  rules (corner-only joins, off-45° pieces, inexact), 9 are duplicates.
+  The play test set will take about 2–2.5 h per emulator.
+- Two owner questions put on the WO (turned copies; how ratings are
+  measured), defaults stand 2026-10-21. The planner's ten readings are
+  ruled at the resume. Paused; nothing running.
