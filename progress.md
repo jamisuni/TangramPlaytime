@@ -973,3 +973,275 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   **G4 under row 9:** ready to merge; this is the 1-in-5 spot-check WO, so
   an owner play-test is recommended; checkpoint items 1–4 stand on their
   defaults 2026-10-20; the snapshot commit is the owner's.
+
+## 2026-10-17 — New puzzle source: TangramCollections → WO-010 planned
+
+**Human input (verbatim, 16:16):**
+
+> plz look this folder [C:\GitHub\AI\TangramCollections] it has plenty of new puzzles. Plz add task to workorders to add those out game when possible
+
+**Summary (orchestrator, 16:16–16:22):**
+- Surveyed the folder read-only: five collections in one JSON format —
+  13 convex shapes (CC0), 131 Android-Tangram figures (GPL-3.0), 203 Nevit
+  Dilmen figures (Commons, attribution, licence unconfirmed), 1,002
+  KILOGRAM figures (research-only), 179 Richter silhouettes (no solutions).
+  None has a picture, rating or Finnish title.
+- Planned **WO-010 content batch** (`workorders/WO-010.md`, Proposed):
+  convert accepted figures into `Tangrams/*.json` with titles, rating, a
+  drawn picture and provenance, both validity checks green. Slot: after
+  WO-008, before WO-009; it can be pulled forward (KICKOFF "Planned —
+  WO-010" has its paste-in brief).
+- Recorded: `capture-outbox/src-draft-tangramcollections-puzzles.md` (27
+  drafts now); DI-10 in `design-inputs.md` v1.2 with §2 items 14–16 (no
+  difficulty modes or auto-flip; no pixel-count solve check; the figures'
+  units and accuracy); two `decisions.md` rows; the AGENTS.md phase line.
+- Checkpoint items asked (defaults stand 2026-10-20): (1) which collections
+  may ship — default only the convex shapes (your "only licence-free
+  assets" rule), recommended also the GPL-3.0 figures; (2) the
+  first-release count — default 25.
+
+## 2026-10-17 — WO-006 #Layout + #Language + #Promise opened (P3, fresh orchestrator context)
+
+**Human input (verbatim):**
+
+> WE ARE IN PHASE P3 — WORK ORDER WO-006 #Layout + #Language + #Promise
+> (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl. the
+> "from P3 on" framework files), then governance.md, architecture.md (v1.1),
+> build-map.md (v1.5), design-inputs.md §2, decisions.md (incl. the WO-005 rows
+> of 2026-10-17), the last progress.md entry, KICKOFF.md "State after WO-005",
+> capture-outbox/ (the REQ-006, REQ-047, REQ-048 and licence drafts),
+> platform-notes/android.md (incl. the WO-005 lesson lines).
+> WO-006 scope: #Layout (REQ-006) — #PhoneLayout (REQ-035), #TabletLayout
+> (REQ-036), #TouchTargets (REQ-037); #Language (REQ-047); #Promise (REQ-001)
+> with #NoMoney (REQ-008, REQ-009) and #DeviceOnly (REQ-010) — the TYPE-007
+> window class and the phone/tablet layouts in :app (O-05), insets, back
+> handling, the touch-target sweep (the dev-* nodes exempt by REQ-037's rule),
+> the en/fi resources (English Contract, Finnish reference), the promise lines.
+> REQ-009's free note sits on the settings screen (WO-007's) — say where it
+> lands. Carried: the grid's screen-reader labels; the ‹ › 52 dp sweep; the
+> keyboard under the DEV passcode box; the locale-list mix (KICKOFF).
+> Mode: decide from the four reasons — Light unless one is written in the WO.
+> Verification channels at G3: JVM where the logic is pure; the dev image
+> Medium_Phone_API_37.0 AND the floor image Phone_API_26 (one emulator at a
+> time) — and a tablet image if a REQ needs one (prove it reachable at G3 or
+> record a waiver); the release verifier V-01 + positive control; the JVM line
+> is two Gradle runs (APKs, then tests). Device runs are judged by their XML.
+> Checkpoint candidates (≤5, product-visible). Strings to review-notes.md.
+> Stations as subagents; the four scripts are duties. End every turn with the
+> one signal.
+
+**Summary (orchestrator, Opus 5.5; 16:41 → in progress):**
+- Read the kick-off set; framework v0.20 = project, no drift; HEAD a797553
+  (the WO-005 snapshot; the WO-010 planning rows are uncommitted, the
+  owner's). The tree equals WO-005's final tree.
+- `workorders/WO-006.md` opened: **Light** (none of the four reasons);
+  13 acceptance IDs; eight questions for the planner (the window class and
+  phone portrait lock, insets / keyboard / Back, the touch-size oracle, the
+  screen-reader carry, the locale-list mix, the promise lines' oracles, the
+  play-through and exact window sizes, the system-level code homes).
+- **Where the two lines land** (`decisions.md`, row 8): the free note goes
+  to WO-007 (its only line needs the settings screen); the store-labels
+  line goes to WO-009 (it needs the Play listing). REQ-047.A1 carries
+  `implemented (unverified)` on the pending English-Contract draft (row 20).
+- **G3 channels proven:** JVM toolchain 96 + 2 green (16:45); a **tablet
+  image** made from the installed Android 37 image (1280 × 800 dp — no
+  download) and proven (16:47); floor image (16:49); dev image with gesture
+  navigation (16:50), left running. Run log `.swdev/run-log/WO-006.md`.
+- Planner dispatched 16:51 (Opus); back 17:30: six tasks (two parallel),
+  plan-check GREEN, nine questions. Ruled 17:32 (nine `decisions.md`
+  rows): seven as proposed (window class from the upright width so a phone
+  stays portrait; Back closes only the grid; touch sizes measured on the
+  router's real areas; the screen-reader carry dropped — no REQ; one
+  language rule; the play-through proves "fully playable" as locked);
+  **two amended** — the API 26 floor runs the Finnish and Swedish legs
+  (locale boots), and a root route for airplane mode is probed before any
+  skip. Planner resumed, amendments written 17:37.
+- Checkpoint items 1–2 asked 17:32 (the tablet screen; edge to edge with
+  always-dark bar icons); defaults stand 2026-10-20. No new strings.
+- Plan review 17:39: 0 Blockers, 2 Shoulds (one applied, one carried).
+  **G3 approved 17:39** under row 7. P4 step 1 dispatched: the JVM kit
+  (lands), the device kit (drafting), the device-reset script + the floor
+  route probes.
+- JVM kit landed 17:55 (the release APK holds no permission, a closed
+  package allow-list for "no ad / billing" code, the layout-class boundary,
+  the safe-area geometry).
+- Device-reset script done 18:10. **Finding:** on Android 8.0 a
+  `-change-locale` boot does not change the language; a root route does
+  (even a two-language list), and airplane mode works by root too — so the
+  floor runs every language and airplane test; the only allowed skips are
+  the two process-death phases (row "The floor routes, as measured").
+  Planner rewrote the floor steps 18:16.
+- Device kit drafted (seven files); seven questions ruled — the keyboard
+  test runs in its own pass; rounded buttons are probed on their edges, not
+  corners (my earlier corner rule narrowed before it became a test defect).
+- Screen geometry done 18:41 (`:kernel` layout class, `:play` safe area,
+  the DEV card above the keyboard); my re-run green 18:43 (JVM 165 tests,
+  V-01 + control). Device kit landing (step 3).
+
+**Human input (verbatim, 19:1x):**
+
+> running out of credits soon.. plz pause when possible
+
+**Summary (orchestrator, 19:12 — paused):**
+- Device kit landed 19:10 (seven classes; hashes checked). On the dev image
+  the touch-size, play-through and language tests already pass; the phone,
+  tablet and keyboard tests fail only where TASK-031's window shell is still
+  missing. Six kit defects fixed by its author (corrected checks); two of
+  its readings confirmed (`decisions.md`).
+- **Paused at a clean seam:** TASK-027…030 done, nothing dispatched or
+  running. Next is TASK-031. Resume prompt and state in KICKOFF.md
+  "WO-006 — PAUSED"; the WO log's PAUSED row. Dev emulator left running.
+
+## 2026-10-18 — WO-010 checkpoint answers: 13+131 now, no launch cap; WO-010 next after WO-006
+
+**Human input (verbatim, 07:04; the session renamed just before to "ask this to do still 13+131"):**
+
+> lets do that 13+131 now to get bit content for my kiddos who going to test this. 6Y solves those easy buzzles in 1-3 minutes per buzzle... so more material is welcome. We worry limiting launch ones later
+
+**Summary (orchestrator, 07:04–07:12):**
+- Read as the answers to WO-010's two checkpoint items: the 13 convex
+  (public domain) and 131 Android-Tangram (GPL-3.0, the app's own licence,
+  credited) figures may ship; no launch cap now — every figure that passes
+  goes in; the launch selection is decided before the release WO.
+- Found WO-006 paused mid-build (four of six tasks done) with its changes
+  uncommitted, so WO-010 cannot start cleanly "now": two work orders in one
+  tree would share one snapshot and each other's half-finished tests.
+  Decided (row 8): **WO-010 runs right after WO-006 closes**, ahead of
+  WO-007 and WO-008.
+- Recorded: `capture-outbox/src-draft-wo010-checkpoint-answers.md` (28
+  drafts); `chg-draft-licence-notice-and-assets.md` amended (GPL-3.0 puzzle
+  figures, credited); two `decisions.md` rows; `workorders/WO-010.md`
+  (answers, the full 144 in scope, G-16 + the O-06 line as its first P3
+  step, risks to measure: start-up load, the grid, kit runtime, ~144
+  pictures); KICKOFF (the WO-010 section with its paste prompt; a pointer in
+  the WO-006 pause note so its close hands over to WO-010); AGENTS.md.
+
+## 2026-10-18 — WO-006 resumed (P4, fresh orchestrator context)
+
+**Human input (verbatim, 07:0x):**
+
+> WE ARE IN PHASE P4 — WORK ORDER WO-006 #Layout + #Language + #Promise, RESUMED
+> after a pause (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md
+> first (incl. the "from P3 on" framework files), then governance.md,
+> workorders/WO-006.md (Log to the PAUSED row), tasks.md § WO-006,
+> workorders/WO-006-briefs.md (header, dispatch order, channel table),
+> .swdev/run-log/WO-006.md, the WO-006 rows of decisions.md (2026-10-17), the last
+> progress.md entry, KICKOFF.md "WO-006 — PAUSED", platform-notes/android.md.
+> Resume at dispatch step 4: TASK-031 (slice-implementer, strongest model), then
+> TASK-032, then plan-check, code review, Test & Verify on the dev, tablet and
+> floor images (the floor's root-route steps), trace-check, verifiers,
+> wo-metrics, close. Boot the dev image first and check `tools/device_reset.sh
+> --check` is clean. Stations as subagents; the four scripts are duties. End
+> every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; 07:09 → in progress):**
+- Read the resume set; framework v0.20 = project, no drift. HEAD a797553;
+  the product tree is unchanged since TASK-029 (e84023455fc6), the test
+  tree holds TASK-030's landed kit (789ef4a5944e).
+- The dev image was gone after the pause: rebooted headless 07:09–07:10
+  (API 37, 411 × 914 dp, gesture navigation); `device_reset.sh --check`
+  clean 07:10:24. Kit hashes recorded in the WO log (07:10).
+- Step 4 dispatched 07:11: TASK-031, the window shell (slice-implementer,
+  Opus) — layout class, phone portrait, the tablet layout, edge to edge,
+  insets, the keyboard; on the dev, tablet and floor images.
+- 08:13: no change — only the orchestrator's dev-emulator launch exited
+  (TASK-031 switches images, one at a time); TASK-031 still running.
+- 09:32 TASK-031 back: the window shell is built (phone upright from the
+  manifest, tablet unlocked at run time, the one-row tablet tray, edge to
+  edge with dark icons, the insets and the keyboard). Its tests are green
+  except three kit legs it contested with evidence.
+- 09:37 ruled: all three are test-kit defects, the product stays (the
+  floor can't make a 2560-px-wide tablet display, the kit read the bars'
+  size before they settled, a restore waited forever). Checkpoint item 3
+  asked: an older tablet turns upright for a moment at start (default:
+  keep it, stands 2026-10-21). 09:39 a fresh kit author fixes the three
+  legs and proves them on the three images.
+
+**Human input (verbatim, 10:2x):**
+
+> plz look change to close sessions, as leaving for while
+
+**Summary (orchestrator, 10:25 — pause requested):**
+- The kit author was 46 min in (six of seven kit files edited, device
+  proofs running). Not stopped: a stop mid-edit leaves a half-fixed kit
+  with no hand-back. Nothing new is dispatched; the pause lands at its
+  hand-back.
+- Pause notes written now so a close at any moment is recoverable:
+  KICKOFF.md "WO-006 — PAUSED again" (state + resume prompt for both
+  cases — hand-back logged, or the session closed first), the WO log
+  10:25 row (kit hashes at that moment), the WO status line, AGENTS.md
+  phase line.
+
+## 2026-10-18 — WO-006 resumed again (P4, fresh orchestrator context)
+
+**Human input (verbatim, 13:35):**
+
+> WE ARE IN PHASE P4 — WORK ORDER WO-006 #Layout + #Language + #Promise, RESUMED
+> after a second pause (TangramPlaytime, SWDev v0.20, intake path C). Read
+> AGENTS.md first (incl. the "from P3 on" framework files), then governance.md,
+> workorders/WO-006.md (Log to the last row), tasks.md § WO-006,
+> workorders/WO-006-briefs.md (header, dispatch order, channel table),
+> .swdev/run-log/WO-006.md, the WO-006 rows of decisions.md (2026-10-17 and
+> 2026-10-18), the last progress.md entry, KICKOFF.md "WO-006 — PAUSED again",
+> platform-notes/android.md. First settle the kit recirculation as KICKOFF says
+> (accept its hand-back if logged, else re-dispatch a fresh acceptance-test-author
+> on the partial fix); TASK-031 is accepted from the fixed kit's green runs on the
+> dev, tablet and floor images. Then TASK-032 (slice-implementer, strongest model),
+> plan-check, code review, Test & Verify on the three images (the floor's
+> root-route steps), trace-check, verifiers, wo-metrics, close (next brief:
+> WO-010). Boot the dev image first and check `tools/device_reset.sh --check` is
+> clean. Stations as subagents; the four scripts are duties. End every turn with
+> the one signal.
+
+**Summary (orchestrator, Opus 5.5; 13:35 → in progress):**
+- Read the resume set; framework v0.20 = project, no drift. No hand-back
+  was logged: the session closed while the kit author ran. The seven kit
+  files are exactly as at 10:25; the product is unchanged since TASK-031.
+- The earlier author's evidence survived: on the phone image, after its
+  last edit, the keyboard, phone and tablet tests were green; the touch
+  test never finished; tablet and floor images never ran.
+- Dev image rebooted 13:35; the killed run had left a tablet-sized display
+  and a turned screen on it — the reset script put both back, check clean.
+- 13:37 a fresh kit author finishes the fix and proves it on the phone,
+  tablet and floor images (WO log 13:37).
+
+**Human input (verbatim, 16:05):**
+
+> what in strange world that one is doing for 2.5 hours... do we have too big tasks?
+
+**Summary (orchestrator, 16:05 → 16:08):**
+- Answered from the kit author's evidence timestamps: ~1 h was the
+  needed proof (seven classes × three emulators, one at a time, ~10 min a
+  full set), ~55 min a hang on the oldest phone found last, ~40 min
+  re-proving the other two after that fix. The task itself was small.
+- Proposed for later WOs (to `proposals.md` at close): oldest phone
+  first; only the broken test while fixing, the full set once at the end;
+  a per-test time limit; fewer repeat runs.
+- 16:05 the kit author came back done; receive checks and the XMLs read
+  directly all match. Ruled: two more kit defects → corrected checks 11;
+  the reset's crash-dialog blind spot carried with an interim floor rule.
+  The window-shell task accepted as done (WO log 16:08). Next: the
+  language task.
+- 16:09–17:43 the language task (one rule from the device's first
+  locale) built and green on all three emulators; accepted 17:46. Found:
+  a comma list never reaches a test argument (corrected check 12; the
+  floor's list step proven by a direct run instead). Plan check green.
+- 17:47 independent code review of the whole work order dispatched;
+  back 17:56: no blockers, two shoulds, three notes. Triaged 18:33: the
+  "no ad library" check on the release app is tightened now (corrected
+  check 13, test side, no emulator needed); the language rule's corner
+  (a first language no library has texts for) recorded and carried to
+  the release WO; the counter's digits on Arabic/Persian phones carried
+  to WO-010; the side back-swipe zone goes on the owner's play list.
+- 18:39 the check fix landed (21 named Google libraries instead of the
+  whole family; all green). 18:42 final test pass dispatched, starting
+  from the language task's runs (same trees) — only the oldest phone's
+  airplane-mode step, two small unit-test sets and the verifiers re-run.
+- 18:47 a finished station, re-woken when its emulator was stopped, ran a
+  reset on the final pass's floor; that step was re-run clean (lesson
+  logged). 18:53 final pass GREEN, 13/13; 18:54 traceability GREEN.
+- **19:10 WO-006 closed at G4** (`decisions.md` "WO-006 closed at G4").
+  Build map v1.6; 13 corrected checks and the device-time lessons in
+  `proposals.md`; seven lines in `platform-notes/android.md`; play-test
+  items in `review-notes.md`; KICKOFF "State after WO-006" → next WO-010.
+  Snapshot commit prompted to the owner.

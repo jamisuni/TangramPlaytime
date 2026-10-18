@@ -56,6 +56,18 @@ duty of the station it names; none of it is methodology.
   with a debug-APK positive control. Match a table entry (the dex string
   table, the resource string pool), never raw bytes: "0417" occurs in
   library vector paths of this release APK (`…C11.0417,8…`).
+- *(Project lesson, WO-006.)* **An allow-list names each member of a
+  family.** A bare `androidx/` in the release dex's package allow-list
+  admits `androidx.ads`, `androidx.privacysandbox`, `androidx.webkit` and
+  `androidx.browser`. List the measured subpackages by name, and give the
+  self-test a made-up class inside the family (`androidx/ads/…`) that must
+  land outside. The staleness inputs include the version catalog and
+  `settings.gradle.kts`.
+- *(Project lesson, WO-006.)* **Device time: riskiest image first, the
+  whole set once.** Run the floor image first: every hard device failure in
+  WO-006 came from API 26, and finding one last cost a re-run of the other
+  two images. While fixing, run only the failing class. Run the whole sets
+  once, on the final tree. A kit change re-opens every image's verdict.
 
 ## Device hygiene
 
@@ -71,6 +83,27 @@ duty of the station it names; none of it is methodology.
   gesture bar (a gesture-bar rule is evidenced on the dev image), `svc wifi`
   unavailable, the launcher relaunches after a display change (the kit
   waits for it to settle).
+- *(Project lesson, WO-006.)* **On API 26 never change the display while
+  the home screen is in front.** The launcher crashes (`am_crash` NPE), and
+  its crash dialog holds the focus: finishing activities never reach
+  DESTROYED, and the keyboard inset never rises. Change `wm size` /
+  `wm density` / the rotation under the app's own running activity. Then
+  launch the next one, and close every activity only after the device
+  restores. `--check` does not see the dialog, so record
+  `dumpsys window | grep mCurrentFocus` with each floor check. After a
+  stopped or killed floor run, reboot the floor instead of trusting the
+  reset.
+- *(Project lesson, WO-006.)* **API 26 display overrides.** A forced width
+  is clamped to twice the initial width: `wm size 2560x1600` reads back
+  2160x1600, so construct 1280 × 800 dp as 2160 × 1350 px at 270 dpi. And
+  an override over a running activity is a configuration change, not a
+  recreation (no `am_relaunch`), so start the activity after the override.
+- *(Project lesson, WO-006.)* **A station never owns an emulator as its
+  background task.** When another station stops that emulator, the
+  background task's end re-wakes the first station, and it acts on a
+  device it no longer holds. In WO-006 a reset landed on the next station's
+  floor run, and that step was re-run. Boot detached (`nohup … &`), and let
+  one station hold the device at a time.
 
 ## Compose test kit
 
@@ -127,6 +160,22 @@ duty of the station it names; none of it is methodology.
   `cmd.exe //c` runs only `A`. Run one class per invocation, or omit the
   argument for a whole set. The connected-test XML folder is overwritten on
   every run, so copy each XML you cite to the scratchpad.
+- *(Project lesson, WO-006.)* **A comma never reaches an instrumentation
+  argument.** AGP joins every `android.testInstrumentationRunnerArguments.*`
+  into one comma list and splits it on commas, so `kitDeviceLocales=sv-SE,fi-FI`
+  arrives as `-e kitDeviceLocales sv-SE`. Use a separator without a comma,
+  or run that one leg with `am instrument -w -e <key> <a,b> …` and the APKs
+  installed by adb. A control run with a value that must fail shows whether
+  the whole value arrived.
+- *(Project lesson, WO-006.)* **Bound every Compose call a device kit
+  makes, and wait for a steady activity first.** On API 26 a Compose read
+  polled while a turn relaunched the activity parked forever in Espresso's
+  idle wait, with the main thread idle. Wait without Compose until one
+  resumed activity has been steady for a settle time, then read. Bound each
+  Compose call (60 s → a named stall failure), and never retry it. No
+  restore path has an unbounded wait. Read values derived from the insets
+  only after the bars settle: after a display change they move for up to
+  about 5 s.
 
 ## Gradle from Git Bash on Windows
 

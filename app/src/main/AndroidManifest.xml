@@ -18,9 +18,15 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
+        <!-- WO-006 TASK-031 · S-35: a phone is created in portrait, before its first frame (REQ-035 statement); MainActivity
+             unlocks a tablet at run time (REQ-036; decisions.md 2026-10-17 Q1). `adjustResize` brings the soft keyboard's
+             inset to Compose on API 26-29 too (S-35 step 4; Q3). The theme stays opaque: API 26 refuses an orientation
+             request from a translucent activity. -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

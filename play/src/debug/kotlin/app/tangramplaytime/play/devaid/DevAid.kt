@@ -6,6 +6,7 @@
 // WO-005 TASK-026 · the overrides of S-25's composable members (plan review F3): the DEV button's slot and drawing
 // and the solution overlay (`DevAidLayers.kt`), the sheet (`DevAidSheet.kt`). The state and the solve above are
 // TASK-024's and unchanged.
+// WO-006 TASK-029 · S-33: `SheetLayer` passes the sheet's content area on to `DevSheetLayer`.
 package app.tangramplaytime.play.devaid
 
 import androidx.compose.runtime.Composable
@@ -99,10 +100,10 @@ internal class DevAid : DevAidHook() {
         DevButton(slot, solutionShown)
     }
 
-    /** The open sheet over [area] (S-25): the prompt or the menu, on a scrim below the top bar. */
+    /** The open sheet (S-25): the scrim over [area], below the top bar; the prompt or the menu inside [content] (S-33). */
     @Composable
-    override fun SheetLayer(controller: PlayController, area: Slot) {
-        DevSheetLayer(this, controller, area)
+    override fun SheetLayer(controller: PlayController, area: Slot, content: Slot) {
+        DevSheetLayer(this, controller, area, content)
     }
 
     /**

@@ -1,6 +1,6 @@
 # Build map — TangramPlaytime
 
-**Status:** Signed off (G2)  ·  **Version:** 1.5  ·  **Last updated:** 2026-10-17
+**Status:** Signed off (G2)  ·  **Version:** 1.6  ·  **Last updated:** 2026-10-18
 **Approved by:** the orchestrator under governance row 4 (`ai+inform`), with `architecture.md` v1.0  ·  **Approved on:** 2026-10-11 (owner informed the same day)
 **Feature tree:** `Requirements/features.md` (SwReqCollector collection v1.2, locked 2026-10-01; G1 accepted for this project 2026-10-11)
 
@@ -16,9 +16,9 @@
 | #Tag | Code home | Build status | Cross-feature deps (via I*) | Notes |
 |---|---|---|---|---|
 | (kernel) | `kernel/` | Planned | — | TYPE-001/003/004/005/006/007 rules live here once (D1); `ILockEngine` implementation; pure JVM |
-| #Promise | — | Planned | — | system-level: manifest has no permission, no ad/billing/network dependency (release verifier); REQ-001.A2 / REQ-048 = owner evidence |
-| #NoMoney | `app/` | Planned | — | REQ-009 free note on the settings screen; REQ-008 negatives verified system-level by the same verifier |
-| #DeviceOnly | — | Planned | — | REQ-010: airplane-mode run + manifest scan |
+| #Promise | — | Built (WO-006: A1; A2 → WO-009) | — | system-level: manifest has no permission, no ad/billing/network dependency (release verifier); REQ-001.A2 / REQ-048 = owner evidence |
+| #NoMoney | `app/` | Built (WO-006: REQ-008; REQ-009 → WO-007) | — | REQ-009 free note on the settings screen; REQ-008 negatives verified system-level by the same verifier |
+| #DeviceOnly | — | Built (WO-006) | — | REQ-010: airplane-mode run + manifest scan |
 | #Solving | `play/` | Built (WO-003; REQ-002 A2 → WO-009) | #Content (via `IPuzzleLibrary`), (kernel) (via `ILockEngine`), #ResumePuzzle (via `IProgressStore`) | board, tray, size marks, drag, tap/twist/flip gestures, solved picture; the whole subtree inherits unless listed |
 | #Locking | `kernel/` | Built (WO-001) | — | REQ-019 is JVM-tested here (geometry); REQ-020's screen half is the `#GoHome` row below |
 | #GoHome | `play/` | Built (WO-003) | (kernel) (via `ILockEngine` `LockResult.None`) | REQ-020: A1 proven at the seam in `kernel/` (WO-001) **and** on the screen (WO-003); A2 (no error message) only on the screen. Row added 2026-10-11 so the screen tests satisfy trace-check's one-code-home rule (decisions.md WO-003) |
@@ -31,8 +31,8 @@
 | #PlayTime | `kernel/` | Planned | #ResumePuzzle (via `IProgressStore`) | TYPE-005 active-second accounting, today/all-time, puzzle and best time (REQ-029, 030) |
 | #TimerDisplay | `play/` | Planned | — | REQ-031 timer on the board |
 | #Settings | `app/` | Planned | #PlayTime, #ResumePuzzle (via `IProgressStore`) | settings screen, sound toggle + playback + haptic, reset with confirmation |
-| #Language | `app/` | Planned | #Content (via `IPuzzleLibrary` titles) | `values/` + `values-fi/`; English Contract, Finnish reference (pending CHG) |
-| #Layout | `app/` | Planned | — | TYPE-007 window class, phone/tablet layouts, insets, back button, touch targets |
+| #Language | `app/` | Built (WO-006; A1 `implemented (unverified)` on the REQ-047 English-Contract draft) | #Content (via `IPuzzleLibrary` titles) | `values/` + `values-fi/`; English Contract, Finnish reference (pending CHG) |
+| #Layout | `app/` | Built (WO-006) | — | TYPE-007 window class, phone/tablet layouts, insets, back button, touch targets |
 | #Content | `content/` | Built (WO-002) | (kernel) (via `ILockEngine`: piece congruence through `vertices`, overlap through `stillValid` — the engine is injected, `:content` main code depends on `:contracts` only) | `Tangrams/*.json` bundled as Java resources at build (WO-002 design), parser, load-time validity, ordering; `IPuzzleLibrary` implementation |
 | #Release | — | Planned | — | store listing, data safety, rating, icon (DI-9 in `app/src/main/res`), release verifier; owner-evidence rows |
 | #DevTools | `play/` | Built (WO-005) | (kernel) (via `ILockEngine`), #Content (via `IPuzzleLibrary`: the solution placements), #ResumePuzzle (via `IProgressStore`, through `:play`'s `Persistence`) | REQ-046 debug-only: the aid lives in `play/src/debug` (the `debug` build type), absent from release (G-08); `play/src/main` holds only the door `DevAidHook` (decisions.md 2026-10-17 "The DEV aid reaches the screen through one door"). The cell names the module alone because trace-check reads the code home literally (decisions.md 2026-10-17 "The #DevTools code home reads `play/`") |
@@ -56,3 +56,4 @@ WO-001 #Locking (+ `:contracts`, `:kernel`) → WO-002 #Content → WO-003 #Solv
 | 1.3 | 2026-10-11 | Rows `#GoHome`, `#PuzzleArt`, `#PuzzleMini` with code home `play/` (they inherited `kernel/` / `content/`); `#Solving` → In progress (WO-003); `#Locking` note narrowed | WO-003 scope: the carried screen-side lines (REQ-020.A2, REQ-039.A1, REQ-045.A2) are proven only in `play/`, and trace-check allows one code home per tag; the seam-side A1 tests stay as extra coverage (decisions.md 2026-10-11, WO-003). At the WO-003 close (2026-10-12): build status Built (WO-003) for `#Solving` (REQ-002 A2 → WO-009), `#GoHome`, `#PuzzleArt` (A1; A2 → WO-009), `#PuzzleMini`, `#LandingPreview`, `#CornerTeach` — same row | orchestrator (notify-tier delta, WO-003 Contract deltas) |
 | 1.4 | 2026-10-17 | `#Browsing` → Built (WO-004), its note names the screen-half tokens of REQ-040.A1 / REQ-041.A1; the `store/` note → built in WO-004 (ADR-003). No code home changed, no row added (design review F5(b) reversed: the `content/` tokens satisfy the one-code-home rule) | WO-004 close: 16/16 IDs green on JVM + dev image + floor image + the process-death channel (`reviews/WO-004-test-verify.md`) | orchestrator (notify-tier delta, WO-004 Contract deltas) |
 | 1.5 | 2026-10-17 | `#DevTools` code-home cell `` `play/` (`src/debug`) `` → `` `play/` `` (the debug source set moves to Notes); cross-feature deps gain #Content (`IPuzzleLibrary` solution placements) and #ResumePuzzle (`IProgressStore` through `Persistence`); build status In progress (WO-005). At the WO-005 close (2026-10-17): build status Built (WO-005) — same row | WO-005 planner question 1: trace-check's `parse_build_map` read the parenthesis as part of the path, so every REQ-046 token under `play/` would fail the one-code-home rule (decisions.md 2026-10-17) | orchestrator (notify-tier delta, WO-005 Contract deltas) |
+| 1.6 | 2026-10-18 | Build status at the WO-006 close: `#Layout`, `#DeviceOnly` → Built (WO-006); `#Language` → Built (WO-006; A1 `implemented (unverified)`); `#NoMoney` → Built (WO-006: REQ-008; REQ-009 → WO-007); `#Promise` → Built (WO-006: A1; A2 → WO-009). No code home changed, no row added (the REQ-001 / REQ-010 tokens live in `app/`; trace-check `--wo WO-006` GREEN 13/13) | WO-006 close: 13/13 IDs green on JVM + dev + tablet + floor images + the release APK (`reviews/WO-006-test-verify.md`) | orchestrator (notify-tier delta, WO-006 Contract deltas) |

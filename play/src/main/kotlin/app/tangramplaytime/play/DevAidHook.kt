@@ -4,6 +4,10 @@
 // WO-005 TASK-026 · S-25's four composable members (plan review F3: added together with their overrides in the
 // debug source set). `PlayScreen` calls them only when it is given an aid (S-10Δ2); the router reads the button's
 // slot and `sheetOpen` (S-22Δ2). They are declarations only: what they draw lives with the aid (O-08).
+// WO-006 TASK-029 · S-33 (tasks.md § WO-006 › Seams) · REQ-035 rule 3; decisions.md 2026-10-17 "The DEV aid, drawn in
+// detail" (the keyboard carry) and "Edge to edge, the insets and the keyboard, as drawn": `SheetLayer` also takes its
+// content area (`ScreenGeometry.sheetContent`), so the prompt and the menu sit inside the insets and above the soft
+// keyboard. The door still names no aid class and holds no aid text (O-08).
 package app.tangramplaytime.play
 
 import androidx.compose.runtime.Composable
@@ -45,9 +49,13 @@ abstract class DevAidHook internal constructor() {
     @Composable
     internal abstract fun ButtonLayer(slot: Slot)
 
-    /** The open sheet over [area], the screen below the top bar, composed last while [sheetOpen] holds (S-10Δ2). */
+    /**
+     * The open sheet, composed last while [sheetOpen] holds (S-10Δ2): its scrim over [area] (`ScreenGeometry.overlay`,
+     * the screen below the top bar to its edges), its prompt or menu inside [content] (`ScreenGeometry.sheetContent`:
+     * inside the insets and above the soft keyboard; S-33). With no insets and no keyboard [content] is [area].
+     */
     @Composable
-    internal abstract fun SheetLayer(controller: PlayController, area: Slot)
+    internal abstract fun SheetLayer(controller: PlayController, area: Slot, content: Slot)
 
     /** The door's one lookup (S-25). */
     companion object {

@@ -63,6 +63,81 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## State after WO-006 (2026-10-18, closed 19:10)
+
+- **WO-006 #Layout + #Language + #Promise is done** (`workorders/WO-006.md`, Light).
+  - **Layouts:** a phone is upright only, with the tray in two rows; a tablet (600 dp and wider) turns freely, with all seven pieces in one row. The rule lives once in `:kernel` (`LayoutClass`). The screen is drawn edge to edge with dark system icons; every control stays inside the safe area, and the tray clears the gesture bar. Back closes the grid, otherwise it leaves the game. Every player control is at least 48 dp (‹ › 52, the flip badge 60).
+  - **Language:** one rule — Finnish when the phone's first language is Finnish, English otherwise — for strings and titles together (`AppLanguage`). As built, "first" means the first language the app has any texts for (code review S1, recorded).
+  - **The promise:** the release APK declares no permission, and its classes come only from a measured list of 30 packages (21 named `androidx` members), which a planted ad class fails. A play-through on a phone and on a tablet shows no price, ad, money ask or rating prompt, with airplane mode on.
+  - **Results:** 13/13 IDs green on JVM (243), the dev image, the **new tablet image** `Medium_Tablet_API_37.0` and the floor image (incl. the root-route steps), plus V-01. **REQ-047.A1 stays `implemented (unverified)`** (the English-Contract draft).
+  - **Code review:** 0 B / 2 S / 3 N. Corrected checks 13 (the device kit's timing and API 26 assumptions, a comma cut from a test argument, the allow-list family). Product defects 0. Disputes: the worker won 3.
+- **Channels from now on:** the tablet image is a standing channel for the app set (one whole-set run per close). **Device time rules** (`platform-notes/android.md`, WO-006 lessons): the floor image first; while fixing, the failing class alone; the whole sets once, on the final tree; Test & Verify starts from the run log; an emulator is booted detached (`nohup`), never as a station's background task.
+- **Carry into later WOs:**
+  - **WO-010 (next):** the counter formats with the device's default locale, so a phone in Arabic or Persian shows other digits in the English counter. Format with the app's resolved locale or `Locale.ROOT`, with a JVM pin (code review N1). WO-010's grid reaches three-digit counts.
+  - **WO-007:** the settings screen joins the "every screen" tests (the play-through's closed world of texts, the touch-size sweep, the no-money walk, the Finnish walk); REQ-009's free note lands on that screen. From WO-005: an aid solve fires the normal events in one burst — decide how sounds handle it.
+  - **WO-008 must-dos** (from WO-004 / WO-005): unchanged — an aid solve never sets a best time; which side guarantees a time the store's reader rejects is never written.
+  - **WO-009:** REQ-001.A2 (the store labels, an owner-evidence row); the manifest's `portrait` makes Google Play infer `android.hardware.screen.portrait` — decide a `uses-feature … required="false"` line with the listing. **If WO-009 (or any WO) trims library locales** (`localeFilters`), `[sv, fi]` would turn Finnish: re-open S-36 — read a locale list Android has not reordered, and add a discriminating `eo,fi-FI` kit leg (code review S1, `decisions.md` 2026-10-18).
+  - **The next WO with device steps:** `tools/device_reset.sh --check` should name a focused "Application Error" window (S-37 blind spot; interim rule: reboot the floor after a stopped run). Optional kit item: the other six build files as staleness inputs of `ReleasePromiseKitTest`.
+- **Checkpoint items:** 1–2 (the tablet screen; edge to edge with dark icons) **stand 2026-10-20**; 3 (an older tablet held sideways turns upright for a moment at start) **stands 2026-10-21** (`workorders/WO-006.md` § Checkpoint items).
+- **Lock behind build:** 28 outbox drafts await a capture session; this WO wrote and amended none.
+- **Owner steps:**
+  - Commit the WO-006 snapshot (prompted on the G4 surface).
+  - Play the build on a phone and a tablet, and once with the phone in Finnish (`review-notes.md` 2026-10-18).
+  - Answer checkpoint items 1–3 if a default is wrong ("Q3 no" is enough).
+- **Next:** WO-010 — paste the prompt in "Next after WO-006 — WO-010" below. The tablet image is now a standing channel, so WO-010's G3 includes it.
+
+## WO-006 — PAUSED again (2026-10-18 10:25; the owner: "plz look change to close sessions, as leaving for while") — RESUMED 2026-10-18 13:35, DONE (closed 19:10)
+
+- **Where it stands** (`workorders/WO-006.md` Log, rows of 2026-10-18; `.swdev/run-log/WO-006.md` row i31): resumed 07:10. **TASK-031 (the `:app` window shell) is built and in review** — product tree d345bc0af99c; JVM, V-01 and the old device sets green; its new device classes were red only on three kit legs it contested, ruled kit defects 09:37 (`decisions.md` 2026-10-18 "Worker wins three contests …"). **A kit recirculation was in flight at the pause** (fresh `acceptance-test-author`, dispatched 09:39): it fixes the floor tablet display, the inset snapshots and the restore's unbounded wait, and proves them on the dev, tablet and floor images. At 10:25 six of the seven kit files were already edited (WO log 10:25 row has the hashes). **Not started:** TASK-032 (language override), plan-check, code review, Test & Verify, trace-check, verifiers, wo-metrics, close.
+- **If the kit author's hand-back is in the WO log** (a row after 10:25): receive-check it (kit hashes, the product tree still d345bc0af99c, the XML counts), then accept TASK-031 from the fixed kit's runs (step 4 gate) and go on with TASK-032.
+- **If it is not** (the session was closed while it ran): the kit files may hold a partial fix. Recompute the seven kit hashes against the WO log's 07:10 and 10:25 lists, then dispatch a fresh `acceptance-test-author` with the TASK-030 brief, the 2026-10-18 ruling row, and the note "the files may hold a partial fix by an earlier author — finish it". Its evidence folder was the session scratchpad `kitfix030/` (gone with the session).
+- **Rulings to know:** the WO-006 rows of 2026-10-17 and 2026-10-18 (incl. the manifest-portrait row and the transparent-bars row). Checkpoint items 1–2 default 2026-10-20; **item 3** (an older tablet turns upright for a moment at start) asked 2026-10-18, default "keep it" 2026-10-21. Disputes so far: worker 3, checker 0; corrected checks 6 (+3 when the fix lands).
+- **Devices:** the dev image `Medium_Phone_API_37.0` may be running as `emulator-5554` (`adb devices`; boot it headless if not; `tools/device_reset.sh --check` must be clean before any step).
+- **After the close:** WO-010 (unchanged, see "Next after WO-006 — WO-010").
+
+```text
+WE ARE IN PHASE P4 — WORK ORDER WO-006 #Layout + #Language + #Promise, RESUMED
+after a second pause (TangramPlaytime, SWDev v0.20, intake path C). Read
+AGENTS.md first (incl. the "from P3 on" framework files), then governance.md,
+workorders/WO-006.md (Log to the last row), tasks.md § WO-006,
+workorders/WO-006-briefs.md (header, dispatch order, channel table),
+.swdev/run-log/WO-006.md, the WO-006 rows of decisions.md (2026-10-17 and
+2026-10-18), the last progress.md entry, KICKOFF.md "WO-006 — PAUSED again",
+platform-notes/android.md. First settle the kit recirculation as KICKOFF says
+(accept its hand-back if logged, else re-dispatch a fresh acceptance-test-author
+on the partial fix); TASK-031 is accepted from the fixed kit's green runs on the
+dev, tablet and floor images. Then TASK-032 (slice-implementer, strongest model),
+plan-check, code review, Test & Verify on the three images (the floor's
+root-route steps), trace-check, verifiers, wo-metrics, close (next brief:
+WO-010). Boot the dev image first and check `tools/device_reset.sh --check` is
+clean. Stations as subagents; the four scripts are duties. End every turn with
+the one signal.
+```
+
+## WO-006 — PAUSED (2026-10-17 19:12; the owner: "running out of credits soon.. plz pause when possible") — RESUMED 2026-10-18 07:10
+
+- **Where it stands** (`workorders/WO-006.md` Log; `.swdev/run-log/WO-006.md`): G3 approved 17:39 (Light). **Done:** TASK-027 (JVM kit), TASK-028 (`tools/device_reset.sh` + the floor routes), TASK-029 (`:kernel` `LayoutClass`, `:play` safe-area geometry), TASK-030 (device kit, seven classes, landed 19:10). **Next:** TASK-031 (`:app` window shell — layout class, portrait request, tablet layout, edge to edge, insets, `adjustResize`; dispatch step 4), then TASK-032 (language override, step 5), plan-check, code review, Test & Verify on all three images (floor incl. the root-route steps (a)–(e)), trace-check, verifiers, wo-metrics, close.
+- **Rulings to know:** `decisions.md` WO-006 rows of 2026-10-17 (scope; Q1–Q9; the floor routes as measured — root route, not `-change-locale`; the device kit's readings — keyboard pin in its own class, app set = two invocations per image; the safe-area readings; the closed-world readings). Named skips: only the two `ProcessDeathKitTest` phases.
+- **Open for the close:** 6 corrected checks to file in `proposals.md` (TASK-030's kit defects); review-notes items (the tablet ‹ › 3 dp above the bar's centre line; a play-through on a tablet and in Finnish); checkpoint items 1–2 (tablet screen; edge to edge with dark icons) — defaults stand 2026-10-20; carry lines for WO-007 (the settings screen joins the every-screen tests; the free note REQ-009) and WO-009 (REQ-001.A2).
+- **Devices:** dev image `Medium_Phone_API_37.0` was left running and clean; the new tablet AVD `Medium_Tablet_API_37.0` exists (C:/Users/Jami/.android/avd/Medium_Tablet.avd).
+- **After the close (added 2026-10-18, another session):** the next WO is **WO-010** (the content batch the owner pulled forward: "lets do that 13+131 now"), not WO-007 — `decisions.md` 2026-10-18 row 8. Its paste-in prompt is ready in "Next after WO-006 — WO-010" below; the WO-006 close points there instead of writing a WO-007 brief.
+
+```text
+WE ARE IN PHASE P4 — WORK ORDER WO-006 #Layout + #Language + #Promise, RESUMED
+after a pause (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md
+first (incl. the "from P3 on" framework files), then governance.md,
+workorders/WO-006.md (Log to the PAUSED row), tasks.md § WO-006,
+workorders/WO-006-briefs.md (header, dispatch order, channel table),
+.swdev/run-log/WO-006.md, the WO-006 rows of decisions.md (2026-10-17), the last
+progress.md entry, KICKOFF.md "WO-006 — PAUSED", platform-notes/android.md.
+Resume at dispatch step 4: TASK-031 (slice-implementer, strongest model), then
+TASK-032, then plan-check, code review, Test & Verify on the dev, tablet and
+floor images (the floor's root-route steps), trace-check, verifiers,
+wo-metrics, close. Boot the dev image first and check `tools/device_reset.sh
+--check` is clean. Stations as subagents; the four scripts are duties. End
+every turn with the one signal.
+```
+
 ## State after WO-005 (2026-10-17, closed 13:13)
 
 - **WO-005 #DevTools is done** (`workorders/WO-005.md`, Light).
@@ -120,6 +195,44 @@ is two Gradle runs (APKs, then tests). Device runs are judged by their XML.
 Checkpoint candidates (≤5, product-visible). Strings to review-notes.md.
 Stations as subagents; the four scripts are duties. End every turn with the
 one signal.
+```
+
+## Next after WO-006 — WO-010 content batch from TangramCollections (planned 2026-10-17, answered 2026-10-18)
+
+- **The owner's request** (2026-10-17): add the puzzles of `C:/GitHub/AI/TangramCollections` to the game. **The owner's answers (2026-10-18):** "lets do that 13+131 now to get bit content for my kiddos who going to test this. 6Y solves those easy buzzles in 1-3 minutes per buzzle... so more material is welcome. We worry limiting launch ones later" — the 13 convex (CC0) and 131 Android-Tangram (GPL-3.0, the app's own licence, credited) figures, **all that pass, no launch cap now**. Recorded: `capture-outbox/src-draft-tangramcollections-puzzles.md`, `src-draft-wo010-checkpoint-answers.md` (28 outbox drafts now), `chg-draft-licence-notice-and-assets.md` amended; DI-10 in `design-inputs.md` v1.2.
+- **When:** right after WO-006 closes, ahead of WO-007 and WO-008 (`decisions.md` 2026-10-18 row 8). Not before: WO-006 is paused mid-P4 with its changes uncommitted; two WOs in one tree would share one snapshot and each other's red windows. **The WO-006 close writes WO-010 (not WO-007) as the next brief** — this section's prompt is ready.
+- **`workorders/WO-010.md` (Proposed):** P3 starts by amending G-16 (+ the O-06 line) through the G2 route; then ~144 figures converted, titled, rated, pictured, credited and validated. Risks to measure: start-up load with ~157 puzzles, the grid with every cell composed, kit runtime over every puzzle, ~144 pictures.
+
+```text
+WE ARE IN PHASE P3 — WORK ORDER WO-010 content batch: new puzzles from
+TangramCollections (TangramPlaytime, SWDev v0.20, intake path C). Read
+AGENTS.md first (incl. the "from P3 on" framework files), then governance.md,
+architecture.md (v1.1; G-05, G-16, O-06), build-map.md, design-inputs.md
+(DI-5, DI-10, §2 items 14–16), decisions.md (the WO-010 rows of 2026-10-17 and
+2026-10-18, the content rows of 2026-10-11), the last progress.md entry,
+KICKOFF.md "Next after WO-006 — WO-010", workorders/WO-010.md (the stub, its
+answered checkpoint items and § Constraints' risks),
+capture-outbox/src-draft-tangramcollections-puzzles.md,
+src-draft-wo010-checkpoint-answers.md and chg-draft-licence-notice-and-assets.md,
+Spec/03-puzzle-format.md, Tangrams/README.md, platform-notes/android.md.
+WO-010 scope: first amend architecture.md G-16 (GPL-3.0 puzzle figures,
+credited) and add the O-06 exception for the DEV aid's strings through the
+G2 route (row 4). Then convert every figure of
+C:/GitHub/AI/TangramCollections/collections/convex-13 and
+android-tangram-131 (read-only) that passes and is not a duplicate into
+Tangrams/*.json (tangram-puzzle/1, polygon form) — kind, rating, en title
+(fi reference), a picture drawn for this project, provenance + licence,
+ASSET-LICENCES.md credits, reviewedByHuman false — with the Python
+validator + renderer + preview sheet and the Kotlin load check green, and
+every kit that iterates the bundled puzzles green. Measure the start-up
+load and the grid with the full bundle. Owner rules 6–7 bind.
+Mode: decide from the four reasons — Light unless one is written in the WO.
+Verification channels at G3: the Python tool channel; JVM (the two-run line);
+the device sets on the dev image Medium_Phone_API_37.0 AND the floor image
+Phone_API_26 AND the tablet image Medium_Tablet_API_37.0 (a standing channel
+since WO-006: the app set; the floor first, the whole sets once);
+V-01 + positive control. Puzzle titles to review-notes.md. Stations as
+subagents; the four scripts are duties. End every turn with the one signal.
 ```
 
 ## State after WO-004 (2026-10-17, closed 09:25)

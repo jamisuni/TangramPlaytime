@@ -8,6 +8,10 @@
 // foundation `clickable`s while the root router stands aside · architecture.md G-08 / O-08, G-10 (every text from the
 // aid's resources), G-17, S-12 · DI-1 `#devDlg`, `.sheet`, `.pin`, `.toggle`, `.big` (numbers no row fixes: proposed
 // decisions row of TASK-026).
+// WO-006 TASK-029 · S-33 (tasks.md § WO-006 › Seams) · decisions.md 2026-10-17 "Edge to edge, the insets and the
+// keyboard, as drawn" closes the WO-005 carry ("The DEV aid, drawn in detail"): the scrim still covers `area`; the prompt
+// and the menu sit inside `content` (`ScreenGeometry.sheetContent`, inside the insets and above the soft keyboard), so the
+// number keyboard never covers the field, OK or Cancel. With no insets and no keyboard `content` = `area`: WO-005's look.
 package app.tangramplaytime.play.devaid
 
 import androidx.compose.foundation.clickable
@@ -58,8 +62,10 @@ import app.tangramplaytime.play.PlayController
 import app.tangramplaytime.play.PlayPalette
 import app.tangramplaytime.play.R
 import app.tangramplaytime.play.Slot
+import app.tangramplaytime.play.SlotLayout
 import app.tangramplaytime.play.drawControlShape
 import app.tangramplaytime.play.slot
+import app.tangramplaytime.play.within
 
 /** Touch geometry "The sheet": inset 16 dp from the area below the top bar (DI-1 `.overlay` padding 16 px). */
 private const val SHEET_INSET_DP = 16f
@@ -117,11 +123,12 @@ private const val MIN_TOUCH_DP = 48f
 
 /**
  * The aid's sheet over [area] (the tag table's `dev-aid-sheet`, "the screen below the top bar"): the scrim, which closes
- * the sheet at a tap (S-26 `close()`), and, centred and inset 16 dp, the prompt or the menu. Every touch here goes to
- * foundation `clickable`s and the field; the root router stands aside while the sheet is open (S-22Δ2 hit order 0).
+ * the sheet at a tap (S-26 `close()`), and, centred in [content] and inset 16 dp, the prompt or the menu (S-33: [content]
+ * is `ScreenGeometry.sheetContent`, inside the insets and above the soft keyboard). Every touch here goes to foundation
+ * `clickable`s and the field; the root router stands aside while the sheet is open (S-22Δ2 hit order 0).
  */
 @Composable
-internal fun DevSheetLayer(aid: DevAid, controller: PlayController, area: Slot) {
+internal fun DevSheetLayer(aid: DevAid, controller: PlayController, area: Slot, content: Slot) {
     val open = aid.sheet
     if (open == DevSheet.NONE) return
     Box(Modifier.slot(area).testTag(DevAidTags.SHEET)) {
@@ -131,11 +138,15 @@ internal fun DevSheetLayer(aid: DevAid, controller: PlayController, area: Slot) 
                 .drawBehind { drawRect(PlayPalette.scrim) }
                 .clickable(interactionSource = null, indication = null) { aid.close() },
         )
-        Box(Modifier.fillMaxSize().padding(SHEET_INSET_DP.dp), contentAlignment = Alignment.Center) {
-            when (open) {
-                DevSheet.PROMPT -> DevPrompt(aid)
-                DevSheet.MENU -> DevMenu(aid, controller)
-                DevSheet.NONE -> Unit
+        // S-33: the card's box is `content`, in the sheet node's own px; it takes no touch, so the scrim still gets every
+        // touch the card does not cover.
+        SlotLayout(Modifier.fillMaxSize()) {
+            Box(Modifier.slot(content.within(area)).padding(SHEET_INSET_DP.dp), contentAlignment = Alignment.Center) {
+                when (open) {
+                    DevSheet.PROMPT -> DevPrompt(aid)
+                    DevSheet.MENU -> DevMenu(aid, controller)
+                    DevSheet.NONE -> Unit
+                }
             }
         }
     }

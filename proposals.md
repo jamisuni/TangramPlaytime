@@ -387,3 +387,75 @@ from starvation.
 - **Severity:** low to medium. The build-map parser misread is medium (a
   silent RED at the close gate, found only because the planner read the
   script). The rest are low.
+
+## 2026-10-18 — WO-006 #Layout + #Language + #Promise: thirteen corrected checks, device time, a station re-woken onto another's emulator
+
+- **Corrected checks 1–6 (the device kit at landing, found on the dev
+  image by its own author).** (1) A format resource's `$` placeholder was
+  counted as a currency symbol on screen. (2) Every untagged clickable was
+  a stray, so the grid's scrim inside `overview` failed. (3) The rotation
+  restore. (4) The held drag's pose in REQ-036.A2. (5) The pulse pin's
+  clock. (6) Held-finger steps under a paused clock. **Miscalibration:** a
+  closed-world check written from the REQ's words before the real screen
+  was read (1–2), and timing assumptions about the device (3–6).
+- **Corrected checks 7–9 (three contests by the implementer, all won by
+  the worker).** (7) The floor cannot construct a 2560 × 1600 px display
+  (API 26 clamps the width), and an override there is not a recreation.
+  (8) Inset snapshots raced the bars settling. (9) The rotation restore's
+  unbounded Compose wait hung the class. **Miscalibration:** the kit
+  assumed API 37's display behaviour on the floor, and a restore path had
+  no bound.
+- **Corrected checks 10–11 (found on the floor while proving 7–9).**
+  (10) The kit changed the display with the launcher in front; on API 26
+  the launcher crashed and its dialog held the focus. (11) A Compose read
+  polled across a relaunch parked forever in Espresso's idle wait.
+  **Miscalibration:** device-level changes made outside the app's own
+  activity, and Compose calls without a bound.
+- **Corrected check 12 (a channel line that could not deliver its value).**
+  AGP splits instrumentation arguments on commas, so the floor's list leg
+  `kitDeviceLocales=sv-SE,fi-FI` arrived as `sv-SE`. It was proven by a
+  direct `am instrument` run instead. **Miscalibration:** a channel line
+  never shown to deliver its argument whole. **Proposal:** the
+  test-author brief template asks for one control run per instrumentation
+  argument, with a value that must fail.
+- **Corrected check 13 (code review S2: an allow-list with a whole family
+  in it).** The G-01 pin allowed bare `androidx/`, which holds ads,
+  privacy-sandbox and webkit packages; its self-test only removed
+  `kotlinx/`. **Proposal:** the guardrail-authoring "closed allow-list"
+  pattern says: no family entry; list the measured members; the self-test
+  injects a member of a family.
+- **Device time was the WO's cost, not task size.** The fixes were small.
+  Proving them took hours: seven classes × three emulators, one at a time,
+  about 10 minutes a whole set. A defect found on the last image (the
+  floor) forced a re-run of the other two. The first kit recirculation took
+  2 h 29 min: about 1 h needed, 55 min a floor hang found last, 40 min
+  re-proving. After the owner asked "do we have too big tasks?", TASK-032
+  was routed floor-first, iterating on one class and running the whole
+  sets once (1 h 35 min). Test & Verify started from the run-log baseline
+  (v0.17) and re-ran one floor step, about 11 minutes. **Proposal:**
+  `orchestration.md` / the brief template: "riskiest image first; while
+  fixing, the failing class alone; the whole sets once, on the final tree".
+  The kit template also gets a per-test time limit, so a hang costs
+  minutes, not 15 per test.
+- **A station re-woken onto another station's emulator.** The TASK-032
+  implementer left the dev image running as its own background task. When
+  Test & Verify stopped it to boot the floor, the background task's end
+  re-woke the finished implementer. It tried to restart the image and ran
+  one reset on Test & Verify's floor, and that step was re-run.
+  **Proposal:** `adapters/claude/CLAUDE.md` (device stations): "boot an
+  emulator detached (`nohup`), never as your own background task; after
+  your hand-back, make no device call".
+- **A pause mid-station loses the hand-back.** The owner's second pause
+  (10:25) closed the session while a kit author ran. The next context
+  found a half-fixed kit and no hand-back, and re-dispatched with both hash
+  lists and the old evidence folder. KICKOFF's two-case resume prompt
+  worked. **Proposal:** none beyond keeping that two-case form.
+- **The planner's launch is missing from `telemetry.jsonl` again** (as in
+  WO-005). The 13 launches logged from 2026-10-17 16:41 lack the planner's
+  (16:51).
+- **The review cycle worked.** The code review found what the kit could
+  not see: S-36's wrap is unobservable on this APK (a mutation survived),
+  and the allow-list family. Test & Verify reused the baseline honestly and
+  discarded its own interfered run.
+- **Severity:** medium. Device time decides the owner's experience of a WO
+  (the owner asked about it mid-WO). The other items are low.

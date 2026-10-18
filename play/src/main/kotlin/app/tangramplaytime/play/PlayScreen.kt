@@ -24,6 +24,13 @@
 // slot is published with the other controls each composition, the solution layer follows the silhouette, the button
 // follows the solved row, and the sheet comes last, below the top bar, while it is open. Without one (the default),
 // nothing of it is composed and the screen is exactly WO-004's.
+// WO-006 TASK-029 · S-32 (tasks.md § WO-006 › Seams; the touch geometry per layout class) · REQ-035 statement, rules
+// 2–3, A1, A2; REQ-036 statement, rule 2, A1; REQ-037 (the slots the router hits); REQ-013 consumed · decisions.md
+// 2026-10-17 "Edge to edge, the insets and the keyboard, as drawn": `ScreenGeometry` places every slot inside the
+// safe area (the composable minus `PlayLayout.insets`); the tray strip runs to the composable's bottom edge, behind the
+// gesture bar; `overlay`, `overlayContent` and `sheetContent` are the overlays' areas, and only `sheetContent` reads
+// the keyboard. S-33: the overview and the DEV sheet get their scrim area and their content area from it. With
+// `PlayInsets.NONE` and no keyboard every slot equals WO-005's (seam note 1). Every slot in px (G-17).
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
@@ -229,14 +236,14 @@ fun PlayScreen(
                 solve.elapsedMs?.let { if (solve.confettiShown(reducedMotion)) Confetti(geometry, it) }
                 // S-22 "Overview": over everything below the top bar, which stays drawn (and inert: hit order 0). Its
                 // open state is the controller's, so a recreated screen shows it from the first frame ("What survives").
+                // S-33: the scrim over `overlay`, the sheet inside `overlayContent` (the safe part of it).
                 if (controller.overviewOpen) {
-                    val barBottom = geometry.topBar.top + geometry.topBar.height
-                    Overview(controller, Slot(0, barBottom, widthPx, (heightPx - barBottom).coerceAtLeast(0)), texts)
+                    Overview(controller, geometry.overlay, geometry.overlayContent, texts)
                 }
                 // S-10Δ2: the aid's sheet last, over the screen below the top bar, while it is open (hit order 0).
+                // S-33: the scrim over `overlay`, the prompt or the menu inside `sheetContent` (above the keyboard).
                 if (devAid != null && devAid.sheetOpen) {
-                    val barBottom = geometry.topBar.top + geometry.topBar.height
-                    devAid.SheetLayer(controller, Slot(0, barBottom, widthPx, (heightPx - barBottom).coerceAtLeast(0)))
+                    devAid.SheetLayer(controller, geometry.overlay, geometry.sheetContent)
                 }
             }
         }
@@ -244,44 +251,71 @@ fun PlayScreen(
 }
 
 /**
- * Where everything sits for one screen size, whole px of the `play-screen` node: the top bar and its three
- * columns (S-22), the board and its mapping, the tray strip and its cells (S-6 with the screen's own size), and
- * the thirds the solved row splits the strip into (S-22).
+ * Where everything sits for one screen size, whole px of the `play-screen` node (S-32): the safe area, the top bar and
+ * its three columns (S-22, inside the safe area), the board and its mapping, the tray strip and its cells (S-6 with the
+ * safe width and the screen's full height), the thirds the solved row splits the tray band into (S-22), and the
+ * overlays' areas (S-33). With `PlayInsets.NONE` and no keyboard every slot is WO-005's (seam note 1).
  */
 internal class ScreenGeometry(
+    /** S-32: `topBarDp` tall from the safe top, across the safe width. */
     val topBar: Slot,
-    /** ‹: x from 0 to 60 dp, the bar's full height (S-22). */
+    /** ‹: the column from the safe left edge, 60 dp wide, the bar's full height (S-22, S-32). */
     val navPrev: Slot,
-    /** ›: x from W − 60 dp to W, the bar's full height (S-22). */
+    /** ›: the column ending at the safe right edge, 60 dp wide, the bar's full height (S-22, S-32). */
     val navNext: Slot,
     /** The counter zone: everything between ‹ and ›, the bar's full height (S-22). */
     val counter: Slot,
+    /** S-32: from the bar's bottom + 4 dp to the tray's top − 8 dp, `sideMarginDp` inside the safe left and right edges. */
     val board: Slot,
     val mapping: BoardMapping,
+    /** The tray strip: from the tray's top (the safe bottom − the tray height) to the composable's bottom edge, across the composable, behind the gesture bar (S-32). */
     val tray: Slot,
     /** The miniatures' common scale, px per unit (REQ-013). */
     val trayPxPerUnit: Float,
+    /** One cell per piece of the puzzle, S-6's cells offset by the safe left and placed from the tray's top (S-32). */
     val cells: Map<PieceId, Slot>,
-    /** The tray strip in thirds, left to right: Retry, the best time, Next (S-22 "Solved row"). */
+    /** The band between the tray's top and the safe bottom, across the safe width, in thirds, left to right: Retry, the best time, Next (S-22 "Solved row", S-32). */
     val solvedThirds: List<Slot>,
     /** The screen's density, px per dp, for the dp sizes of the decorations (the badge's 60 dp area, the marks, the markers). */
     val density: Float,
+    /** S-32: the safe area, the composable minus `PlayLayout.insets`. */
+    val safe: Slot,
+    /** S-32: below the top bar to the composable's edges — the overview's and the DEV sheet's scrim (S-33). */
+    val overlay: Slot,
+    /** S-32: [overlay] ∩ [safe] — where the overview's sheet sits (S-33). */
+    val overlayContent: Slot,
+    /** S-32: [overlayContent], its bottom raised to at most the composable's bottom − `keyboardDp` — where the DEV sheet's prompt and menu sit (S-33). */
+    val sheetContent: Slot,
 ) {
     companion object {
         fun of(widthPx: Int, heightPx: Int, density: Float, layout: PlayLayout, puzzle: PuzzleDefinition): ScreenGeometry {
-            val topBarPx = (layout.topBarDp * density).roundToInt()
-            val topBar = Slot(0, 0, widthPx, topBarPx)
-            val column = (NAV_COLUMN_DP * density).roundToInt().coerceAtMost(widthPx / 2)
-            val navPrev = Slot(0, 0, column, topBarPx)
-            val navNext = Slot(widthPx - column, 0, column, topBarPx)
-            val counter = Slot(column, 0, (widthPx - 2 * column).coerceAtLeast(0), topBarPx)
+            // S-32: the safe area is the composable minus `layout.insets` (the system bars and the cutout, never the
+            // keyboard). With `PlayInsets.NONE` it is the whole composable, and every slot below is WO-005's.
+            val insets = layout.insets
+            val safeLeft = (insets.leftDp * density).roundToInt().coerceIn(0, widthPx)
+            val safeTop = (insets.topDp * density).roundToInt().coerceIn(0, heightPx)
+            val safeRight = (widthPx - (insets.rightDp * density).roundToInt()).coerceIn(safeLeft, widthPx)
+            val safeBottom = (heightPx - (insets.bottomDp * density).roundToInt()).coerceIn(safeTop, heightPx)
+            val safeWidth = safeRight - safeLeft
+            val safe = Slot(safeLeft, safeTop, safeWidth, safeBottom - safeTop)
 
-            val trayGeometry = TrayMetrics.layout(widthPx / density, heightPx / density, layout, puzzle.pieces)
-            val trayTop = (heightPx - trayGeometry.heightDp * density).roundToInt().coerceIn(0, heightPx)
+            val topBarPx = (layout.topBarDp * density).roundToInt()
+            val topBar = Slot(safeLeft, safeTop, safeWidth, topBarPx)
+            val column = (NAV_COLUMN_DP * density).roundToInt().coerceAtMost(safeWidth / 2)
+            val navPrev = Slot(safeLeft, safeTop, column, topBarPx)
+            val navNext = Slot(safeRight - column, safeTop, column, topBarPx)
+            val counter = Slot(safeLeft + column, safeTop, (safeWidth - 2 * column).coerceAtLeast(0), topBarPx)
+            val barBottom = safeTop + topBarPx
+
+            // S-32 "Tray": S-6 with the safe width and the composable's full height (REQ-013's "screen height" is the
+            // whole screen); the tray's top is the safe bottom − the tray height; the strip runs on to the bottom edge.
+            val safeWidthDp = widthPx / density - insets.leftDp - insets.rightDp
+            val trayGeometry = TrayMetrics.layout(safeWidthDp, heightPx / density, layout, puzzle.pieces)
+            val trayTop = (safeBottom - trayGeometry.heightDp * density).roundToInt().coerceIn(0, safeBottom)
             val tray = Slot(0, trayTop, widthPx, heightPx - trayTop)
             val cells = trayGeometry.cells.mapValues { (_, c) ->
                 Slot(
-                    left = (c.xDp * density).roundToInt(),
+                    left = safeLeft + (c.xDp * density).roundToInt(),
                     top = trayTop + (c.yDp * density).roundToInt(),
                     width = (c.widthDp * density).roundToInt(),
                     height = (c.heightDp * density).roundToInt(),
@@ -289,9 +323,9 @@ internal class ScreenGeometry(
             }
 
             val side = (layout.sideMarginDp * density).roundToInt()
-            val boardTop = topBarPx + (BOARD_GAP_TOP_DP * density).roundToInt()
+            val boardTop = barBottom + (BOARD_GAP_TOP_DP * density).roundToInt()
             val boardBottom = trayTop - (BOARD_GAP_BOTTOM_DP * density).roundToInt()
-            val board = Slot(side, boardTop, (widthPx - 2 * side).coerceAtLeast(0), (boardBottom - boardTop).coerceAtLeast(0))
+            val board = Slot(safeLeft + side, boardTop, (safeWidth - 2 * side).coerceAtLeast(0), (boardBottom - boardTop).coerceAtLeast(0))
 
             val points = puzzle.solution.flatMap { it.polygon }
             val minX = points.minOf { it.x }
@@ -304,9 +338,31 @@ internal class ScreenGeometry(
                 originYPx = (board.topPx + (board.height - unitHeight * scale) / 2 - minY * scale).toFloat(),
                 pxPerUnit = scale,
             )
-            val cuts = listOf(0, (widthPx / 3f).roundToInt(), (widthPx * 2 / 3f).roundToInt(), widthPx)
-            val thirds = (0 until 3).map { i -> Slot(cuts[i], tray.top, cuts[i + 1] - cuts[i], tray.height) }
-            return ScreenGeometry(topBar, navPrev, navNext, counter, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, thirds, density)
+            // S-32: the thirds split the band between the tray's top and the safe bottom, across the safe width.
+            val cuts = listOf(safeLeft, safeLeft + (safeWidth / 3f).roundToInt(), safeLeft + (safeWidth * 2 / 3f).roundToInt(), safeRight)
+            val band = (safeBottom - trayTop).coerceAtLeast(0)
+            val thirds = (0 until 3).map { i -> Slot(cuts[i], trayTop, cuts[i + 1] - cuts[i], band) }
+
+            // S-32's overlay areas (S-33). Only `sheetContent` reads the keyboard: nothing else moves while it is open.
+            val overlay = Slot(0, barBottom, widthPx, (heightPx - barBottom).coerceAtLeast(0))
+            val overlayContent = overlay.intersect(safe)
+            val keyboardPx = (layout.keyboardDp * density).roundToInt().coerceAtLeast(0)
+            val contentBottom = overlayContent.top + overlayContent.height
+            val sheetBottom = min(contentBottom, heightPx - keyboardPx).coerceAtLeast(overlayContent.top)
+            val sheetContent = Slot(overlayContent.left, overlayContent.top, overlayContent.width, sheetBottom - overlayContent.top)
+            return ScreenGeometry(
+                topBar, navPrev, navNext, counter, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, thirds, density,
+                safe, overlay, overlayContent, sheetContent,
+            )
+        }
+
+        /** S-32's "∩": the part of this slot that also lies in [other] (an empty slot at the nearer corner when they do not meet). */
+        private fun Slot.intersect(other: Slot): Slot {
+            val l = max(left, other.left)
+            val t = max(top, other.top)
+            val r = min(left + width, other.left + other.width)
+            val b = min(top + height, other.top + other.height)
+            return Slot(l, t, (r - l).coerceAtLeast(0), (b - t).coerceAtLeast(0))
         }
     }
 }

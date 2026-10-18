@@ -11,6 +11,10 @@
 // design §1 "How it works" and §3 library fact 4: the overlay works with foundation `clickable`s while the root router
 // stands aside (`PointerRouter`, hit order 0) · G-17: every cell path is built in px for the cell's own size and drawn
 // without a canvas scale · G-10 / O-06: the title and Done come in through PlayTexts.
+// WO-006 TASK-029 · S-33 (tasks.md § WO-006 › Seams; the touch geometry's "Grid overview") · REQ-035 rule 3 (every
+// control respects the system insets), REQ-050 rules consumed: the scrim still covers `area` (below the top bar to the
+// composable's edges) and closes the grid at a tap; the sheet sits inset 16 dp inside `content` (`overlayContent`, the
+// safe part of `area`). With no insets `content` = `area`: WO-004's look.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.clickable
@@ -103,16 +107,20 @@ private const val MIN_TOUCH_DP = 48f
 
 /**
  * The grid overview (S-22), shown while [PlayController.overviewOpen]: the `overview` node over [area] — the whole
- * Play screen below the top bar — holding the scrim and, inset 16 dp, the sheet with the title, a vertically scrolling
- * grid of every listed puzzle (every cell composed, not lazy) and Done.
+ * Play screen below the top bar, to the composable's edges — holding the scrim and, inset 16 dp inside [content], the
+ * sheet with the title, a vertically scrolling grid of every listed puzzle (every cell composed, not lazy) and Done.
  *
  * Touches go to foundation `clickable`s: a cell is [PlayController.choose], Done and the scrim are
  * [PlayController.closeOverview]. The sheet is a hit target of its own, so a touch on it outside a cell and Done reaches
  * neither the scrim nor anything under the overlay. The root router stands aside for every touch that starts while the
  * overview is open (hit order 0), so nothing under it — the top bar included — reacts.
+ *
+ * @param area `ScreenGeometry.overlay` (S-33): the scrim's area and the `overview` node's bounds.
+ * @param content `ScreenGeometry.overlayContent` (S-33): the part of [area] inside the system insets, where the sheet
+ *   sits, centred and inset 16 dp, at most 640 dp wide. With no insets it is [area].
  */
 @Composable
-internal fun Overview(controller: PlayController, area: Slot, texts: PlayTexts) {
+internal fun Overview(controller: PlayController, area: Slot, content: Slot, texts: PlayTexts) {
     Box(Modifier.slot(area).testTag(PlayTags.OVERVIEW)) {
         // The scrim: every point of the overview the sheet does not cover; a tap on it closes the grid (S-22).
         Box(
@@ -121,32 +129,42 @@ internal fun Overview(controller: PlayController, area: Slot, texts: PlayTexts) 
                 .drawBehind { drawRect(PlayPalette.scrim) }
                 .clickable(interactionSource = null, indication = null) { controller.closeOverview() },
         )
-        Box(Modifier.fillMaxSize().padding(SHEET_INSET_DP.dp), contentAlignment = Alignment.Center) {
-            Column(
-                Modifier
-                    .widthIn(max = SHEET_MAX_WIDTH_DP.dp)
-                    .fillMaxWidth()
-                    // A hit target that consumes nothing: a touch on the sheet stops here instead of at the scrim
-                    // beneath it, and the cells' and Done's `clickable`s still see every change unconsumed.
-                    .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent() } }
-                    .drawBehind { drawRoundRect(PlayPalette.paper, cornerRadius = CornerRadius(SHEET_CORNER_DP * density)) }
-                    .padding(start = SHEET_PAD_DP.dp, top = SHEET_PAD_DP.dp, end = SHEET_PAD_DP.dp, bottom = SHEET_PAD_BOTTOM_DP.dp),
-                verticalArrangement = Arrangement.spacedBy(SHEET_GAP_DP.dp),
-            ) {
-                // The title: a merged, inert text node (S-14Δ).
-                Box(Modifier.semantics(mergeDescendants = true) {}) {
-                    BasicText(texts.allPuzzles, style = SHEET_TITLE, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
-                }
-                Box(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
-                    OverviewGrid(controller)
-                }
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                    DoneButton(texts.done) { controller.closeOverview() }
+        // S-33: the sheet's box is `content`, in the overview's own px; it takes no touch, so the scrim still gets every
+        // touch the sheet does not cover.
+        SlotLayout(Modifier.fillMaxSize()) {
+            Box(Modifier.slot(content.within(area)).padding(SHEET_INSET_DP.dp), contentAlignment = Alignment.Center) {
+                Column(
+                    Modifier
+                        .widthIn(max = SHEET_MAX_WIDTH_DP.dp)
+                        .fillMaxWidth()
+                        // A hit target that consumes nothing: a touch on the sheet stops here instead of at the scrim
+                        // beneath it, and the cells' and Done's `clickable`s still see every change unconsumed.
+                        .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent() } }
+                        .drawBehind { drawRoundRect(PlayPalette.paper, cornerRadius = CornerRadius(SHEET_CORNER_DP * density)) }
+                        .padding(start = SHEET_PAD_DP.dp, top = SHEET_PAD_DP.dp, end = SHEET_PAD_DP.dp, bottom = SHEET_PAD_BOTTOM_DP.dp),
+                    verticalArrangement = Arrangement.spacedBy(SHEET_GAP_DP.dp),
+                ) {
+                    // The title: a merged, inert text node (S-14Δ).
+                    Box(Modifier.semantics(mergeDescendants = true) {}) {
+                        BasicText(texts.allPuzzles, style = SHEET_TITLE, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+                    }
+                    Box(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
+                        OverviewGrid(controller)
+                    }
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                        DoneButton(texts.done) { controller.closeOverview() }
+                    }
                 }
             }
         }
     }
 }
+
+/**
+ * This slot in the px of [outer]'s own node (S-33: an overlay's content area placed inside its scrim's node); the
+ * whole of [outer] when the two are equal, as with no insets and no keyboard.
+ */
+internal fun Slot.within(outer: Slot): Slot = Slot(left - outer.left, top - outer.top, width, height)
 
 /**
  * Every listed puzzle in ‹ › order (REQ-050 rule; REQ-040), row by row: as many square columns of at least 84 dp as
