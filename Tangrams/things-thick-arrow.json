@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "things-thick-arrow",
+  "title": {
+    "en": "Thick arrow",
+    "fi": "Paksu nuoli"
+  },
+  "category": "things",
+  "difficulty": 5,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[[0, 1], [2, 1]], [[0, 3], [2, -1]], [[0, 3], [2, 1]]]},
+    {"piece": "LT2", "polygon": [[[0, 3], 4], [[0, 3], 0], [[2, 3], 2]]},
+    {"piece": "MT", "polygon": [[[0, 2], 2], [[0, 1], [2, -1]], [[0, 3], [2, -1]]]},
+    {"piece": "SQ", "polygon": [[0, [2, -1]], [[0, 1], [2, -1]], [[0, 1], 2], [0, 2]]},
+    {"piece": "PG", "polygon": [[0, [2, 1]], [[0, 1], 2], [[0, 2], 2], [[0, 1], [2, 1]]]},
+    {"piece": "ST1", "polygon": [[[0, 1], [2, -1]], [[0, 2], 2], [[0, 1], 2]]},
+    {"piece": "ST2", "polygon": [[[0, 1], 2], [0, [2, 1]], [0, 2]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

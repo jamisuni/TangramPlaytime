@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "things-bridge",
+  "title": {
+    "en": "Bridge",
+    "fi": "Silta"
+  },
+  "category": "things",
+  "difficulty": 4,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[[0, 5], 0], [[0, 7], [0, 2]], [[0, 5], [0, 2]]]},
+    {"piece": "LT2", "polygon": [[0, [0, 2]], [[0, 2], 0], [[0, 2], [0, 2]]]},
+    {"piece": "MT", "polygon": [[[0, 3], [0, 1]], [[0, 2], [0, 2]], [[0, 2], 0]]},
+    {"piece": "SQ", "polygon": [[[0, 4], 0], [[0, 5], 0], [[0, 5], [0, 1]], [[0, 4], [0, 1]]]},
+    {"piece": "PG", "polygon": [[[0, 2], 0], [[0, 3], [0, 1]], [[0, 4], [0, 1]], [[0, 3], 0]]},
+    {"piece": "ST1", "polygon": [[[0, 4], [0, 1]], [[0, 3], 0], [[0, 4], 0]]},
+    {"piece": "ST2", "polygon": [[[0, 5], [0, 2]], [[0, 4], [0, 1]], [[0, 5], [0, 1]]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

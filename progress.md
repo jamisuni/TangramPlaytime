@@ -1348,3 +1348,84 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
 - Two owner questions put on the WO (turned copies; how ratings are
   measured), defaults stand 2026-10-21. The planner's ten readings are
   ruled at the resume. Paused; nothing running.
+
+## 2026-10-19 — WO-010 resumed (P3 → P4, fresh orchestrator context)
+
+**Human input (verbatim, 06:09):**
+
+> WE ARE IN PHASE P3 — WORK ORDER WO-010 content batch, RESUMED after a pause
+> (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl. the
+> "from P3 on" framework files), then governance.md, workorders/WO-010.md (whole,
+> Log to the last row), architecture.md v1.2 (G-05, G-16, O-06), build-map.md,
+> design-inputs.md (DI-5, DI-10, §2 items 9, 14–16), the WO-010 rows of
+> decisions.md (2026-10-17, 2026-10-18), .swdev/run-log/WO-010.md, the last
+> progress.md entry, KICKOFF.md "WO-010 — PAUSED", platform-notes/android.md.
+> The planner's hand-back is received (WO log 21:07): first rule its readings
+> R1–R10 against tasks.md § WO-010 › Seams and write the decisions.md rows.
+> Then plan review, G3 (row 7), and P4: the kit author and the implementers, code
+> review, Test & Verify on the floor, dev and tablet images (the floor first,
+> the whole sets once), trace-check, verifiers, wo-metrics, close. Stations as
+> subagents; the four scripts are duties. End every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; from 06:13):**
+- Framework v0.20 = project, no drift. HEAD `c953230` "Backup" (the
+  owner's snapshot of the paused state); no emulator running.
+- The planner's ten readings ruled: all accepted as written, ten
+  `decisions.md` rows under its titles (two are guardrail readings for
+  the G3 surface: the sheets/prototype one and the asset-record one).
+- Run log: tree definitions extended, helper re-made (r-base); the
+  eyes channel (headless Chrome PNG of a sheet) proven (g3-eyes).
+- Dispatch ruling: code review after the last kit stage and before the
+  long device runs, so a review fix does not re-open 7–8 h of devices.
+- 06:16 `plan-reviewer` dispatched; back 06:17: no blockers, three
+  small fixes (two applied to the plan, one carried in dispatch);
+  plan check green again.
+- 06:18 G3 passed (row 7): plan approved, P4 opened. The test-kit author
+  dispatched for its first stage (the corrected order test, the
+  counter-digits pin).
+- 06:33 kit stage 1 accepted (one corrected check: the order test had
+  pinned a fact of the 13-puzzle bundle); the counter pin red as
+  planned. 06:34 the counter fix dispatched.
+- 06:36 the counter fix accepted (one line; all 245 JVM tests green).
+  06:37 the start-up/grid measurement and its 13-puzzle baseline on the
+  three emulators dispatched.
+
+**Human input (verbatim, ~07:00):**
+
+> why you start spamming?
+
+**Summary (orchestrator, 07:01):**
+- Cause: the measurement station runs its emulator steps as many short
+  background commands; each one that ends sends me an interim "still
+  waiting" notice, and I answered every one (eleven since 06:47) with a
+  status line and the turn signal. None carried news.
+- Fix from now on: interim notices with no hand-back get no message
+  from me; I report only when a station hands back or something needs
+  the owner. Device stations from TASK-036 on are briefed to run each
+  emulator's steps as one background script, so they wake me rarely.
+- Filed in `proposals.md` (the signal rule has no "working" state).
+- 07:14 the start-up/grid baseline accepted (13 puzzles; slowest
+  start 2.5 s on the tablet, grid opens in about 0.2 s everywhere — far
+  under the 5 s / 1 s thresholds; the grid does not scroll yet).
+- 07:15 the import task (converter, ~93 new puzzle files, the licence
+  record, a floor run) dispatched, its emulator steps as one script.
+
+**Human input (verbatim, 07:47):**
+
+> next change lets start shutdown process.. we wait still moment but no new ones anymore
+
+**Summary (orchestrator, 07:47):**
+- Pausing at the next safe point: the import task's hand-back. It is
+  received and checked when it comes; no new station is dispatched (the
+  four picture batches wait). Then the pause is written down for a
+  fresh context: WO log, KICKOFF resume section, AGENTS.md phase line.
+- 08:01 the import task accepted after my own checks: 93 puzzles
+  imported, 51 of 144 skipped with reasons (25 joined only at a corner,
+  17 not on exact positions, 9 duplicates); 6 turned copies kept and
+  flagged; every file valid; all JVM tests and the two floor classes
+  green over 106 puzzles; on the oldest phone the start is 1.35 s and the
+  grid opens in 0.35 s, far under the limits. The ratings came out
+  18 / 20 / 23 / 10 / 22 (checkpoint item 4's numbers corrected; the
+  rule is the same). Pictures are still placeholders.
+- **PAUSED 08:01.** Nothing running, no emulator up. Resume: KICKOFF
+  "WO-010 — PAUSED again" (next: the four picture batches in parallel).

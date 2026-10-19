@@ -63,29 +63,32 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
-## WO-010 — PAUSED (2026-10-18 20:54; the owner: "plz pause when getting change") — in P3, planner running at the pause
+## WO-010 — PAUSED again (2026-10-19 07:47; the owner: "next change lets start shutdown process.. we wait still moment but no new ones anymore") — in P4, TASK-036 running at the pause
 
-- **Where it stands** (`workorders/WO-010.md` Log, rows of 2026-10-18 20:00…20:54; `.swdev/run-log/WO-010.md`): opened 20:00, Light. **Done:** scope and the provenance reading (`decisions.md` 2026-10-18 rows "Scope of WO-010 …", "The figures' source and licence are credited in `ASSET-LICENCES.md` …"); **`architecture.md` v1.2** through the G2 route (G-16 GPL-3.0 puzzle figures credited; the O-06 DEV-aid line), baseline re-frozen 20:05; **every G3 channel proven** (Python tools 13/13, JVM 243/0, V-01 3/3 + control 2/2, dev / floor / tablet 2/0 each). **The planner came back during the pause (21:06) and is received** (WO log 21:07): `tasks.md` § WO-010 (TASK-033…042, 10 / 4 `[P]`) + `workorders/WO-010-briefs.md`; plan-check GREEN (re-run by the orchestrator), trace-check `--wo` GREEN 11/11. **About 93 figures import, not ~144** (42 fail the locked rules, 9 duplicates). Checkpoint items 3–4 asked (turned copies; the measured rating), defaults stand 2026-10-21. **Not started:** the rulings on the planner's readings R1–R10 (WO log 21:07 lists them; each a `decisions.md` row), plan review, G3, everything after.
-- **Resume here:** rule R1–R10 (read `tasks.md` § WO-010 › Seams; accept, amend or send back to the planner) and write their `decisions.md` rows — then the plan review (`plan-reviewer`), G3 (row 7), P4. Put the device-time figure (play set ≈ 2–2.5 h per image) on the G3 surface.
-- **If the planner's hand-back is in the WO log** (a row after 20:54): receive-check it — `tasks.md` § WO-010 and `workorders/WO-010-briefs.md` exist, re-run `plan_check.py --wo WO-010` yourself (same line?), read its readings and checkpoint candidates and write the `decisions.md` rows — then the plan review (`plan-reviewer`), G3 (row 7), P4. *(Done 21:07 for the receive check; the rulings remain.)*
-- **If it is not** (the session closed while it ran): look for a partial `tasks.md` § WO-010 or briefs file. Dispatch a fresh `wo-planner` with the brief text in the WO log 20:27 row's sense — the same "Read exactly" list (`workorders/WO-010.md` whole, the REQ files, the drafts, DI-10's two collections, the test tree for question 7) — plus "the files may hold a partial plan by an earlier planner: finish or replace it".
-- **Devices:** all emulators stopped at the pause (the tablet 20:54). Boot detached; wrap every adb / Gradle device call in `timeout` (the void floor boot 20:07–20:24: a serial clash left `adb shell` hanging).
-- **Rulings to know:** the 2026-10-18 WO-010 rows of `decisions.md`; `architecture.md` v1.2 change-log row; the run log's preview-file finding (a re-render rewrites every committed preview — CRLF, no C2PA metadata — question 8).
+- **Where it stands** (`workorders/WO-010.md` Log, rows of 2026-10-19 06:13…; `.swdev/run-log/WO-010.md`; `tasks.md` § WO-010 status cells): resumed 2026-10-19 06:13. **Done:** R1–R10 ruled, all accepted as written (ten `decisions.md` rows of 2026-10-19 under the planner's titles); the eyes channel proven (g3-eyes); plan review 0 B / 3 S (S1, S2 applied — `tasks.md` 0.18; S3 carried); **G3 passed 06:18** (row 7); **TASK-033** (kit stage 1: the REQ-040.A2 test corrected — corrected check 1; `CounterDigitsKitTest`) **done**; **TASK-034** (the counter's `Locale.ROOT`, one line) **done**, JVM 245/0; **TASK-035** (`ScaleMeasureTest` + the 13-puzzle baseline on three images, run log t035-scale) **done**. **TASK-036 done** (back 08:00, accepted 08:01 — WO log): **93 puzzles imported** (51 of 144 skipped with reasons in `Tangrams/README.md`), each with the **stub picture**; `tools/import_figures.py`, `tools/import/batch-1…4.txt` (26 / 22 / 25 / 20), `ASSET-LICENCES.md` (106 rows), the titles row in `review-notes.md`; validator 106/106, JVM 245/0, floor `BoardTrayKitTest` 7/0 + `DragKitTest` 20/0 over 106 puzzles; floor scale: start 1.35 s, grid open 0.35 s — no threshold crossed. **The flux window is open** (the pictures are stubs): no JVM line or device set runs for a verdict until TASK-041.
+- **Dispatch rulings in force:** the code review runs **after TASK-041 and before TASK-042** (WO log 06:15); device stations run each image's steps as **one background script**, and the orchestrator does not answer interim "still waiting" notices beyond the signal line (WO log 07:00; owner: "why you start spamming?").
+- **Resume here** (TASK-036's hand-back is in the WO log, 08:01 — this case applies). Next is the fan-out: record the pre-fan-out `git status --short` (plan S1), then dispatch **TASK-037 ∥ TASK-038 ∥ TASK-039 ∥ TASK-040** (four `slice-implementer`s, each its own brief + the channel table; name to them the art-sensitive device oracles: `SolvedPictureKitTest` REQ-039.A1 / REQ-023.A2, and `OverviewKitTest` REQ-050.A2 — each solved cell ≥ 2 % in its picture's own colours, WO log 06:33). Open every batch's sheets before accepting (R4). Then TASK-041 (resume the kit author — a fresh `acceptance-test-author` if its context is gone; its stage-2 draft was in the old session scratch, which is wiped), code review, TASK-042, Test & Verify, trace-check, verifiers, wo-metrics, close.
+- *(No longer applies — kept for the record.)* **If it is not** (the session closed while TASK-036 ran): check what landed — `git status`; `tools/import_figures.py`, `tools/tests/test_import_figures.py`, `tools/import/batch-*.txt`, new `Tangrams/*.json`, `ASSET-LICENCES.md`, the README / review-notes edits. If the files are complete and consistent (every imported file in exactly one batch list and one `ASSET-LICENCES.md` row; the validator green), dispatch a fresh `slice-implementer` to finish TASK-036 from the step reached (its brief + "an earlier implementer did steps 1–N; verify and finish") — at least the JVM line and the floor step (9), which only it can prove. If they are partial, dispatch it to finish or redo the import (the converter never overwrites: remove the partial imports first, by `rm -- "${DIR:?}/${NAME:?}"` per file, never a shipped file).
+- **Devices:** none running at the pause (`adb devices` empty 08:01; TASK-036 killed the floor 07:59). After a pause check `adb devices` anyway; reboot the floor rather than trusting a reset.
+- **Scratch:** the session scratchpad (`wo010/…`, incl. `trees.sh`, the TASK-033/035 XMLs) is wiped with the session; the run log rows are the record. Re-make the tree helper from the run log header's definitions (extended 2026-10-19).
 
 ```text
-WE ARE IN PHASE P3 — WORK ORDER WO-010 content batch, RESUMED after a pause
-(TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl. the
-"from P3 on" framework files), then governance.md, workorders/WO-010.md (whole,
-Log to the last row), architecture.md v1.2 (G-05, G-16, O-06), build-map.md,
-design-inputs.md (DI-5, DI-10, §2 items 9, 14–16), the WO-010 rows of
-decisions.md (2026-10-17, 2026-10-18), .swdev/run-log/WO-010.md, the last
-progress.md entry, KICKOFF.md "WO-010 — PAUSED", platform-notes/android.md.
-The planner's hand-back is received (WO log 21:07): first rule its readings
-R1–R10 against tasks.md § WO-010 › Seams and write the decisions.md rows.
-Then plan review, G3 (row 7), and P4: the kit author and the implementers, code
-review, Test & Verify on the floor, dev and tablet images (the floor first,
-the whole sets once), trace-check, verifiers, wo-metrics, close. Stations as
-subagents; the four scripts are duties. End every turn with the one signal.
+WE ARE IN PHASE P4 — WORK ORDER WO-010 content batch, RESUMED after a second
+pause (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl.
+the "from P3 on" framework files), then governance.md, workorders/WO-010.md
+(whole, Log to the last row), tasks.md § WO-010 (Seams, the shared-file table,
+the rows and their status cells), workorders/WO-010-briefs.md (header, dispatch
+order, channel table), .swdev/run-log/WO-010.md, the WO-010 rows of decisions.md
+(2026-10-18, 2026-10-19), the last progress.md entry, KICKOFF.md "WO-010 —
+PAUSED again", platform-notes/android.md. TASK-033…036 are done (TASK-036
+accepted 08:01: 93 imports with stub pictures). Next: the four picture batches
+TASK-037…040 in parallel (record the pre-fan-out git status first; name the
+art-sensitive device oracles; open every sheet before accepting), TASK-041 (kit stage 2),
+the code review, TASK-042 (every channel on the final tree, floor first, the
+whole sets once), Test & Verify, trace-check, verifiers, wo-metrics, close.
+Stations as subagents; device steps as one background script per image; no
+replies to interim notices. The four scripts are duties. End every turn with the
+one signal.
 ```
 
 ## State after WO-006 (2026-10-18, closed 19:10)

@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "nature-crescent-moon",
+  "title": {
+    "en": "Crescent Moon",
+    "fi": "Kuunsirppi"
+  },
+  "category": "nature",
+  "difficulty": 4,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[[0, 2], [2, 3]], [[0, 2], [-2, 3]], [[2, 2], [0, 3]]]},
+    {"piece": "LT2", "polygon": [[[2, 2], [0, 3]], [2, [0, 1]], [[2, 2], [0, 1]]]},
+    {"piece": "MT", "polygon": [[[2, 1], 0], [[2, 2], [0, 1]], [2, [0, 1]]]},
+    {"piece": "SQ", "polygon": [[[0, 1], [2, 2]], [[0, 2], [2, 2]], [[0, 2], [2, 3]], [[0, 1], [2, 3]]]},
+    {"piece": "PG", "polygon": [[[2, -1], [0, 1]], [2, 0], [[2, 1], 0], [2, [0, 1]]]},
+    {"piece": "ST1", "polygon": [[[0, 1], [2, 3]], [0, [2, 2]], [[0, 1], [2, 2]]]},
+    {"piece": "ST2", "polygon": [[[0, 1], [2, 2]], [[0, 2], [2, 1]], [[0, 2], [2, 2]]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

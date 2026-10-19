@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "animals-turtle",
+  "title": {
+    "en": "Turtle",
+    "fi": "Kilpikonna"
+  },
+  "category": "animals",
+  "difficulty": 1,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[1.5, [0, 2]], [[1.5, 2], 0], [[1.5, 2], [0, 2]]]},
+    {"piece": "LT2", "polygon": [[[1.5, 2], 0], [1.5, [0, 2]], [1.5, 0]]},
+    {"piece": "MT", "polygon": [[[1.5, -1], [0, 1]], [1.5, 0], [1.5, [0, 2]]]},
+    {"piece": "SQ", "polygon": [[[1.5, 3], 0], [[1.5, 4], 0], [[1.5, 4], [0, 1]], [[1.5, 3], [0, 1]]]},
+    {"piece": "PG", "polygon": [[[1.5, 3], 0], [[1.5, 2], [0, 1]], [[1.5, 2], [0, 2]], [[1.5, 3], [0, 1]]]},
+    {"piece": "ST1", "polygon": [[2, [0.5, 2]], [0, [0.5, 2]], [1, [-0.5, 2]]]},
+    {"piece": "ST2", "polygon": [[[3, 2], [0.5, 2]], [[1, 2], [0.5, 2]], [[2, 2], [-0.5, 2]]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

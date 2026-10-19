@@ -459,3 +459,27 @@ from starvation.
   discarded its own interfered run.
 - **Severity:** medium. Device time decides the owner's experience of a WO
   (the owner asked about it mid-WO). The other items are low.
+
+## 2026-10-19 — WO-010 (mid-P4): the turn signal turns background progress into chat spam
+
+- **What happened.** TASK-035 (device-only) ran its emulator steps as many
+  short background commands. Each time one ended, the harness woke the
+  orchestrator with an interim "the station is still waiting on its own
+  work" notice — eleven in about 25 minutes. Principle 16 requires every
+  turn to end with one of the two signals, so each notice became a reply
+  ("still running … All ready, whats next Jami?"). The owner: "why you
+  start spamming?"
+- **Two faults.** (1) The signal rule has no state for "a station is
+  running, nothing for you": `All ready` claims idle, which is false, and
+  the replies carried no information. (2) Device stations were not told to
+  batch: a whole image's steps as one background script would wake the
+  orchestrator once per image, not once per command.
+- **Proposal.** (a) In `00-principles.md` §16 (or the adapter page): an
+  interim background notice with no hand-back gets no reply text beyond
+  the signal line, and a third signal, e.g. `Working, nothing needed from
+  you Jami`, for "stations running, not blocked". (b) In the device
+  stations' brief template: one background script per image (boot, steps,
+  kill), so a long device task wakes the orchestrator a few times, not
+  dozens.
+- **Severity:** medium — it costs the owner's attention, which the
+  checkpoint rules work hard to protect.

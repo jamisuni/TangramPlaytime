@@ -56,4 +56,4 @@ internal fun PlayTexts.titleOf(puzzle: PuzzleDefinition): String =
     puzzle.titles[titleLanguage] ?: puzzle.titles["en"] ?: puzzle.titles.values.firstOrNull() ?: puzzle.id
 
 /** The top bar's "n / N" for puzzle [number] of [count] (S-11Δ `counterFormat`; REQ-024 rule). */
-internal fun PlayTexts.counterOf(number: Int, count: Int): String = counterFormat.format(number, count)
+internal fun PlayTexts.counterOf(number: Int, count: Int): String = counterFormat.format(java.util.Locale.ROOT, number, count)

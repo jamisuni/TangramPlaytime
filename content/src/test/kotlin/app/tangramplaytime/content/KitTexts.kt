@@ -360,6 +360,19 @@ internal fun kitEarlyFullOfRatingOne(): PuzzleSource = kitEdited(
     "'difficulty': 3," to "'difficulty': 1,",
 )
 
+/**
+ * Edited from animals-cat.json: id animals-cat → animals-kit-ahead, rating 3 → 1; kind full kept.
+ * (WO-010 TASK-033.) A second valid full puzzle of rating 1, whose id sorts before
+ * animals-kit-early ("a" < "e" after "animals-kit-"): loaded beside [kitEarlyFullOfRatingOne], it is
+ * a full puzzle of rating 1 listed between the warm-ups and animals-kit-early — the case WO-010's
+ * imports bring (tasks.md § WO-010 › Seams S-39: every import is `full`, rated 1 to 5). No import
+ * id has a `kit` segment (S-39), so the id cannot collide. Breaks nothing.
+ */
+internal fun kitAheadFullOfRatingOne(): PuzzleSource = kitEdited(
+    "animals-cat.json", "animals-kit-ahead",
+    "'difficulty': 3," to "'difficulty': 1,",
+)
+
 // ── Crafted texts: titles, rating, kind, picture ───────────────────────────────────────────────
 
 /** Edited from things-arrow.json: the `fi` title removed. Breaks only "an English and a Finnish title" → TITLE. */

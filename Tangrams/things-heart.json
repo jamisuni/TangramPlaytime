@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "things-heart",
+  "title": {
+    "en": "Heart",
+    "fi": "Sydän"
+  },
+  "category": "things",
+  "difficulty": 5,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[4, 2], [0, 2], [2, 0]]},
+    {"piece": "LT2", "polygon": [[2, 2], [6, 2], [4, 4]]},
+    {"piece": "MT", "polygon": [[2, 2], [2, 4], [0, 2]]},
+    {"piece": "SQ", "polygon": [[2, 4], [3, 3], [4, 4], [3, 5]]},
+    {"piece": "PG", "polygon": [[6, 2], [4, 2], [3, 1], [5, 1]]},
+    {"piece": "ST1", "polygon": [[5, 1], [3, 1], [4, 0]]},
+    {"piece": "ST2", "polygon": [[2, 4], [2, 2], [3, 3]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

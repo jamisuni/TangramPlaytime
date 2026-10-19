@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "numbers-3",
+  "title": {
+    "en": "Number 3",
+    "fi": "Numero 3"
+  },
+  "category": "numbers",
+  "difficulty": 1,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[[0, 3], 2], [[-4, 3], 2], [[-2, 3], 0]]},
+    {"piece": "LT2", "polygon": [[[0, 2], [6, 1]], [[0, 2], [2, 1]], [[2, 2], [4, 1]]]},
+    {"piece": "MT", "polygon": [[0, 6], [[0, 1], [6, -1]], [[0, 1], [6, 1]]]},
+    {"piece": "SQ", "polygon": [[[0, 1], 6], [[0, 2], 6], [[0, 2], [6, 1]], [[0, 1], [6, 1]]]},
+    {"piece": "PG", "polygon": [[[0, 1], [2, 1]], [[0, 2], 2], [[0, 3], 2], [[0, 2], [2, 1]]]},
+    {"piece": "ST1", "polygon": [[[0, 2], [2, 2]], [[0, 1], [2, 1]], [[0, 2], [2, 1]]]},
+    {"piece": "ST2", "polygon": [[[0, 1], [6, -1]], [0, 6], [0, [6, -1]]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "things-sword",
+  "title": {
+    "en": "Sword",
+    "fi": "Miekka"
+  },
+  "category": "things",
+  "difficulty": 3,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[3.5, 0], [3.5, 4], [1.5, 2]]},
+    {"piece": "LT2", "polygon": [[1.5, 6], [1.5, 2], [3.5, 4]]},
+    {"piece": "MT", "polygon": [[3.5, 6], [1.5, 6], [3.5, 4]]},
+    {"piece": "SQ", "polygon": [[[2.5, -0.5], 7], [[2.5, 0.5], 7], [[2.5, 0.5], [7, 1]], [[2.5, -0.5], [7, 1]]]},
+    {"piece": "PG", "polygon": [[4, 7], [2, 7], [1, 6], [3, 6]]},
+    {"piece": "ST1", "polygon": [[2, 7], [0, 7], [1, 6]]},
+    {"piece": "ST2", "polygon": [[3, 6], [5, 6], [4, 7]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

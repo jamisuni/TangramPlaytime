@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "things-table",
+  "title": {
+    "en": "Table",
+    "fi": "Pöytä"
+  },
+  "category": "things",
+  "difficulty": 3,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[0, 0], [4, 0], [2, 2]]},
+    {"piece": "LT2", "polygon": [[4, 0], [8, 0], [6, 2]]},
+    {"piece": "MT", "polygon": [[4, 0], [[4, 1], [0, 1]], [[4, -1], [0, 1]]]},
+    {"piece": "SQ", "polygon": [[[2, -1], 2], [2, 2], [2, [2, 1]], [[2, -1], [2, 1]]]},
+    {"piece": "PG", "polygon": [[[6, 1], [2, -1]], [6, 2], [6, [2, 1]], [[6, 1], 2]]},
+    {"piece": "ST1", "polygon": [[[2, -1], [2, -1]], [2, 2], [[2, -1], 2]]},
+    {"piece": "ST2", "polygon": [[6, [2, 1]], [[6, 1], 2], [[6, 1], [2, 1]]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

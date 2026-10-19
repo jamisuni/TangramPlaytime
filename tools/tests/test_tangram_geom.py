@@ -51,16 +51,21 @@ def corner_set(name):
 
 
 def main():
+    # WO-010 TASK-036 (tasks.md § WO-010, the Q7 table): the folder grows with imported puzzles, so the pin is
+    # narrowed to its 13 pinned names. Each must still be a puzzle file, and each keeps its pinned corner set.
     files = sorted(p.stem for p in (ROOT / "Tangrams").glob("*.json") if "schema" not in p.name)
-    assert sorted(PRE_FIX) == files, f"pinned names {sorted(PRE_FIX)} != puzzle files {files}"
-    for name in files:
+    pinned = sorted(PRE_FIX)
+    missing = [name for name in pinned if name not in files]
+    assert not missing, f"pinned puzzle files missing from Tangrams: {missing}"
+    for name in pinned:
         expected = {parse_corner(t) for t in PRE_FIX[name].split()}
         expected |= {parse_corner(t) for t in ADDED.get(name, [])}
         got = corner_set(name)
         assert got == expected, f"{name}: extra={sorted(map(repr, got - expected))} missing={sorted(map(repr, expected - got))}"
     w4 = corner_set("shapes-warmup-4")
     assert (Q2(2), Q2(2)) in w4, "warmup-4 (2,2) must be a corner"
-    print(f"ok: corner sets match for {len(files)} files; warmup-4 gains exactly (2,2)")
+    print(f"ok: corner sets match for the {len(pinned)} pinned files ({len(files)} puzzle files in Tangrams); "
+          f"warmup-4 gains exactly (2,2)")
 
 
 if __name__ == "__main__":

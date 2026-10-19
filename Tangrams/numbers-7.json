@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "numbers-7",
+  "title": {
+    "en": "Number 7",
+    "fi": "Numero 7"
+  },
+  "category": "numbers",
+  "difficulty": 2,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[[0, 2], 0], [0, [0, 2]], [0, 0]]},
+    {"piece": "LT2", "polygon": [[0, [0, 4]], [[0, 2], [0, 2]], [[0, 2], [0, 4]]]},
+    {"piece": "MT", "polygon": [[[0, 4], [0, 1]], [[0, 3], [0, 2]], [[0, 3], 0]]},
+    {"piece": "SQ", "polygon": [[[0, 2], 0], [[0, 3], 0], [[0, 3], [0, 1]], [[0, 2], [0, 1]]]},
+    {"piece": "PG", "polygon": [[[0, 3], [0, 1]], [[0, 2], [0, 2]], [[0, 2], [0, 3]], [[0, 3], [0, 2]]]},
+    {"piece": "ST1", "polygon": [[[0, 1], [0, 1]], [[0, 2], 0], [[0, 2], [0, 1]]]},
+    {"piece": "ST2", "polygon": [[[0, 4], [0, 1]], [[0, 3], 0], [[0, 4], 0]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

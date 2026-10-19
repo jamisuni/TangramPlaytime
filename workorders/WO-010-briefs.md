@@ -240,7 +240,7 @@
   11. `review-notes.md` (its table: you add one row); `LICENSE`.
   12. `platform-notes/android.md` (all of it); `.swdev/run-log/WO-010.md` (Env; g3-py's preview finding).
 - **Do not read:** the kit author's briefs; other implementers' briefs; `C:/GitHub/AI/TangramNoAds`; the three other collections and `sources/twpride-tangram/` in `C:/GitHub/AI/TangramCollections`.
-- **Inputs:** the row's Inputs cell: DI-10's two `figures.json`; `Tangrams/*.json`; `tools/tests/test_tangram_geom.py`; `tools/device_reset.sh`.
+- **Inputs:** the row's Inputs cell: DI-10's two `figures.json`; `Tangrams/*.json`; `tools/tests/test_tangram_geom.py`; the play scaffolding tests that open the first full puzzle (`DecorationScaffoldTest.kt`, `DevButtonHitScaffoldTest.kt`, `TouchScaffoldTest.kt` in `play/src/test/kotlin/app/tangramplaytime/play/scaffolding/`; yours to update if your imports break one — say so); `tools/device_reset.sh`. *(Plan review S2, orchestrator edit 2026-10-19.)*
 - **Constraints:**
   - **S-38 … S-42 are binding.** A rule that does not work on the data (a snap bound that must widen, a category a figure does not fit, an id the rule cannot make) is a `recirculate → planner` with the figure and the numbers, never a quiet change.
   - **Files:** never overwrite or edit a shipped file (seam note 1); never edit the schema or `IPuzzleLibrary.kt` (locked); never set `reviewedByHuman: true` (owner rule 7); never write under `C:/GitHub/AI/TangramCollections`.

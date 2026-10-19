@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "letters-q",
+  "title": {
+    "en": "Letter Q",
+    "fi": "Kirjain Q"
+  },
+  "category": "letters",
+  "difficulty": 1,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[[1, 2], [0, 2]], [1, 0], [[1, 2], 0]]},
+    {"piece": "LT2", "polygon": [[0, 3], [[0, 2], [3, 2]], [0, [3, 2]]]},
+    {"piece": "MT", "polygon": [[[-1, 2], [2, 2]], [[-1, 3], [2, 1]], [[-1, 3], [2, 3]]]},
+    {"piece": "SQ", "polygon": [[0, 1], [1, 0], [2, 1], [1, 2]]},
+    {"piece": "PG", "polygon": [[0, 1], [0, 3], [1, 4], [1, 2]]},
+    {"piece": "ST1", "polygon": [[[0, 2], [1, 2]], [[0, 2], [-1, 2]], [[1, 2], [0, 2]]]},
+    {"piece": "ST2", "polygon": [[[-1, 3], [2, 2]], [[-1, 4], [2, 3]], [[-1, 3], [2, 3]]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}

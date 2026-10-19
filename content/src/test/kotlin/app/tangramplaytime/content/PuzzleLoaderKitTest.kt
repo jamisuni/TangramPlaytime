@@ -19,6 +19,7 @@
 package app.tangramplaytime.content
 
 import app.tangramplaytime.contracts.PieceId
+import app.tangramplaytime.contracts.PuzzleDefinition
 import app.tangramplaytime.contracts.PuzzleKind
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -320,11 +321,12 @@ class PuzzleLoaderKitTest {
     @Test // REQ-040.A2
     fun aFullPuzzleOfRatingOneWhoseIdSortsFirstStillComesAfterEveryWarmUp() {
         // REQ-040 A2: "A full puzzle of rating 1 whose id sorts before "shapes-warmup" still comes
-        // after every warm-up." The shipped bundle has no full puzzle of rating 1, so the text is edited.
+        // after every warm-up." The text is edited so that the case exists whatever the bundle holds
+        // (the 13 shipped files have no full puzzle of rating 1; WO-010's imports add some, S-39).
         val early = kitEarlyFullOfRatingOne()
         val id = kitStem(early)
         // Fixture check: the id sorts before "shapes-warmup" and before "shapes-mini", so an order by
-        // rating and id that ignored the kind would list it first.
+        // rating and id that ignored the kind would list it before every mini and every warm-up.
         assertTrue(id < "shapes-warmup")
         assertTrue(id < "shapes-mini")
         val listed = kitLoaded(kitLoadWithShipped(early)).puzzles
@@ -335,9 +337,54 @@ class PuzzleLoaderKitTest {
         val lastWarmUp = listed.indexOfLast { it.kind == PuzzleKind.WARMUP }
         assertTrue("the list has warm-ups", lastWarmUp >= 0)
         assertTrue("$id at $at comes after every warm-up (last at $lastWarmUp)", at > lastWarmUp)
-        // REQ-040 statement: by kind, then rating, lowest first — the only full puzzle of rating 1
-        // is the first full puzzle, right after the warm-ups.
-        assertEquals(lastWarmUp + 1, at)
+        // REQ-040 statement: "list puzzles by kind (mini, then warm-up, then full), then by their
+        // difficulty rating, lowest first, and by id within a rating" — so its place is the one that
+        // order gives it: every puzzle listed before it sorts before it, every one after it sorts after.
+        // Corrected check (WO-010 TASK-033; decisions.md 2026-10-19 "The tests that pinned the
+        // 13-puzzle bundle"): the line was `assertEquals(lastWarmUp + 1, at)` ("the only full puzzle of
+        // rating 1 is the first full puzzle"), a fact of the 13 shipped files that no REQ sentence states.
+        assertEquals("$id's place in the REQ-040 order", emptyList<String>(), kitOrderPlaceProblems(listed, id))
+
+        // A second full puzzle of rating 1 whose id sorts before it: the case WO-010's imports bring
+        // (S-39: every import full, rated 1 to 5). Both come after every warm-up, each where the
+        // statement's order puts it (the earlier id first: "by id within a rating").
+        val ahead = kitAheadFullOfRatingOne()
+        val aheadId = kitStem(ahead)
+        // Fixture check: it sorts before animals-kit-early, so that one is not right after the warm-ups
+        // here — the order the removed line rejected.
+        assertTrue(aheadId < id)
+        val both = kitLoaded(kitLoadWithShipped(early, ahead)).puzzles
+        val lastWarmUpOfBoth = both.indexOfLast { it.kind == PuzzleKind.WARMUP }
+        assertTrue("the list has warm-ups", lastWarmUpOfBoth >= 0)
+        for (each in listOf(aheadId, id)) {
+            val i = both.indexOfFirst { it.id == each }
+            assertTrue("$each is listed", i >= 0)
+            assertTrue("$each at $i comes after every warm-up (last at $lastWarmUpOfBoth)", i > lastWarmUpOfBoth)
+            assertEquals("$each's place in the REQ-040 order", emptyList<String>(), kitOrderPlaceProblems(both, each))
+        }
+        assertTrue("fixture: $id is not right after the warm-ups", both.indexOfFirst { it.id == id } != lastWarmUpOfBoth + 1)
+
+        // Discrimination, test-side: the same check, on crafted lists of the same puzzles, rejects
+        // (1) the full puzzle of rating 1 put right before the last warm-up, (2) the order by rating
+        // and id alone, (3) it put after a full puzzle of a higher rating, (4) the two rating-1 full
+        // puzzles in the wrong id order.
+        val beforeAWarmUp = listed.toMutableList().apply { add(lastWarmUp, removeAt(at)) }
+        assertTrue("fixture (1): a warm-up comes after $id", beforeAWarmUp.indexOfFirst { it.id == id } < beforeAWarmUp.indexOfLast { it.kind == PuzzleKind.WARMUP })
+        assertTrue("(1) before a warm-up is rejected", kitOrderPlaceProblems(beforeAWarmUp, id).isNotEmpty())
+        val byRatingAndIdOnly = listed.sortedWith(compareBy<PuzzleDefinition>({ it.rating }, { it.id }))
+        assertTrue("fixture (2): a warm-up comes after $id", byRatingAndIdOnly.indexOfFirst { it.id == id } < byRatingAndIdOnly.indexOfLast { it.kind == PuzzleKind.WARMUP })
+        assertTrue("(2) the order by rating and id alone is rejected", kitOrderPlaceProblems(byRatingAndIdOnly, id).isNotEmpty())
+        val higher = listed.indexOfFirst { it.kind == PuzzleKind.FULL && it.rating > 1 }
+        assertTrue("fixture (3): the list has a full puzzle of a rating above 1 after $id", higher > at)
+        val afterAHigherRating = listed.toMutableList().apply { add(higher, removeAt(at)) }
+        assertTrue("(3) after a full puzzle of a higher rating is rejected", kitOrderPlaceProblems(afterAHigherRating, id).isNotEmpty())
+        val swapped = both.toMutableList().apply {
+            val i = indexOfFirst { it.id == aheadId }
+            val j = indexOfFirst { it.id == id }
+            this[i] = both[j]
+            this[j] = both[i]
+        }
+        assertTrue("(4) the wrong id order within rating 1 is rejected", kitOrderPlaceProblems(swapped, id).isNotEmpty())
     }
 
     // ── REQ-041: the warm-up measure ───────────────────────────────────────────────────────────
@@ -378,4 +425,33 @@ class PuzzleLoaderKitTest {
             assertEquals(PuzzleKind.WARMUP, listed.kind)
         }
     }
+}
+
+// ── The REQ-040 order, as the kit reads the statement (WO-010 TASK-033) ─────────────────────────────
+
+/** REQ-040 statement: "by kind (mini, then warm-up, then full)". */
+private val KIT_KIND_RANK: Map<PuzzleKind, Int> = mapOf(PuzzleKind.MINI to 0, PuzzleKind.WARMUP to 1, PuzzleKind.FULL to 2)
+
+/** REQ-040 statement: by kind, "then by their difficulty rating, lowest first, and by id within a rating". */
+private val KIT_REQ040_ORDER: Comparator<PuzzleDefinition> =
+    compareBy<PuzzleDefinition>({ KIT_KIND_RANK.getValue(it.kind) }, { it.rating }, { it.id })
+
+/**
+ * What is wrong with [id]'s place in [listed] under the REQ-040 statement's order, as text; empty
+ * when it sits where that order puts it: every puzzle listed before it sorts before it, and every
+ * puzzle listed after it sorts after it (ids are unique: `puzzles` KDoc "Edge: ids are unique").
+ * It compares [id] with every other listed puzzle and names no other puzzle, so it holds for any
+ * bundle the statement's order lists, and judges [id]'s place only.
+ */
+private fun kitOrderPlaceProblems(listed: List<PuzzleDefinition>, id: String): List<String> {
+    val at = listed.indexOfFirst { it.id == id }
+    if (at < 0) return listOf("$id is not listed")
+    val p = listed[at]
+    val problems = mutableListOf<String>()
+    listed.forEachIndexed { i, q ->
+        val c = KIT_REQ040_ORDER.compare(q, p)
+        if (i < at && c > 0) problems += "${q.id} (${q.kind}, rating ${q.rating}) at $i is listed before $id (${p.kind}, rating ${p.rating}) at $at but sorts after it"
+        if (i > at && c < 0) problems += "${q.id} (${q.kind}, rating ${q.rating}) at $i is listed after $id (${p.kind}, rating ${p.rating}) at $at but sorts before it"
+    }
+    return problems
 }

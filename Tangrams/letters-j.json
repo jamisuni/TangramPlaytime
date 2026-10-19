@@ -1,0 +1,28 @@
+{
+  "format": "tangram-puzzle/1",
+  "id": "letters-j",
+  "title": {
+    "en": "Letter J",
+    "fi": "Kirjain J"
+  },
+  "category": "letters",
+  "difficulty": 4,
+  "kind": "full",
+  "solution": [
+    {"piece": "LT1", "polygon": [[2, 6], [2, 2], [4, 4]]},
+    {"piece": "LT2", "polygon": [[4, 0], [4, 4], [2, 2]]},
+    {"piece": "MT", "polygon": [[2, 0], [4, 0], [2, 2]]},
+    {"piece": "SQ", "polygon": [[1, 7], [2, 6], [3, 7], [2, 8]]},
+    {"piece": "PG", "polygon": [[3, 7], [3, 5], [4, 4], [4, 6]]},
+    {"piece": "ST1", "polygon": [[3, 5], [3, 7], [2, 6]]},
+    {"piece": "ST2", "polygon": [[0, 6], [2, 6], [1, 7]]}
+  ],
+  "art": {
+    "base": "#D9DCE8",
+    "shapes": []
+  },
+  "provenance": {
+    "author": "ai:claude",
+    "reviewedByHuman": false
+  }
+}
