@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Pinwheel  <tspan fill="#8A8FA8" font-size="14" font-weight="400">things-pinwheel · difficulty 2 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="36.00,166.80 103.20,99.60 103.20,166.80" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="103.20,66.00 170.40,133.20 103.20,133.20" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="136.80,200.40 103.20,166.80 170.40,166.80" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="136.80,133.20 170.40,133.20 170.40,166.80 136.80,166.80" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="136.80,234.00 103.20,200.40 103.20,166.80 136.80,200.40" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="103.20,200.40 69.60,166.80 103.20,166.80" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="204.00,133.20 170.40,166.80 170.40,133.20" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="251.00,166.80 318.20,99.60 318.20,166.80" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="318.20,66.00 385.40,133.20 318.20,133.20" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="351.80,200.40 318.20,166.80 385.40,166.80" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="351.80,133.20 385.40,133.20 385.40,166.80 351.80,166.80" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="351.80,234.00 318.20,200.40 318.20,166.80 351.80,200.40" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="318.20,200.40 284.60,166.80 318.20,166.80" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="419.00,133.20 385.40,166.80 385.40,133.20" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-things-pinwheel"><polygon points="466.00,166.80 533.20,99.60 533.20,166.80" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="533.20,66.00 600.40,133.20 533.20,133.20" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="566.80,200.40 533.20,166.80 600.40,166.80" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="566.80,133.20 600.40,133.20 600.40,166.80 566.80,166.80" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="566.80,234.00 533.20,200.40 533.20,166.80 566.80,200.40" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="533.20,200.40 499.60,166.80 533.20,166.80" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="634.00,133.20 600.40,166.80 600.40,133.20" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-things-pinwheel)">
+<rect x="464.0" y="64.0" width="172.0" height="172.0" fill="#E76F51"/>
+<polygon points="466.00,166.81 533.19,166.81 499.59,133.19" fill="#F2A48F"/>
+<polygon points="533.19,66.00 600.40,133.19 533.19,133.19" fill="#E9C46A"/>
+<polygon points="533.19,66.00 533.19,133.19 566.81,99.59" fill="#F4DFA6"/>
+<polygon points="634.00,133.19 566.81,200.40 566.81,133.19" fill="#2A9D8F"/>
+<polygon points="634.00,133.19 566.81,133.19 600.40,166.81" fill="#7CC9BE"/>
+<polygon points="566.81,234.00 499.59,166.81 566.81,166.81" fill="#3D5A80"/>
+<polygon points="566.81,234.00 566.81,166.81 533.19,200.40" fill="#8AA1C2"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

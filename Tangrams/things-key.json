@@ -18,8 +18,12 @@
     {"piece": "ST2", "polygon": [[[7, 1], [1, 2]], [7, [1, 1]], [[7, 1], [1, 1]]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#C99A2E",
+    "shapes": [
+      {"type": "path", "d": "M0.8,2 L2,0.8 L3.2,2 L2,3.2 Z", "stroke": "#E8C468", "width": 0.12},
+      {"type": "circle", "c": [2, 2], "r": 0.5, "fill": "#8C6A1F"},
+      {"type": "line", "from": [3.7, 1.3], "to": [8.1, 1.3], "stroke": "#E8C468", "width": 0.13}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

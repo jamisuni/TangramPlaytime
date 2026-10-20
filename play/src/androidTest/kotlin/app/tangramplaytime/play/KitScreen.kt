@@ -18,6 +18,13 @@
 // Amended WO-005 (TASK-025; tasks.md § WO-005 S-10Δ2 and seam note 3): an optional `devAid`, given to `PlayScreen` in
 // `show()` and `recreate()`. It defaults to null, so every WO-003/004 test composes the screen exactly as WO-004 did and
 // none sees the aid; only the WO-005 tests pass one. No token lives in this file.
+//
+// Amended WO-010 (F2, recirculation 3): `scrollTo` — a grid scroll that returns under the paused clock. No token lives in this file.
+//
+// Amended WO-010 (F3, recirculation 6; a corrected check — decisions.md 2026-10-20 "F3's cause is the REQ-023 A1 leg's inside
+// mask, not the product or the data"): `silhouetteBands`, the silhouette's "3 px in" and "3 px out" pixel sets measured from
+// the exact outline (`kitOutline`, `kitBands`). `silhouetteMask` (each polygon widened 0.75 px) stays for the legs that do not
+// measure from the outline and for the self-check's old construction. No token lives in this file.
 package app.tangramplaytime.play
 
 import androidx.activity.ComponentActivity
@@ -40,6 +47,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.core.app.ActivityScenario
 import app.tangramplaytime.content.PuzzleLibraries
@@ -207,6 +215,26 @@ internal class KitScreen(
     }
 
     fun <T> onMain(block: () -> T): T = rule.runOnIdle(block)
+
+    /**
+     * A semantics scroll that brings [tag]'s node wholly into its scrolling parent's view (`performScrollTo`), from the paused
+     * clock of [show]. *Amended WO-010 (F2, recirculation 3; a corrected check):* ui-test 1.12's `performScrollTo` repeats its
+     * scroll until the node needs none, and the scroll it sends is animated on the main clock. Under the paused clock that
+     * animation never advances, so the call never returned (on the floor at 106 puzzles: 35 min inside `performScrollTo`, the
+     * main thread spinning; with 13 puzzles every grid cell fitted the first screen and no call ever had to scroll). The
+     * clock auto-advances for this one call only and is paused again after it; the caller settles afterwards as before.
+     * Cited: platform-notes/android.md § Compose test kit, WO-010 "Under a paused clock, `performScrollTo` never returns once
+     * a scroll is needed" (run log f2-sB; reviews/WO-010-code-review-delta.md S-2).
+     */
+    fun scrollTo(tag: String) {
+        check(!rule.mainClock.autoAdvance) { "kit: scrollTo() expects the paused clock of show()" }
+        rule.mainClock.autoAdvance = true
+        try {
+            interaction(tag).performScrollTo()
+        } finally {
+            rule.mainClock.autoAdvance = false
+        }
+    }
 
     /** S-2 `open` on the main thread, then two frames. */
     fun open(id: String) {
@@ -467,10 +495,29 @@ internal class KitScreen(
         return p.solution.map { sp -> sp.polygon.map { toPx(it) - origin } }
     }
 
-    /** The silhouette mask in the `board` capture's px (each solution polygon widened by 0.75 px). */
+    /**
+     * The silhouette mask in the `board` capture's px (each solution polygon widened by 0.75 px). Not a measure of distance
+     * from the outline: eroded or dilated by a square it comes as close as 0.46 px to the outline at a 315° notch (WO-010 F3);
+     * a "3 px in" or "3 px out" set is [silhouetteBands].
+     */
     fun silhouetteMask(p: PuzzleDefinition = puzzle): KitMask {
         val b = bounds(PlayTags.BOARD)
         return kitRasterise(solutionPolygonsInBoardPx(p), b.width.roundToInt(), b.height.roundToInt())
+    }
+
+    /**
+     * The silhouette's "[marginPx] in" and "[marginPx] out" sets in the `board` capture's px, measured from the exact outline
+     * (decisions.md 2026-10-20 "F3's cause is the REQ-023 A1 leg's inside mask, not the product or the data": "3 px in" and
+     * "3 px out" are measured from the exact outline): the pixels whose centres lie in the union of the solution polygons at
+     * least [marginPx] from its outline ([KitBands.inside]), and those whose centres lie outside it at least [marginPx] from it
+     * ([KitBands.outside]). One `board` bounds read and one `BoardMappingKey` read; nothing is read per pixel.
+     * The 3 px margin holds because the picture's outline stroke reaches inside only its inner half-width, 0.6 dp × density (1.6 px at 2.625, 1.2 px at 2.0), plus anti-aliasing.
+     */
+    fun silhouetteBands(p: PuzzleDefinition = puzzle, marginPx: Double = 3.0): KitBands {
+        val b = bounds(PlayTags.BOARD)
+        val m = mapping()
+        val outline = kitOutline(p).map { s -> KitSegPx(m.toPx(s.a) - b.topLeft, m.toPx(s.b) - b.topLeft) }
+        return kitBands(kitPolygonsPx(p, m, b.topLeft), outline, b.width.roundToInt(), b.height.roundToInt(), marginPx)
     }
 
     // ── WO-004 (TASK-019): the top bar, the controls, the long press ──
@@ -1005,6 +1052,44 @@ internal fun kitInternalEdges(p: PuzzleDefinition): List<KitSeg> {
     return out
 }
 
+/**
+ * The silhouette's exact outline in puzzle units (WO-010 F3): every sub-segment of a solution-piece edge, cut at the corners of
+ * the pieces that lie on it, with the union of the pieces on one side only. A sub-segment two pieces share has pieces on both
+ * sides and is left out ([kitInternalEdges] are those); the outline's corners are piece corners. Worked out by the F3 probe
+ * (run log f3-probe-*).
+ */
+internal fun kitOutline(p: PuzzleDefinition): List<KitSeg> {
+    val polys = p.solution.map { it.polygon }
+    val corners = polys.flatten()
+    val out = ArrayList<KitSeg>()
+    for (poly in polys) for (i in poly.indices) {
+        val a = poly[i]
+        val b = poly[(i + 1) % poly.size]
+        val dx = b.x - a.x
+        val dy = b.y - a.y
+        val len2 = dx * dx + dy * dy
+        if (len2 < KIT_TOL * KIT_TOL) continue
+        val cuts = sortedSetOf(0.0, 1.0)
+        for (v in corners) {
+            val t = ((v.x - a.x) * dx + (v.y - a.y) * dy) / len2
+            if (t > 1e-9 && t < 1 - 1e-9 && hypot(v.x - (a.x + t * dx), v.y - (a.y + t * dy)) < KIT_TOL) cuts += t
+        }
+        val ts = cuts.toList()
+        val len = sqrt(len2)
+        val nx = -dy / len * 1e-4
+        val ny = dx / len * 1e-4
+        for (k in 0 until ts.size - 1) {
+            val tm = (ts[k] + ts[k + 1]) / 2
+            val mx = a.x + tm * dx
+            val my = a.y + tm * dy
+            val left = kitInsideAny(Point(mx + nx, my + ny), polys)
+            val right = kitInsideAny(Point(mx - nx, my - ny), polys)
+            if (left != right) out += KitSeg(Point(a.x + ts[k] * dx, a.y + ts[k] * dy), Point(a.x + ts[k + 1] * dx, a.y + ts[k + 1] * dy))
+        }
+    }
+    return out
+}
+
 /** Points along [seg] every [stepUnits], excluding its ends. */
 internal fun kitSamplesAlong(seg: KitSeg, stepUnits: Double): List<Point> {
     val len = hypot(seg.b.x - seg.a.x, seg.b.y - seg.a.y)
@@ -1144,6 +1229,48 @@ internal fun kitRasterise(polys: List<List<Offset>>, w: Int, h: Int, expandPx: F
         }
     }
     return m
+}
+
+/** [p]'s solution polygons in the `board` capture's px through [m], the `board` node's top-left at [boardTopLeft]. */
+internal fun kitPolygonsPx(p: PuzzleDefinition, m: BoardMapping, boardTopLeft: Offset): List<List<Offset>> =
+    p.solution.map { sp -> sp.polygon.map { m.toPx(it) - boardTopLeft } }
+
+/** A segment in a capture's px. */
+internal data class KitSegPx(val a: Offset, val b: Offset)
+
+/** A silhouette's inside and outside pixel sets at a margin from its exact outline ([KitScreen.silhouetteBands]). */
+internal class KitBands(val inside: KitMask, val outside: KitMask)
+
+/**
+ * The pixels whose centres lie at least [marginPx] from [outline]: in [KitBands.inside] when the centre is in the union of
+ * [polys], in [KitBands.outside] when it is not (WO-010 F3; the distance is the exact one, to the nearest point of a segment).
+ * A centre counts as in the union when it lies in a polygon or within 1 px of one, so a centre on an edge two pieces share is
+ * in it; every centre either set keeps lies [marginPx] (more than 1 px) from the outline, so the 1 px decides nothing else.
+ */
+internal fun kitBands(polys: List<List<Offset>>, outline: List<KitSegPx>, w: Int, h: Int, marginPx: Double = 3.0): KitBands {
+    require(marginPx > 1.0) { "kit: a band margin of $marginPx px; more than 1 px is needed" }
+    val near = KitMask(w, h)
+    for (s in outline) {
+        val ax = s.a.x.toDouble()
+        val ay = s.a.y.toDouble()
+        val bx = s.b.x.toDouble()
+        val by = s.b.y.toDouble()
+        val x0 = max(0, floor(min(ax, bx) - marginPx - 1).toInt())
+        val x1 = min(w - 1, ceil(max(ax, bx) + marginPx + 1).toInt())
+        val y0 = max(0, floor(min(ay, by) - marginPx - 1).toInt())
+        val y1 = min(h - 1, ceil(max(ay, by) + marginPx + 1).toInt())
+        for (y in y0..y1) for (x in x0..x1) {
+            if (!near[x, y] && kitDistToSegment(x + 0.5, y + 0.5, ax, ay, bx, by) < marginPx) near[x, y] = true
+        }
+    }
+    val member = kitRasterise(polys, w, h, expandPx = 1f)
+    val inside = KitMask(w, h)
+    val outside = KitMask(w, h)
+    for (i in 0 until w * h) {
+        if (near.bits[i]) continue
+        if (member.bits[i]) inside.bits[i] = true else outside.bits[i] = true
+    }
+    return KitBands(inside, outside)
 }
 
 internal fun kitNear(a: Color, b: Color, tol: Float = 10f / 255f): Boolean =

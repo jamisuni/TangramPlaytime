@@ -18,8 +18,33 @@
     {"piece": "ST2", "polygon": [[[0, 1.5], [0, 3]], [[0, 2.5], [0, 4]], [[0, 1.5], [0, 4]]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#E6D5F5",
+    "shapes": [
+      {"type": "circle", "c": [0.42, 0.75], "r": 0.12, "stroke": "#5B3A29", "width": 0.06},
+      {"type": "path", "d": "M0.92,2.05 Q0.25,1.6 0.5,1.2 Q0.62,1 0.42,0.87", "stroke": "#5B3A29", "width": 0.06},
+      {"type": "circle", "c": [0.92, 2.05], "r": 0.62, "fill": "#C81E32"},
+      {"type": "circle", "c": [0.92, 2.05], "r": 0.409, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [0.92, 2.05], "r": 0.335, "fill": "#C81E32"},
+      {"type": "circle", "c": [0.92, 2.05], "r": 0.081, "fill": "#5B3A29"},
+      {"type": "circle", "c": [5.24, 0.75], "r": 0.12, "stroke": "#5B3A29", "width": 0.06},
+      {"type": "path", "d": "M4.74,2.05 Q5.41,1.6 5.16,1.2 Q5.04,1 5.24,0.87", "stroke": "#5B3A29", "width": 0.06},
+      {"type": "circle", "c": [4.74, 2.05], "r": 0.62, "fill": "#26A69A"},
+      {"type": "circle", "c": [4.74, 2.05], "r": 0.409, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [4.74, 2.05], "r": 0.335, "fill": "#26A69A"},
+      {"type": "circle", "c": [4.74, 2.05], "r": 0.081, "fill": "#5B3A29"},
+      {"type": "circle", "c": [1.55, 3.12], "r": 0.12, "stroke": "#5B3A29", "width": 0.06},
+      {"type": "path", "d": "M2.83,3.48 Q2.1,3 1.67,3.12", "stroke": "#5B3A29", "width": 0.06},
+      {"type": "circle", "c": [2.83, 3.48], "r": 0.5, "fill": "#FF8C42"},
+      {"type": "circle", "c": [2.83, 3.48], "r": 0.33, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [2.83, 3.48], "r": 0.27, "fill": "#FF8C42"},
+      {"type": "circle", "c": [2.83, 3.48], "r": 0.065, "fill": "#5B3A29"},
+      {"type": "circle", "c": [2.83, 4.92], "r": 0.12, "stroke": "#5B3A29", "width": 0.06},
+      {"type": "path", "d": "M2.83,6.22 Q2.45,5.5 2.83,5.04", "stroke": "#5B3A29", "width": 0.06},
+      {"type": "circle", "c": [2.83, 6.22], "r": 0.56, "fill": "#C81E32"},
+      {"type": "circle", "c": [2.83, 6.22], "r": 0.37, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [2.83, 6.22], "r": 0.302, "fill": "#C81E32"},
+      {"type": "circle", "c": [2.83, 6.22], "r": 0.073, "fill": "#5B3A29"}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

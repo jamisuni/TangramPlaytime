@@ -177,6 +177,43 @@ duty of the station it names; none of it is methodology.
   only after the bars settle: after a display change they move for up to
   about 5 s.
 
+- *(Project lessons, WO-010.)* **Under a paused clock, `performScrollTo`
+  never returns once a scroll is needed.** ui-test 1.12.1's
+  `performScrollTo` repeats its scroll until the node needs none, and the
+  scroll animates on the main clock; with `mainClock.autoAdvance = false`
+  the animation never ends and the call spins (WO-010: 35 min on the floor,
+  then 2 h in the whole set — at 13 puzzles no grid cell needed a scroll,
+  so the hang only appeared at 106). Scroll through the kit's
+  `KitScreen.scrollTo` (auto-advance on for that one call, paused again
+  after), and settle on the paused clock afterwards as before (run log
+  f2-sB, `reviews/WO-010-code-review-delta.md` S-2).
+- *(Project lessons, WO-010.)* **Every semantics read waits for a frame,
+  so node reads stay out of per-sample loops.** A `BoardMappingKey` read
+  for every edge sample made REQ-023.A2 run over 30 min at 106 puzzles;
+  reading the mapping once per puzzle (the board does not move inside a
+  leg) gave the same pixels in about 6 min. A per-puzzle or per-cell leg
+  is timed on the floor at the bundle size it will meet, before the whole
+  set runs (WO-010 F2 and its look-alikes).
+- *(Project lessons, WO-010.)* **A "3 px in / 3 px out" pixel set is
+  measured from the exact outline, never made by widening a raster mask
+  and eroding or dilating it by a square.** The kit's silhouette mask
+  (each piece widened 0.75 px) fills the tip of every 315° notch, where a
+  piece corner meets the middle of another piece's edge; `erode(3)` then
+  counted pixels 0.46 px from the outline as "3 px in", and the solved
+  picture's designed outline stroke there went red on one image and not
+  another (where the pixel grid fell). The same construction left 3–5 px
+  off every edge unjudged on the outside. Use `KitScreen.silhouetteBands`.
+  A margin set gets a self-check against an oracle that does not share
+  its construction (WO-010 F3, `decisions.md` 2026-10-20 "F3's cause is
+  the REQ-023.A1 leg's inside mask …", `reviews/WO-010-code-review-delta-2.md`
+  S-1).
+- *(Project lessons, WO-010.)* **API 26 is not edge to edge, so the
+  floor's board sits at a different pixel offset from an API 35+ phone
+  with the same dp size.** On the 411 × 914 dp phone the floor's board is
+  1325 px tall against 1514 px on API 37, 94.5 px higher: the same puzzle
+  falls on a different pixel grid. A pixel-exact leg green on one image
+  says nothing about the other (WO-010 F3, run log f3-probe-*).
+
 ## Gradle from Git Bash on Windows
 
 `cmd.exe //c ".\gradlew.bat assembleDebug test"`; set `JAVA_HOME` and

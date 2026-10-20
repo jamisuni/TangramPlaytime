@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Letter M  <tspan fill="#8A8FA8" font-size="14" font-weight="400">letters-m · difficulty 1 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="36.00,66.00 120.00,150.00 36.00,150.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="120.00,150.00 204.00,66.00 204.00,150.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="120.00,192.00 78.00,150.00 162.00,150.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="36.00,150.00 78.00,150.00 78.00,192.00 36.00,192.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="204.00,234.00 162.00,192.00 162.00,150.00 204.00,192.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="204.00,192.00 162.00,150.00 204.00,150.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="78.00,192.00 36.00,234.00 36.00,192.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="251.00,66.00 335.00,150.00 251.00,150.00" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="335.00,150.00 419.00,66.00 419.00,150.00" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="335.00,192.00 293.00,150.00 377.00,150.00" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="251.00,150.00 293.00,150.00 293.00,192.00 251.00,192.00" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="419.00,234.00 377.00,192.00 377.00,150.00 419.00,192.00" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="419.00,192.00 377.00,150.00 419.00,150.00" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="293.00,192.00 251.00,234.00 251.00,192.00" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-letters-m"><polygon points="466.00,66.00 550.00,150.00 466.00,150.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="550.00,150.00 634.00,66.00 634.00,150.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="550.00,192.00 508.00,150.00 592.00,150.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="466.00,150.00 508.00,150.00 508.00,192.00 466.00,192.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="634.00,234.00 592.00,192.00 592.00,150.00 634.00,192.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="634.00,192.00 592.00,150.00 634.00,150.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="508.00,192.00 466.00,234.00 466.00,192.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-letters-m)">
+<rect x="464.0" y="64.0" width="172.0" height="172.0" fill="#A6DCF5"/>
+<circle cx="615.98" cy="95.70" r="8.91" fill="#FFD966"/>
+<polygon points="500.15,106.09 555.10,158.07 448.18,158.07" fill="#7B86C9"/>
+<polygon points="500.15,106.09 555.10,158.07 507.58,158.07" fill="#5E69AE"/>
+<polygon points="500.15,106.09 514.29,119.46 507.22,116.78 500.15,120.14 493.47,116.78 486.79,119.46" fill="#FFFFFF"/>
+<polygon points="599.64,106.09 653.10,158.07 546.19,158.07" fill="#7B86C9"/>
+<polygon points="599.64,106.09 653.10,158.07 607.07,158.07" fill="#5E69AE"/>
+<polygon points="599.64,106.09 613.39,119.46 606.50,116.78 599.64,120.14 592.78,116.78 585.89,119.46" fill="#FFFFFF"/>
+<polygon points="460.06,152.13 471.85,149.87 483.49,148.32 494.99,147.46 506.30,147.28 517.50,147.82 528.49,149.07 539.36,151.00 550.05,153.61 560.38,151.00 571.01,149.07 581.94,147.82 593.20,147.31 604.72,147.46 616.60,148.32 628.75,149.87 641.22,152.13 641.22,241.22 460.06,241.22" fill="#6DBE45"/>
+<polygon points="482.33,166.23 487.56,182.57 477.11,182.57" fill="#2F7D32"/>
+<polygon points="550.05,159.55 554.80,174.40 545.29,174.40" fill="#2F7D32"/>
+<polygon points="617.46,166.23 622.69,182.57 612.24,182.57" fill="#2F7D32"/>
+<polygon points="479.36,195.93 483.64,209.30 475.09,209.30" fill="#2F7D32"/>
+<polygon points="620.43,195.93 624.71,209.30 616.16,209.30" fill="#2F7D32"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

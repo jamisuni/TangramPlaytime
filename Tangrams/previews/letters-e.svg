@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Letter E  <tspan fill="#8A8FA8" font-size="14" font-weight="400">letters-e · difficulty 2 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="141.00,66.00 57.00,150.00 57.00,66.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="57.00,150.00 141.00,234.00 57.00,234.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="57.00,150.00 99.00,108.00 99.00,192.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="99.00,129.00 141.00,129.00 141.00,171.00 99.00,171.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="99.00,192.00 141.00,234.00 183.00,234.00 141.00,192.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="99.00,108.00 141.00,66.00 141.00,108.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+<polygon points="183.00,66.00 141.00,108.00 141.00,66.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.38" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="356.00,66.00 272.00,150.00 272.00,66.00" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="272.00,150.00 356.00,234.00 272.00,234.00" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="272.00,150.00 314.00,108.00 314.00,192.00" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="314.00,129.00 356.00,129.00 356.00,171.00 314.00,171.00" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="314.00,192.00 356.00,234.00 398.00,234.00 356.00,192.00" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="314.00,108.00 356.00,66.00 356.00,108.00" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+<polygon points="398.00,66.00 356.00,108.00 356.00,66.00" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.19" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-letters-e"><polygon points="571.00,66.00 487.00,150.00 487.00,66.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="487.00,150.00 571.00,234.00 487.00,234.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="487.00,150.00 529.00,108.00 529.00,192.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="529.00,129.00 571.00,129.00 571.00,171.00 529.00,171.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="529.00,192.00 571.00,234.00 613.00,234.00 571.00,192.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="529.00,108.00 571.00,66.00 571.00,108.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/><polygon points="613.00,66.00 571.00,108.00 571.00,66.00" stroke="#000" stroke-width="0.59" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-letters-e)">
+<rect x="485.0" y="64.0" width="130.0" height="172.0" fill="#CDEFD9"/>
+<ellipse cx="529.68" cy="219.54" rx="8.32" ry="10.99" fill="#F49AC1"/>
+<path d="M 522.88,221.68 L 525.13,217.40 L 527.42,221.68 L 529.68,217.40 L 531.96,221.68 L 534.22,217.40 L 536.51,221.68" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="529.68" cy="213.48" r="1.34" fill="#FFFFFF"/>
+<circle cx="525.93" cy="225.04" r="1.19" fill="#FFFFFF"/>
+<circle cx="533.42" cy="225.04" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="508.74" cy="130.80" rx="8.32" ry="10.99" fill="#7FB8F0"/>
+<path d="M 501.94,132.94 L 504.20,128.66 L 506.48,132.94 L 508.74,128.66 L 511.03,132.94 L 513.31,128.66 L 515.57,132.94" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="508.74" cy="124.74" r="1.34" fill="#FFFFFF"/>
+<circle cx="505.00" cy="136.30" r="1.19" fill="#FFFFFF"/>
+<circle cx="512.48" cy="136.30" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="539.98" cy="91.72" rx="8.32" ry="10.99" fill="#FFE066"/>
+<path d="M 533.15,93.86 L 535.44,89.58 L 537.70,93.86 L 539.98,89.58 L 542.24,93.86 L 544.53,89.58 L 546.78,93.86" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="539.98" cy="85.66" r="1.34" fill="#FFFFFF"/>
+<circle cx="536.24" cy="97.21" r="1.19" fill="#FFFFFF"/>
+<circle cx="543.72" cy="97.21" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="504.05" cy="160.47" rx="8.32" ry="10.99" fill="#B892E8"/>
+<path d="M 497.22,162.61 L 499.50,158.33 L 501.76,162.61 L 504.05,158.33 L 506.30,162.61 L 508.59,158.33 L 510.85,162.61" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="504.05" cy="154.44" r="1.34" fill="#FFFFFF"/>
+<circle cx="500.30" cy="165.97" r="1.19" fill="#FFFFFF"/>
+<circle cx="507.79" cy="165.97" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="512.84" cy="87.92" rx="8.32" ry="10.99" fill="#F49AC1"/>
+<path d="M 506.01,90.06 L 508.29,85.78 L 510.55,90.06 L 512.84,85.78 L 515.09,90.06 L 517.38,85.78 L 519.67,90.06" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="512.84" cy="81.86" r="1.34" fill="#FFFFFF"/>
+<circle cx="509.10" cy="93.41" r="1.19" fill="#FFFFFF"/>
+<circle cx="516.58" cy="93.41" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="510.28" cy="190.61" rx="8.32" ry="10.99" fill="#7FB8F0"/>
+<path d="M 503.45,192.75 L 505.74,188.48 L 508.00,192.75 L 510.28,188.48 L 512.54,192.75 L 514.83,188.48 L 517.08,192.75" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="510.28" cy="184.56" r="1.34" fill="#FFFFFF"/>
+<circle cx="506.54" cy="196.11" r="1.19" fill="#FFFFFF"/>
+<circle cx="514.03" cy="196.11" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="564.93" cy="218.80" rx="8.32" ry="10.99" fill="#FFE066"/>
+<path d="M 558.13,220.94 L 560.38,216.66 L 562.67,220.94 L 564.93,216.66 L 567.22,220.94 L 569.50,216.66 L 571.76,220.94" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="564.93" cy="212.77" r="1.34" fill="#FFFFFF"/>
+<circle cx="561.19" cy="224.29" r="1.19" fill="#FFFFFF"/>
+<circle cx="568.67" cy="224.29" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="571.17" cy="85.63" rx="8.32" ry="10.99" fill="#B892E8"/>
+<path d="M 564.36,87.77 L 566.62,83.49 L 568.91,87.77 L 571.17,83.49 L 573.45,87.77 L 575.71,83.49 L 578.00,87.77" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="571.17" cy="79.57" r="1.34" fill="#FFFFFF"/>
+<circle cx="567.42" cy="91.12" r="1.19" fill="#FFFFFF"/>
+<circle cx="574.91" cy="91.12" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="533.36" cy="144.58" rx="8.32" ry="10.99" fill="#F49AC1"/>
+<path d="M 526.53,146.72 L 528.82,142.44 L 531.07,146.72 L 533.36,142.44 L 535.62,146.72 L 537.90,142.44 L 540.16,146.72" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="533.36" cy="138.55" r="1.34" fill="#FFFFFF"/>
+<circle cx="529.62" cy="150.08" r="1.19" fill="#FFFFFF"/>
+<circle cx="537.10" cy="150.08" r="1.19" fill="#FFFFFF"/>
+<ellipse cx="501.11" cy="219.57" rx="8.32" ry="10.99" fill="#7FB8F0"/>
+<path d="M 494.28,221.71 L 496.56,217.43 L 498.82,221.71 L 501.11,217.43 L 503.36,221.71 L 505.65,217.43 L 507.91,221.71" fill="none" stroke="#FFFFFF" stroke-width="1.78" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="501.11" cy="213.54" r="1.34" fill="#FFFFFF"/>
+<circle cx="497.36" cy="225.07" r="1.19" fill="#FFFFFF"/>
+<circle cx="504.85" cy="225.07" r="1.19" fill="#FFFFFF"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

@@ -71,3 +71,8 @@ androidComponents {
         variant.sources.resources?.addGeneratedSourceDirectory(bundlePuzzles, BundlePuzzles::outputDir)
     }
 }
+
+// AssetLicencesKitTest (R5's pin) reads ../ASSET-LICENCES.md at run time: an edit of the record alone must re-run the tests.
+tasks.withType<Test>().configureEach {
+    inputs.file(file("../ASSET-LICENCES.md"))
+}

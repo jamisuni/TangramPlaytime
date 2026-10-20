@@ -1429,3 +1429,275 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   rule is the same). Pictures are still placeholders.
 - **PAUSED 08:01.** Nothing running, no emulator up. Resume: KICKOFF
   "WO-010 — PAUSED again" (next: the four picture batches in parallel).
+
+## 2026-10-19 — WO-010 resumed again (P4, fresh orchestrator context)
+
+**Human input (verbatim, 18:26):**
+
+> WE ARE IN PHASE P4 — WORK ORDER WO-010 content batch, RESUMED after a second
+> pause (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl.
+> the "from P3 on" framework files), then governance.md, workorders/WO-010.md
+> (whole, Log to the last row), tasks.md § WO-010 (Seams, the shared-file table,
+> the rows and their status cells), workorders/WO-010-briefs.md (header, dispatch
+> order, channel table), .swdev/run-log/WO-010.md, the WO-010 rows of decisions.md
+> (2026-10-18, 2026-10-19), the last progress.md entry, KICKOFF.md "WO-010 —
+> PAUSED again", platform-notes/android.md. TASK-033…036 are done (TASK-036
+> accepted 08:01: 93 imports with stub pictures). Next: the four picture batches
+> TASK-037…040 in parallel (record the pre-fan-out git status first; name the
+> art-sensitive device oracles; open every sheet before accepting), TASK-041 (kit stage 2),
+> the code review, TASK-042 (every channel on the final tree, floor first, the
+> whole sets once), Test & Verify, trace-check, verifiers, wo-metrics, close.
+> Stations as subagents; device steps as one background script per image; no
+> replies to interim notices. The four scripts are duties. End every turn with the
+> one signal.
+
+**Summary (orchestrator, Opus 5.5; from 18:26):**
+- Framework v0.20 = project, no drift. HEAD `a0d3938` "Backup" (the
+  owner's snapshot of the paused state); no emulator running.
+- Tree-hash helper re-made in this session's scratch; every tree hash
+  equals the last run-log row (nothing changed during the pause).
+- 18:30 pre-fan-out git status recorded (only the hook logs), then the
+  four picture batches dispatched at once (26 / 22 / 25 / 20 puzzles):
+  shapes + numbers, letters, things + vehicles, animals + nature +
+  people. Each was told which device tests will later judge its
+  pictures, to keep its own Chrome profile, and to touch only its own
+  files' pictures.
+- 18:33 a fresh test-kit author dispatched to draft stage 2 (the licence
+  record and colour checks) in its scratch; it lands after the batches.
+- 18:46 the stage-2 draft back (scratch only; the licence record already
+  passes it).
+- 18:57–19:11 the four batches back and accepted one by one (animals /
+  nature / people, things / vehicles, shapes / numbers, letters): every
+  file valid, 3–8 colours, only the picture changed; I looked at all 93
+  sheets on contact pages. All 93 new puzzles now have pictures; the 13
+  old sheets are untouched. Title notes for the owner (mixed casing,
+  "Standing", "Double Convex Hexagon" is an hourglass, the faint Letter
+  Z) go to `review-notes.md` at close. One picture to watch on the
+  device: `shapes-convex-12`.
+- 19:12 the test author resumed to land stage 2 and run the JVM line.
+- Two small frictions filed in `proposals.md` (the approver blocks a
+  read-only git command; the fan-out record should list my own ledgers).
+- 19:14 kit stage 2 accepted: the licence record and colour checks are
+  in the tree and green; all 261 JVM tests pass over 106 puzzles (my own
+  re-count). Plan check still green.
+- 19:16 the independent code review dispatched (before the long device
+  runs, so a fix does not re-open them).
+- 19:24 code review back: no blockers. It re-checked the import from the
+  source (every rating, every geometry, the licence record). Two small
+  fixes ordered now: a README line on how to re-run the converter, and a
+  build-file line so a change to the licence record alone always re-runs
+  its test. Four notes go to the close (one licence detail for WO-009,
+  two Finnish titles for the review notes).
+- 19:31 both fixes accepted after my own check of the two diffs; the
+  recipe was run before it was written (it also needs the old batch
+  lists out of the way); all 261 JVM tests green.
+- 19:33 the final run dispatched: every check once on the final code —
+  the oldest phone image first, then the dev phone, then the tablet;
+  expected to take several hours of emulator time.
+- 20:38 no change: the final run is on the oldest phone image (one
+  emulator up, as planned); no hand-back yet, nothing for the owner.
+
+**Human input (verbatim, ~21:09):**
+
+> we done here? I cant see nothing spinning? do we need to remove some older phone supports? Maybe we raise olderst supported to Android 12 or 13?
+
+**Summary (orchestrator, 21:10):**
+- Not done: TASK-042 runs headless (no emulator window), on the Android 8
+  floor since 19:38. At 21:09 its test process was busy (≈96 % CPU) in
+  the grid-colour test, which checks all 106 puzzle cells one by one —
+  slow on the old emulator, not hung. Then the dev phone and the tablet;
+  several more hours. Then Test & Verify, trace-check, verifiers,
+  metrics, close.
+- The floor: nothing needs removing. Android 8 (API 26) is the build's
+  choice under the owner's G1 answer ("android 8 is more than enough,
+  can go way higher if it simplifies development"); it is in
+  `architecture.md` §2 and the pending `chg-draft-req006-platform-floor.md`,
+  not yet in a locked REQ. Installed images: API 26 and 37 only.
+- Recommended: finish WO-010 on Android 8 (changing it mid-run voids the
+  final run), then raise the floor before the next WO. Asked the owner
+  which version (8 / 12 / 13).
+
+**Human input (verbatim, 21:47):**
+
+> Lets move to Android 12 as oldest supported.
+
+**Summary (orchestrator, 21:48):**
+- Recorded the owner's words as `capture-outbox/src-draft-android-12-floor.md`
+  and amended the pending REQ-006 floor draft to "Android 12 (API 31) and
+  later"; a `decisions.md` row says how and when it is applied.
+- WO-010 closes on Android 8 (its final run is under way on that image).
+  Before the next WO's device tests: `architecture.md` v1.3 through the G2
+  route, a new Android 12 emulator image installed and proven as the floor,
+  and `minSdk 31` as the next WO's first task (all channels re-run there).
+- TASK-042 continues untouched.
+
+**Human input (verbatim, 22:00):**
+
+> time to start shutting down for today.. and continue later.. anyway looks like this 2 hour session is stick
+
+**Summary (orchestrator, 22:01):**
+- Checked first: the oldest-phone run had finished 58 tests by 20:01 (one
+  failed), then sat in one test — the grid colour check over all 106
+  puzzles — for 2 hours with the CPU busy. So the owner was right that it
+  was stuck in practice.
+- Stopped it cleanly: the station stopped, emulator killed, Gradle stopped,
+  no device left running.
+- What stands on the final code: puzzle tools, all 261 JVM tests, the
+  release check and the verifiers, the device-test compile — all green.
+- Two findings for the next session: a badge-tap test fails on Letter M
+  (the badge reaches past the screen's edge), and the grid colour test is
+  far too slow at 106 puzzles. Each needs a reading (test or product).
+- Written down for the resume: WO log, run log (the test lines quoted),
+  `tasks.md` (TASK-042 blocked), KICKOFF "WO-010 — PAUSED a third time"
+  with the paste prompt, AGENTS.md phase line. Nothing running.
+
+## 2026-10-20 — WO-010 resumed a third time (P4, fresh orchestrator context)
+
+**Human input (verbatim, 05:51):**
+
+> WE ARE IN PHASE P4 — WORK ORDER WO-010 content batch, RESUMED after a third
+> pause (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl.
+> the "from P3 on" framework files), then governance.md, workorders/WO-010.md
+> (whole, Log to the last row), tasks.md § WO-010 (Seams, the rows and their
+> status cells), workorders/WO-010-briefs.md (header, dispatch order, channel
+> table, the TASK-042 brief), .swdev/run-log/WO-010.md, the 2026-10-19 rows of
+> decisions.md, reviews/WO-010-code-review.md, the last progress.md entry,
+> KICKOFF.md "WO-010 — PAUSED a third time", platform-notes/android.md.
+> TASK-033…041 are done, the code review is done (S1, S2 fixed), TASK-042 is
+> blocked: steps 1–4 green (t042-a), the floor play set stopped with two
+> findings F1 (DecorationKitTest on letters-m) and F2 (OverviewKitTest REQ-050.A2
+> ran 2 h). Next: route F1 and F2 (class alone on the floor, under timeout),
+> then TASK-042 from the floor step (floor, dev, tablet; one background script
+> per image), Test & Verify, trace-check, verifiers, wo-metrics, close — WO-010
+> closes on Android 8; the Android 12 floor move comes right after. Stations as
+> subagents; no replies to interim notices. The four scripts are duties. End
+> every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; from 05:51):**
+- Framework v0.20 = project, no drift. HEAD `a0d3938`; no emulator
+  running. Every tree hash equals the last run (nothing changed during
+  the pause), so the green steps 1–4 of the final run still count.
+- F1 (the badge test on Letter M): the badge's touch area on the board
+  runs about 3 dp off the right edge of the screen. The rules say the
+  area is at least 60 dp and sits on the board, so this is checked as a
+  product defect first (a fresh implementer), then the test's own
+  helper if it still fails. Same phone size on Android 8 and the dev
+  image, so not an Android 8 issue.
+- F2 (the grid colour test that ran 2 h): the test checks the 106 grid
+  cells one at a time, slowly. The grid's own speed with the drawn
+  pictures is measured first; if the grid is fine, the test author
+  makes the test fast while still checking every cell.
+- 06:18 F1 back: a real product defect, fixed. On 25–28 of the 104
+  puzzles with a parallelogram (depending on the screen), the badge's
+  60 dp touch area ran off the board's edge (the visible disc never
+  did). It is now kept on the board; JVM tests 263/0 (my own re-count);
+  a `decisions.md` row records where the area sits at an edge. The
+  badge test still fails, now inside the test's own disc-finding helper
+  (a piece of the same blue as the badge's ring touches it): a test
+  defect.
+- 06:18 the test author got both test defects: the disc helper (F1),
+  and the slow grid test (F2) — grid speed measured first, then the
+  test made fast while still checking every cell; any similar slow
+  test looked for too.
+- 07:21 no change: the test author is still working on the Android 8
+  image (its own background runs); no hand-back yet, nothing for the
+  owner.
+- 08:27 still running: its fourth floor session started 08:27 (one
+  emulator up, as planned); no hand-back yet.
+- 08:56 the test author back, accepted after my own re-count of every
+  result. The grid itself is fast with the pictures (opens in 0.3 s on
+  Android 8). The 2-hour stall was a test-tool trap: a scroll that never
+  finished under the test's frozen clock — at 13 puzzles no cell needed
+  a scroll. Fixed, and the same scan found two more tests that would
+  have run for hours (the solved-picture and tray checks); all fixed,
+  every check still covering every puzzle. The badge test passes. One
+  test (every puzzle reachable from every other) takes 24 min on its
+  own — that is the check itself, accepted.
+- 08:57 a fresh code reviewer checks all of these fixes before the
+  final run on the three images.
+- 09:11 review back, no blockers. The badge fix is right. One test
+  detail to tighten first: the badge test's helper would no longer
+  notice a badge drawn twice — sent back to the same test author. The
+  test-tool trap is now written into the Android notes so it is not
+  hit again. Two small notes need no change.
+- 09:34 the tightened badge test back and accepted (14/0 on Android 8,
+  my own re-count): it again fails on a badge drawn twice, and still
+  reads the real badge.
+- 09:35 the final run dispatched on the final code: JVM tests and the
+  release check again, then Android 8, the dev phone and the tablet,
+  one script per image. New this time: if no test finishes for 40
+  minutes, the run stops itself and reports — no more silent 2-hour
+  waits. Expected several hours of emulator time.
+- 10:38 the final run is still going (about an hour in, on its own
+  emulator scripts); nothing to judge yet, no change to the ledgers.
+- 12:21 the final run came back. Android 8 is fully green; the speed
+  limits are not crossed; the play set took 48 minutes, not the feared
+  2 hours. On the dev phone (Android 17) one check failed: in the
+  solved vulture picture, one pixel of the dark silhouette shows
+  through inside the picture. The picture's own colours cannot make
+  that pixel, so it is the app's drawing, the puzzle's shape data or
+  the test's mask. Sent to a fresh implementer to find out which and
+  fix it (the same way as this morning's badge). The tablet waits; after
+  the fix the whole run repeats on all three emulators.
+- 12:49 the vulture pixel is the test's fault, not the app's. The
+  solved picture has a thin outline in the silhouette colour by design.
+  At sharp inward notches the test thought pixels right on that outline
+  were well inside the picture. Only one other puzzle (Letter Z) is
+  affected. I checked this against the code and logged it as a
+  decision. I also found and repaired a decisions-table row my own
+  earlier edit had broken. The test fix is now with the test author,
+  who also checks seven other places that use the same mask. Then the
+  full run on all three emulators.
+- 13:51 the test author is still working (about an hour in, on the
+  emulators); nothing to judge yet, no change to the ledgers.
+- 13:56 the test fix is back and checks out: the tests now measure
+  "inside the picture" from the true outline, and a new self-check
+  shows the old way was wrong for the vulture and Letter Z. Eight
+  other tests had the same flaw and are fixed; one was fine as it was.
+  Everything is green on Android 8 and the dev phone, all 106 puzzles
+  judged. No app or puzzle file changed. A code reviewer now reads the
+  test change before the full run on all three emulators.
+- 14:09 the review is back: the test change is sound (the reviewer
+  re-checked the outline maths exactly on all 106 puzzles and tried
+  four ways to break the self-check; all were caught). One small ask:
+  explain at one test why it keeps the old mask, and write the lesson
+  down. I wrote the lesson into the Android notes; the test author
+  adds two comment lines. Then the full run on all three emulators.
+- 14:11 the two comment lines are in, and I checked they are only
+  comments. The full run has started on the final code: JVM tests and
+  the release check, then Android 8, the dev phone and the tablet, one
+  emulator at a time. Expect several hours.
+- 15:24 the full run is still going (about 1 h 15 min in); nothing to
+  judge yet, no change to the ledgers.
+- 16:43 still going (about 2 h 30 min in); nothing to judge yet, no
+  change to the ledgers.
+- 16:45 Jami asked: "is there really happening anything anymore or just
+  open sub sessions those dont do anything?" Checked the machine: yes,
+  real work. The tablet emulator is up and running its last big step
+  (the app set, started 16:44). Android 8 finished at 15:23 and the dev
+  phone at 16:42; by the run script's own summary both are green (play
+  set 97/0, the app set with only the two guarded phases). Not yet my
+  verdict: I re-count every result when the run hands back.
+- 17:07 the full run is done and green on every channel: JVM tests
+  263/0, the release check passes, Android 8 and the dev phone 97/0 on
+  the play tests, the app tests green on all three emulators (only the
+  two guarded phases). I re-counted every result file myself. The speed
+  limits are not crossed anywhere (start-up 1.5–2.1 s, grid open about
+  0.2–0.3 s). All ten WO-010 tasks are done. Test & Verify has started:
+  a fresh station takes this run as its baseline, checks the tests
+  really judge what each requirement says, and re-runs the quick
+  channels itself.
+- 17:22 **WO-010 closed.** Test & Verify green (all 11 requirement
+  lines on every channel, no defects); the traceability check green
+  (its station first claimed a report it had not written; sent back,
+  now written); the plan check, the release check and the metrics run.
+  Written at the close:
+  - the metrics (hand-corrected where the script counted the wrong
+    days);
+  - 17 corrected test checks and this WO's frictions → `proposals.md`;
+  - the title notes and a play-test list for you → `review-notes.md`;
+  - the G4 decision;
+  - KICKOFF "State after WO-010" with the next session's prompt. Next
+    is the move to Android 12 as the oldest supported version, then
+    the next work order.
+  No emulator is running. Please commit the snapshot.

@@ -63,7 +63,91 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
-## WO-010 — PAUSED again (2026-10-19 07:47; the owner: "next change lets start shutdown process.. we wait still moment but no new ones anymore") — in P4, TASK-036 running at the pause
+## State after WO-010 (2026-10-20, closed 17:22)
+
+- **WO-010 content batch is done** (`workorders/WO-010.md`, Light; G4 `decisions.md` 2026-10-20 "WO-010 closed at G4").
+  - **106 puzzles** (13 shipped + 93 imported from TangramCollections: convex-13 CC0, android-tangram-131 GPL-3.0; 51 of 144 skipped with reasons in `Tangrams/README.md`). Each has a drawn picture, and each is credited in `ASSET-LICENCES.md` (106 rows, pinned). `tools/import_figures.py` is the record of how each file was made (its recipe in `Tangrams/README.md`).
+  - **The order:** the measured rating for the new puzzles; the six turned copies ship as their own puzzles (checkpoint items 3–4 stand on their defaults 2026-10-21).
+  - **Product changes:** the counter formats with `Locale.ROOT`; the board badge's 60 dp touch area is clamped onto the board (F1, found by a test: 25–28 of 104 parallelograms' areas left the board).
+  - **Results:** 11/11 IDs green on the Python channel, JVM 263/0, the floor (Android 8), the dev phone and the tablet, plus V-01. The scale record (medians floor / dev / tablet): start-up to the first puzzle 1.5 / 2.1 / 2.1 s, grid open 0.33 / 0.24 / 0.24 s. Nothing near R6's limits.
+  - **Reviews:** code review 0 B / 2 S / 4 N and two delta reviews (every Should fixed). **17 corrected checks** (`proposals.md` 2026-10-20). Most showed only at 106 puzzles or on the second image.
+- **Device time from now on** (run log t042c): the play set is about 45 min on the floor and 54 min on dev; the app set about 20 min per image; REQ-003.A1 alone about 24.5 min. One background script per image, with the 40-min stall watchdog. Every bundle-iterating class runs alone on the floor **and** dev right after a bundle grows, before the final whole sets (`proposals.md` 2026-10-20).
+- **Next: the floor move to Android 12 (API 31), then the next WO** (the owner's decision 2026-10-19 21:47; `decisions.md` 2026-10-19 "The platform floor moves to Android 12 …").
+  1. `architecture.md` v1.3 through the G2 route: the stack line `minSdk 31`, and the floor channel named as the new image.
+  2. The `android-31` system image (google_apis, x86_64) installed, and an AVD `Phone_API_31` created with `Phone_API_26`'s screen (1080 × 2400, 420 dpi), booted, the trivial test run. That is G3's floor proof.
+  3. `platform-notes/android.md`: the floor line updated; the API 26 lessons kept as history.
+  4. `minSdk 31` in every module is **the next WO's first task**, on REQ-006 through `chg-draft-req006-platform-floor.md`, with the JVM line, V-01 and the device sets on the new floor, dev and tablet.
+  - **The next WO (row 8):** WO-007 #Settings by the kickoff order. `build-map.md` lists #Settings as depending on #PlayTime, so the opener decides whether WO-008 #PlayTime comes first.
+- **Carry into later WOs:**
+  - **WO-007** (from KICKOFF "State after WO-006", still open): the settings screen joins the "every screen" tests; REQ-009's free note; how sounds handle an aid solve's burst of events.
+  - **WO-009:**
+    - code review N2: the convex-13 `NOTICE.md` says one line of the drawing program was corrected (shape 10), and `ASSET-LICENCES.md` leaves it out. Take it with `chg-draft-licence-notice-and-assets.md`.
+    - the first-release puzzle selection (checkpoint item 2: "We worry limiting launch ones later");
+    - REQ-039.A2 / REQ-042.A1 (the owner's review marks, `reviewedByHuman`).
+  - **A later kit pass:**
+    - the self-check `kitSelfCheckTheThreePxSetsKeepThreePxFromTheExactOutline` can be 60–70 % faster (delta review 2 N-1);
+    - REQ-039.A1 has no mutation proof of its own (Test & Verify).
+- **Checkpoint items:** 1–2 answered 2026-10-18; 3–4 stand 2026-10-21.
+- **Lock behind build:** 29 outbox drafts await a capture session. This WO wrote `src-draft-android-12-floor.md` and amended `chg-draft-req006-platform-floor.md` and `chg-draft-licence-notice-and-assets.md`.
+- **Owner steps:**
+  - Commit the WO-010 snapshot (prompted on the G4 surface).
+  - Play the build: the grid at 106, a few new pictures per theme, Letter Z's faint edge, flipping the parallelogram at the board's edge (Letter M) — `review-notes.md` 2026-10-20.
+  - Glance at the title notes there.
+  - Answer checkpoint items 3–4 by 2026-10-21 if a default is wrong.
+
+```text
+WE ARE BETWEEN WORK ORDERS — the floor move to Android 12, then the next WO
+(TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl. the
+"from P3 on" framework files), then governance.md, decisions.md (the row
+2026-10-19 "The platform floor moves to Android 12 …" and the 2026-10-20
+rows), KICKOFF.md "State after WO-010" and "State after WO-006" (the WO-007
+carries), architecture.md, build-map.md, capture-outbox/src-draft-android-12-floor.md
+and chg-draft-req006-platform-floor.md, platform-notes/android.md, the last
+progress.md entry. First the floor move: architecture.md v1.3 through the G2
+route (minSdk 31; the floor channel Phone_API_31); the android-31 system image
+installed and the Phone_API_31 AVD created with Phone_API_26's screen, booted,
+the trivial test run (G3's floor proof); the platform-notes floor line. Then
+open the next WO under row 8 (WO-007 #Settings by the kickoff order, or WO-008
+#PlayTime first if #Settings needs its accounting), with minSdk 31 in every
+module as its first task. Channels: Python, JVM (the two-run line), the floor
+Phone_API_31 first, the dev and tablet images, V-01. Stations as subagents;
+device steps as one background script per image; no replies to interim
+notices. The four scripts are duties. End every turn with the one signal.
+```
+
+## WO-010 — PAUSED a third time (2026-10-19 22:01; the owner: "time to start shutting down for today.. and continue later.. anyway looks like this 2 hour session is stick") — in P4, TASK-042 stopped on the floor — RESUMED 2026-10-20 05:51, DONE (closed 17:22)
+
+- **Where it stands** (`workorders/WO-010.md` Log 18:27…22:01; `.swdev/run-log/WO-010.md` rows r-resume2 … t042-floor; `tasks.md` § WO-010 status cells): **done** — TASK-033…TASK-041: the four picture batches (93 pictures drawn, every sheet looked at by the orchestrator), kit stage 2 (`AssetLicencesKitTest`), JVM **261/0**. **Code review done** (`reviews/WO-010-code-review.md`, 0 B / 2 S / 4 N; S1 + S2 fixed and checked 19:31; notes triaged — `decisions.md` 2026-10-19 "S1 and S2 fixed now, before TASK-042 …"). **TASK-042 blocked:** steps 1–4 green on the final tree (run log **t042-a**: Python channel, JVM 261/0, V-01 3/3 + control 2/2, verifiers GREEN, kit compile); the floor play set was **stopped at the pause with no XML** (t042-floor) and left two findings (WO log 22:01): **F1** `DecorationKitTest#aTapInsideANeighboursDrawnShapeUnderTheBoardBadgesAreaActsOnThatPieceNotOnThePg` failed on `letters-m` (the kit found no single disc near `flip-badge-board`, whose rect reaches x = 1088 on a 1080 px screen); **F2** `OverviewKitTest`'s REQ-050.A2 test ran 2 h without finishing on the floor (106 cells, CPU busy).
+- **Owner decision 21:47:** the oldest supported Android becomes **Android 12 (API 31)** from the next WO (`decisions.md` row "The platform floor moves to Android 12 …"; `capture-outbox/src-draft-android-12-floor.md`; the REQ-006 floor draft amended). Per that row **WO-010 closes on Android 8**; its first step after the close is the floor move (G2 route `architecture.md` v1.3, a `Phone_API_31` image installed and proven, `minSdk 31` as the next WO's first task).
+- **Resume here:**
+  1. `adb devices` (expect empty). Re-make the tree helper from the run log header (the product tree's bundle part is `Tangrams/*.json` **without the schema**; row r-resume2). If every hash equals t042-a's, steps 1–4 of TASK-042 stand.
+  2. **Route F1 and F2 first** (rule against the spec only — REQ-018 / the badge rows for F1, REQ-050.A2 and the Q7 run-time table for F2): read the failing leg and its helper against `letters-m`'s geometry and the overview test's per-cell loop; a kit defect → `acceptance-test-author` (a corrected check), a product defect → `slice-implementer`. Reproduce each **on the floor, the class alone, under `timeout`** before and after a fix.
+  3. Then TASK-042 from step 5 (floor → dev → tablet; one background script per image; a fresh implementer with its brief + the t042 rows), Test & Verify, trace-check `--wo`, verifiers, wo-metrics, close (G4 row 9).
+  4. At close: `review-notes.md` rows — the title notes (WO log 18:57, 19:02, 19:03, 19:11: "Standing", mixed casing, "Double Convex Hexagon" is an hourglass, the faint Letter Z) and review N4 (Finnish "Tuulimylly", "Seisomassa"); review N2 → the WO-009 carry with `chg-draft-licence-notice-and-assets.md`; the floor move named as the next WO's first step; the corrected checks → `proposals.md`.
+  - *A ruling to weigh at the resume:* if F1 or F2 turns out to be API-26-specific, whether WO-010 should close after the floor move instead. The 21:48 row says Android 8; reversing it needs a reason and a new row (and the move is a product change outside WO-010's scope).
+- **Devices:** none running (22:01: emulator killed, Gradle daemons stopped, the station's script ended). **Scratch:** wiped with the session — the run log rows quote what matters (the receive-check script `receive_batch.py` and contact pages went with it).
+
+```text
+WE ARE IN PHASE P4 — WORK ORDER WO-010 content batch, RESUMED after a third
+pause (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl.
+the "from P3 on" framework files), then governance.md, workorders/WO-010.md
+(whole, Log to the last row), tasks.md § WO-010 (Seams, the rows and their
+status cells), workorders/WO-010-briefs.md (header, dispatch order, channel
+table, the TASK-042 brief), .swdev/run-log/WO-010.md, the 2026-10-19 rows of
+decisions.md, reviews/WO-010-code-review.md, the last progress.md entry,
+KICKOFF.md "WO-010 — PAUSED a third time", platform-notes/android.md.
+TASK-033…041 are done, the code review is done (S1, S2 fixed), TASK-042 is
+blocked: steps 1–4 green (t042-a), the floor play set stopped with two
+findings F1 (DecorationKitTest on letters-m) and F2 (OverviewKitTest REQ-050.A2
+ran 2 h). Next: route F1 and F2 (class alone on the floor, under timeout),
+then TASK-042 from the floor step (floor, dev, tablet; one background script
+per image), Test & Verify, trace-check, verifiers, wo-metrics, close — WO-010
+closes on Android 8; the Android 12 floor move comes right after. Stations as
+subagents; no replies to interim notices. The four scripts are duties. End
+every turn with the one signal.
+```
+
+## WO-010 — PAUSED again (2026-10-19 07:47; the owner: "next change lets start shutdown process.. we wait still moment but no new ones anymore") — in P4, TASK-036 running at the pause — RESUMED 2026-10-19 18:27 (fresh context; the picture batches dispatched 18:30)
 
 - **Where it stands** (`workorders/WO-010.md` Log, rows of 2026-10-19 06:13…; `.swdev/run-log/WO-010.md`; `tasks.md` § WO-010 status cells): resumed 2026-10-19 06:13. **Done:** R1–R10 ruled, all accepted as written (ten `decisions.md` rows of 2026-10-19 under the planner's titles); the eyes channel proven (g3-eyes); plan review 0 B / 3 S (S1, S2 applied — `tasks.md` 0.18; S3 carried); **G3 passed 06:18** (row 7); **TASK-033** (kit stage 1: the REQ-040.A2 test corrected — corrected check 1; `CounterDigitsKitTest`) **done**; **TASK-034** (the counter's `Locale.ROOT`, one line) **done**, JVM 245/0; **TASK-035** (`ScaleMeasureTest` + the 13-puzzle baseline on three images, run log t035-scale) **done**. **TASK-036 done** (back 08:00, accepted 08:01 — WO log): **93 puzzles imported** (51 of 144 skipped with reasons in `Tangrams/README.md`), each with the **stub picture**; `tools/import_figures.py`, `tools/import/batch-1…4.txt` (26 / 22 / 25 / 20), `ASSET-LICENCES.md` (106 rows), the titles row in `review-notes.md`; validator 106/106, JVM 245/0, floor `BoardTrayKitTest` 7/0 + `DragKitTest` 20/0 over 106 puzzles; floor scale: start 1.35 s, grid open 0.35 s — no threshold crossed. **The flux window is open** (the pictures are stubs): no JVM line or device set runs for a verdict until TASK-041.
 - **Dispatch rulings in force:** the code review runs **after TASK-041 and before TASK-042** (WO log 06:15); device stations run each image's steps as **one background script**, and the orchestrator does not answer interim "still waiting" notices beyond the signal line (WO log 07:00; owner: "why you start spamming?").

@@ -483,3 +483,125 @@ from starvation.
   dozens.
 - **Severity:** medium — it costs the owner's attention, which the
   checkpoint rules work hard to protect.
+
+## 2026-10-19 — WO-010 (P4 fan-out): two small frictions
+
+- **The bash approver's D4 denies `git check-ignore`.** It is a read
+  (it asks whether a path is ignored), but D4 lists it among history
+  writes: "SWDev bash-approve DENY: D4 git writes history (git
+  check-ignore)". The orchestrator fell back to reading `.gitignore`.
+  **Proposal:** add `check-ignore` (and `ls-tree`, `cat-file`) to the
+  read allow-list in `swdev_bash_approve.py` and the adapter page's git
+  list. **Severity:** low.
+- **A pre-fan-out `git status` must name the orchestrator's own writes.**
+  Plan S1 (WO-010) judges each parallel batch against the status recorded
+  at dispatch. The orchestrator then edited its ledgers (`tasks.md`,
+  the WO log, `progress.md`, `AGENTS.md`, `KICKOFF.md`), and all four
+  batches spent effort reporting five "unexplained" paths. **Proposal:**
+  in `task-decomposition.md` or the brief template, the fan-out record
+  lists the ledgers the orchestrator will write during the fan-out as
+  allowed. **Severity:** low.
+
+## 2026-10-20 — WO-010 content batch close: seventeen corrected checks, defects that showed only at 106 puzzles or on the second image
+
+- **Corrected check 1 (TASK-033).** The REQ-040.A2 test's last line
+  pinned a 13-bundle fact ("the only full puzzle of rating 1 is the first
+  full puzzle") instead of the REQ's ordering rule. **Miscalibration:** a
+  fact of today's fixture written as the oracle.
+- **Corrected checks 2–3 (F1, the kit half).** The board badge's disc
+  reader treated seam pockets as a second region. The bundle-wide search
+  stopped at the first doubtful board, although earlier boards had given
+  candidates. **Miscalibration:** a pixel reader calibrated on 13 puzzles,
+  and a search that throws on the first doubt instead of passing over it.
+- **Corrected check 4 (delta review S-1).** The relaxed reader let a
+  second disc pass silently, and the pass-over path never ran.
+  **Miscalibration:** a check relaxed with no test that it still fails.
+  The fix added two kit self-checks.
+- **Corrected checks 5–8 (F2 and its look-alikes).**
+  - ui-test 1.12.1's `performScrollTo` never returns under the kit's
+    paused clock once a scroll is needed (at 13 puzzles none was): a 2-hour
+    stall on the floor.
+  - A semantics read per edge sample, each waiting for a frame, made
+    REQ-023.A2 run over 30 min and REQ-011.A1 18 min.
+  **Miscalibration:** per-puzzle and per-cell legs never timed at the
+  bundle size they would meet.
+- **Corrected checks 9–17 (F3 and eight look-alikes).** The "3 px in /
+  3 px out" pixel sets were built by widening each piece 0.75 px and
+  eroding or dilating by a 3 px square. At a 315° notch that counted
+  pixels 0.46 px from the outline as "3 px in", where the picture's
+  designed outline stroke is. It went red on the dev image only, because
+  of where the pixel grid fell (API 26 is not edge to edge, so the board
+  sits 94.5 px higher). The same construction had been copied into nine
+  legs. Now measured from the exact outline, with a self-check against an
+  independent disc oracle. **Miscalibration:** a margin set with no
+  self-check, copied by imitation.
+- **The pattern: the expensive run found what a cheap run could have.**
+  F2 needed 106 puzzles, and F3 needed the second image's pixel grid.
+  Both surfaced inside the 2–5 h whole-set runs of the final task. One
+  whole-set pass was lost to each (about 2 h and 2 h 44 min), plus the
+  first floor stall at the 2026-10-19 pause.
+  **Proposal:** `task-decomposition.md` / the test-author brief, for any
+  WO that grows a bundle or a fixture set:
+  1. right after the growth lands, every bundle-iterating class runs
+     alone, timed, on the floor **and** on one other image, before the
+     final whole sets;
+  2. every margin or pixel-band set in a kit gets a self-check against an
+     oracle that does not share its construction;
+  3. the kit template carries a per-test stall bound. WO-010 added a
+     40-minute no-test-finished watchdog at dispatch, and it never fired
+     after F2's fix.
+- **A station claimed a file it never wrote — again** (WO-003, 2026-10-12).
+  The trace auditor's report was a shell heredoc. The bash approver denied
+  it (D1, a shell write to markdown), and the hand-back still said
+  "written". The receive check (`ls`) caught it; a second message got the
+  file written with the Write tool. **Proposal:** the auditor's agent file
+  says "write the report with the Write tool and quote `ls -la` of it in
+  the hand-back". `handoff-contract.md`: every artifact a hand-back names
+  carries its `ls -la` line. **Severity:** low (caught), but it is the
+  second time.
+- **The orchestrator broke a ledger row with an Edit.** Inserting the
+  09:11 triage row, the `old_string` ended after the F1 row's Decision
+  cell. The new row went in mid-row, and the F1 row's last five cells sat
+  after it until 12:49, when the orchestrator saw it while reading the
+  table's format. **Proposal:**
+  trace-check (or a hook on ledger edits) lints the governed ledger
+  tables: every row has the header's cell count. **Severity:** low-medium
+  (`decisions.md` rows are evidence at G4).
+- **`wo_metrics.py --write` into an empty Metrics section wrote rows with
+  no table header.** It still windows by calendar date (this WO's window
+  held WO-004…006), so ten rows were hand-corrected again. **Proposal:**
+  emit the `| Metric | Value |` header when absent, and window from the
+  WO's open row (the first Log row of its own phase), as proposed at
+  WO-006. **Severity:** low.
+- **The bash approver's D4 also denies `git archive` (to scratch) and
+  `git config`.** These were used to extract HEAD's copy of a file into
+  scratch for a diff, and to read a setting; neither writes history.
+  **Proposal:** the read allow-list gains `git archive` to stdout or
+  scratch, `git config --get`, `git show <rev>:<path>` (already a read),
+  with `check-ignore` from 2026-10-19. **Severity:** low.
+- **"Is anything happening?"** Mid-run, the owner asked: "is there really
+  happening anything anymore or just open sub sessions those dont do
+  anything?" Interim notices say only "waiting on its own background
+  work", and the signal line says `All ready`. The answer came from
+  machine state: `adb devices`, the qemu process, the newest line of the
+  station's `script.log` (seconds old), the per-image summaries.
+  **Proposal:** extends 2026-10-19. A device station names its live log
+  file in its first interim message; the orchestrator's answer to a
+  progress question is read from that file and `adb devices`, never
+  inferred. The third signal ("Working, nothing needed from you") would
+  have answered it before it was asked. **Severity:** medium (the owner's
+  attention).
+- **What worked.**
+  - Facts-first routing. F1 and F3 each went to a `slice-implementer` to
+    establish the facts before anyone fixed anything. F1 turned out to be
+    a product defect (25–28 of 104 parallelograms' badge areas left the
+    board). F3 turned out to be the kit. The orchestrator's wrong premise
+    ("the board mapping is the same on both phones") was disproved by the
+    station, not acted on.
+  - The delta reviews, two of them. They found S-1 (a check that could no
+    longer fail) and re-derived the outline maths exactly.
+  - Test & Verify reused the t042c baseline on matching hashes in 5
+    minutes.
+- **Severity:** medium overall. Device time decided the WO's length (about
+  9 h of station emulator time on 2026-10-20 for one product fix and 16
+  kit corrections).

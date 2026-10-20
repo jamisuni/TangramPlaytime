@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Slanted trapezoid  <tspan fill="#8A8FA8" font-size="14" font-weight="400">shapes-convex-12 · difficulty 5 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="103.20,66.00 170.40,133.20 103.20,133.20" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="170.40,133.20 103.20,200.40 103.20,133.20" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="103.20,200.40 69.60,234.00 69.60,166.80" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="69.60,99.60 103.20,99.60 103.20,133.20 69.60,133.20" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="103.20,200.40 69.60,166.80 69.60,133.20 103.20,166.80" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="103.20,166.80 69.60,133.20 103.20,133.20" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="69.60,99.60 103.20,66.00 103.20,99.60" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="318.20,66.00 385.40,133.20 318.20,133.20" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="385.40,133.20 318.20,200.40 318.20,133.20" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="318.20,200.40 284.60,234.00 284.60,166.80" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="284.60,99.60 318.20,99.60 318.20,133.20 284.60,133.20" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="318.20,200.40 284.60,166.80 284.60,133.20 318.20,166.80" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="318.20,166.80 284.60,133.20 318.20,133.20" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="284.60,99.60 318.20,66.00 318.20,99.60" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-shapes-convex-12"><polygon points="533.20,66.00 600.40,133.20 533.20,133.20" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="600.40,133.20 533.20,200.40 533.20,133.20" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="533.20,200.40 499.60,234.00 499.60,166.80" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="499.60,99.60 533.20,99.60 533.20,133.20 499.60,133.20" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="533.20,200.40 499.60,166.80 499.60,133.20 533.20,166.80" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="533.20,166.80 499.60,133.20 533.20,133.20" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/><polygon points="499.60,99.60 533.20,66.00 533.20,99.60" stroke="#000" stroke-width="0.48" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-shapes-convex-12)">
+<rect x="497.6" y="64.0" width="104.80000000000007" height="172.0" fill="#2E6E8E"/>
+<circle cx="528.11" cy="63.62" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="544.74" cy="63.62" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="73.60" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="536.43" cy="73.60" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="533.58" cy="77.88" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="553.06" cy="73.60" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="83.58" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="528.11" cy="83.58" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="544.74" cy="83.58" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="561.37" cy="83.58" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="93.56" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="93.56" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="536.43" cy="93.56" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="553.06" cy="93.56" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="550.21" cy="97.84" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="569.69" cy="93.56" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="103.54" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="103.54" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="528.11" cy="103.54" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="525.26" cy="107.82" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="544.74" cy="103.54" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="561.37" cy="103.54" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="578.00" cy="103.54" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="113.52" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="113.52" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="516.94" cy="117.79" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="536.43" cy="113.52" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="553.06" cy="113.52" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="569.69" cy="113.52" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="566.84" cy="117.79" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="586.32" cy="113.52" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="123.50" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="123.50" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="528.11" cy="123.50" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="544.74" cy="123.50" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="541.89" cy="127.77" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="561.37" cy="123.50" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="578.00" cy="123.50" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="594.64" cy="123.50" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="133.47" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="133.47" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="536.43" cy="133.47" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="533.58" cy="137.75" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="553.06" cy="133.47" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="569.69" cy="133.47" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="586.32" cy="133.47" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="583.47" cy="137.75" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="602.95" cy="133.47" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="143.45" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="143.45" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="508.63" cy="147.73" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="528.11" cy="143.45" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="544.74" cy="143.45" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="561.37" cy="143.45" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="558.52" cy="147.73" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="578.00" cy="143.45" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="594.64" cy="143.45" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="153.43" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="153.43" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="536.43" cy="153.43" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="553.06" cy="153.43" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="550.21" cy="157.71" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="569.69" cy="153.43" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="586.32" cy="153.43" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="163.41" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="163.41" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="528.11" cy="163.41" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="525.26" cy="167.69" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="544.74" cy="163.41" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="561.37" cy="163.41" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="578.00" cy="163.41" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="173.39" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="173.39" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="516.94" cy="177.67" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="536.43" cy="173.39" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="553.06" cy="173.39" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="569.69" cy="173.39" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="183.37" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="183.37" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="528.11" cy="183.37" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="544.74" cy="183.37" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="561.37" cy="183.37" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="193.35" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="193.35" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="536.43" cy="193.35" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="553.06" cy="193.35" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="203.33" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="203.33" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="508.63" cy="207.60" rx="2.38" ry="1.19" fill="#FFFFFF" opacity="0.5"/>
+<circle cx="528.11" cy="203.33" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="544.74" cy="203.33" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="213.30" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="519.79" cy="213.30" r="9.98" fill="#4BA3C7" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="223.28" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="511.48" cy="223.28" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="503.16" cy="233.26" r="9.98" fill="#7A8FD6" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="494.85" cy="243.24" r="9.98" fill="#5CC8C2" stroke="#2E6E8E" stroke-width="1.19" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

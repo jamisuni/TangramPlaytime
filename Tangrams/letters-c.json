@@ -18,8 +18,33 @@
     {"piece": "ST2", "polygon": [[[2, 1], 2], [[2, 1], 0], [[3, 1], 1]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#8ED1F2",
+    "shapes": [
+      {"type": "circle", "c": [2.72, 0.7], "r": 0.36, "fill": "#FFD966"},
+      {"type": "line", "from": [3.19, 0.7], "to": [3.32, 0.7], "stroke": "#FFD966", "width": 0.07},
+      {"type": "line", "from": [3.052, 1.032], "to": [3.144, 1.124], "stroke": "#FFD966", "width": 0.07},
+      {"type": "line", "from": [2.72, 1.17], "to": [2.72, 1.3], "stroke": "#FFD966", "width": 0.07},
+      {"type": "line", "from": [2.388, 1.032], "to": [2.296, 1.124], "stroke": "#FFD966", "width": 0.07},
+      {"type": "line", "from": [2.25, 0.7], "to": [2.12, 0.7], "stroke": "#FFD966", "width": 0.07},
+      {"type": "line", "from": [2.388, 0.368], "to": [2.296, 0.276], "stroke": "#FFD966", "width": 0.07},
+      {"type": "line", "from": [2.72, 0.23], "to": [2.72, 0.1], "stroke": "#FFD966", "width": 0.07},
+      {"type": "line", "from": [3.052, 0.368], "to": [3.144, 0.276], "stroke": "#FFD966", "width": 0.07},
+      {"type": "circle", "c": [0.885, 2.071], "r": 0.231, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [1.221, 1.945], "r": 0.315, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [1.515, 2.092], "r": 0.21, "fill": "#FFFFFF"},
+      {"type": "rect", "x": 0.654, "y": 2.05, "w": 1.092, "h": 0.252, "rx": 0.126, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [0.665, 4.019], "r": 0.209, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [0.969, 3.905], "r": 0.285, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [1.235, 4.038], "r": 0.19, "fill": "#FFFFFF"},
+      {"type": "rect", "x": 0.456, "y": 4.0, "w": 0.988, "h": 0.228, "rx": 0.114, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [2.28, 5.368], "r": 0.198, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [2.568, 5.26], "r": 0.27, "fill": "#FFFFFF"},
+      {"type": "circle", "c": [2.82, 5.386], "r": 0.18, "fill": "#FFFFFF"},
+      {"type": "rect", "x": 2.082, "y": 5.35, "w": 0.936, "h": 0.216, "rx": 0.108, "fill": "#FFFFFF"},
+      {"type": "path", "d": "M1.39,3.01 Q1.47,2.92 1.55,3.05 Q1.63,2.92 1.71,3.01", "stroke": "#2F5D8A", "width": 0.045},
+      {"type": "path", "d": "M1.772,3.268 Q1.836,3.196 1.9,3.3 Q1.964,3.196 2.028,3.268", "stroke": "#2F5D8A", "width": 0.045},
+      {"type": "path", "d": "M3.622,4.318 Q3.686,4.246 3.75,4.35 Q3.814,4.246 3.878,4.318", "stroke": "#2F5D8A", "width": 0.045}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

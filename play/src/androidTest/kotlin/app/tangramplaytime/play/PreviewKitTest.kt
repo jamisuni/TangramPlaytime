@@ -217,6 +217,8 @@ class PreviewKitTest {
         val origin = kit.bounds(PlayTags.BOARD).topLeft
         val dragBox = kit.bounds(PlayTags.dragPiece(piece)).translate(-origin).inflate(16f)
         val pill = if (kit.exists(KitTag.RESTART)) kit.bounds(KitTag.RESTART).translate(-origin) else null
+        // Keeps the widened mask, eroded (not a 3 px distance; a real "3 px in" set is `kit.silhouetteBands`): the stroke is white against the dark silhouette on an
+        // unsolved board with no picture outline drawn, so a near-outline pixel cannot pass for it (decisions.md 2026-10-20 "F3's cause is the REQ-023 A1 leg's inside mask …").
         val deep = kit.silhouetteMask(p).erode(3)
         var hits = 0
         var first = ""

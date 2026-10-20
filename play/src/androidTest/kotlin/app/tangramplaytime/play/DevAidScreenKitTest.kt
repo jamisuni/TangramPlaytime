@@ -36,7 +36,6 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -995,7 +994,12 @@ class DevAidScreenKitTest {
     /** 3 px inside the silhouette: no TYPE-001 piece colour the picture does not name, and no flat silhouette colour unless the picture names it. */
     private fun kitAssertThePictureReplacedThePieces(kit: KitScreen, p: PuzzleDefinition, what: String) {
         val board = kit.capture(PlayTags.BOARD)
-        val inside = kit.silhouetteMask(p).erode(3)
+        // Amended WO-010 (F3, recirculation 6, a look-alike; a corrected check — decisions.md 2026-10-20 "F3's cause is the
+        // REQ-023 A1 leg's inside mask, not the product or the data"): "3 px inside" is measured from the exact outline
+        // (`kit.silhouetteBands`), no longer the polygons widened 0.75 px and eroded by a 7 × 7 square, which at a 315° notch held
+        // pixels 0.46 px from the outline, where the picture's own outline stroke rightly paints the flat silhouette colour
+        // (decisions.md 2026-10-12 "The solve, as drawn"): F3's false red, and kitFirst(WARMUP), shapes-warmup-1, has such a notch.
+        val inside = kit.silhouetteBands(p).inside
         val art = kitArtColours(p.art)
         val foreign = kitPieceColours().filterValues { pc -> art.none { kitNear(it, pc, 6f / 255f) } }
         val silhouetteInArt = art.any { kitNear(it, PlayPalette.silhouette, 6f / 255f) }
@@ -1221,7 +1225,7 @@ class DevAidScreenKitTest {
         kit.advance(KIT_AID_SETTLE_MS)
         check(kit.exists(KitTag.OVERVIEW)) { "kit: a tap on the counter opened no grid" }
         val tag = KitTag.overviewCell(id)
-        rule.onNode(hasTestTag(tag), useUnmergedTree = true).performScrollTo()
+        kit.scrollTo(tag) // WO-010 F2: a scroll that returns under the paused clock (KitScreen.scrollTo)
         kit.advance(500)
         val n = kit.node(tag)
         val visible = kit.bounds(tag)

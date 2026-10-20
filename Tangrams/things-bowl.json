@@ -18,8 +18,17 @@
     {"piece": "ST2", "polygon": [[2, 2], [4, 2], [3, 3]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#2F6F9F",
+    "shapes": [
+      {"type": "rect", "x": -0.2, "y": -0.2, "w": 8.4, "h": 0.55, "fill": "#F2E3C6"},
+      {"type": "rect", "x": -0.2, "y": 0.8, "w": 8.4, "h": 0.42, "fill": "#E9C46A"},
+      {"type": "circle", "c": [2.4, 1.62], "r": 0.13, "fill": "#F2E3C6"},
+      {"type": "circle", "c": [3.2, 1.62], "r": 0.13, "fill": "#F2E3C6"},
+      {"type": "circle", "c": [4.0, 1.62], "r": 0.13, "fill": "#F2E3C6"},
+      {"type": "circle", "c": [4.8, 1.62], "r": 0.13, "fill": "#F2E3C6"},
+      {"type": "circle", "c": [5.6, 1.62], "r": 0.13, "fill": "#F2E3C6"},
+      {"type": "rect", "x": 2.0, "y": 2.95, "w": 4.0, "h": 0.7, "fill": "#1F4E73"}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

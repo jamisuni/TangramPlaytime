@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Letter Q  <tspan fill="#8A8FA8" font-size="14" font-weight="400">letters-q · difficulty 1 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="160.37,142.12 84.25,66.00 160.37,66.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="57.34,146.74 133.46,222.85 57.34,222.85" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="106.54,195.94 144.60,157.88 144.60,234.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="57.34,92.91 84.25,66.00 111.16,92.91 84.25,119.82" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="57.34,92.91 57.34,146.74 84.25,173.65 84.25,119.82" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="133.46,169.03 133.46,115.21 160.37,142.12" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="144.60,195.94 182.66,234.00 144.60,234.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="375.37,142.12 299.25,66.00 375.37,66.00" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="272.34,146.74 348.46,222.85 272.34,222.85" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="321.54,195.94 359.60,157.88 359.60,234.00" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="272.34,92.91 299.25,66.00 326.16,92.91 299.25,119.82" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="272.34,92.91 272.34,146.74 299.25,173.65 299.25,119.82" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="348.46,169.03 348.46,115.21 375.37,142.12" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="359.60,195.94 397.66,234.00 359.60,234.00" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-letters-q"><polygon points="590.37,142.12 514.25,66.00 590.37,66.00" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="487.34,146.74 563.46,222.85 487.34,222.85" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="536.54,195.94 574.60,157.88 574.60,234.00" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="487.34,92.91 514.25,66.00 541.16,92.91 514.25,119.82" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="487.34,92.91 487.34,146.74 514.25,173.65 514.25,119.82" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="563.46,169.03 563.46,115.21 590.37,142.12" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="574.60,195.94 612.66,234.00 574.60,234.00" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-letters-q)">
+<rect x="485.3380951166243" y="64.0" width="129.32380976675148" height="172.0" fill="#F2D49B"/>
+<rect x="483.03" y="61.69" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="504.02" y="61.69" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="525.01" y="61.69" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="546.01" y="61.69" width="18.84" height="18.84" rx="1.35" fill="#A7D8F0"/>
+<rect x="567.00" y="61.69" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="587.99" y="61.69" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="483.03" y="82.69" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="504.02" y="82.69" width="18.84" height="18.84" rx="1.35" fill="#A7D8F0"/>
+<rect x="525.01" y="82.69" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="546.01" y="82.69" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="567.00" y="82.69" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="587.99" y="82.69" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="483.03" y="103.68" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="504.02" y="103.68" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="525.01" y="103.68" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="546.01" y="103.68" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="567.00" y="103.68" width="18.84" height="18.84" rx="1.35" fill="#A7D8F0"/>
+<rect x="587.99" y="103.68" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="483.03" y="124.67" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="504.02" y="124.67" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="546.01" y="124.67" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="567.00" y="124.67" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="587.99" y="124.67" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="483.03" y="145.66" width="18.84" height="18.84" rx="1.35" fill="#A7D8F0"/>
+<rect x="504.02" y="145.66" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="546.01" y="145.66" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="567.00" y="145.66" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="483.03" y="166.65" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="504.02" y="166.65" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="525.01" y="166.65" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="546.01" y="166.65" width="18.84" height="18.84" rx="1.35" fill="#A7D8F0"/>
+<rect x="567.00" y="166.65" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="483.03" y="187.64" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="504.02" y="187.64" width="18.84" height="18.84" rx="1.35" fill="#A7D8F0"/>
+<rect x="525.01" y="187.64" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="546.01" y="187.64" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="567.00" y="187.64" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="483.03" y="208.63" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="504.02" y="208.63" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="525.01" y="208.63" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+<rect x="546.01" y="208.63" width="18.84" height="18.84" rx="1.35" fill="#FFE9A8"/>
+<rect x="567.00" y="208.63" width="18.84" height="18.84" rx="1.35" fill="#A7D8F0"/>
+<rect x="587.99" y="208.63" width="18.84" height="18.84" rx="1.35" fill="#C9A7EB"/>
+<rect x="567.00" y="229.62" width="18.84" height="18.84" rx="1.35" fill="#F4A6B8"/>
+<rect x="587.99" y="229.62" width="18.84" height="18.84" rx="1.35" fill="#9ADBC5"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

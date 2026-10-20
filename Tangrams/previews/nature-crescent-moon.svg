@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Crescent Moon  <tspan fill="#8A8FA8" font-size="14" font-weight="400">nature-crescent-moon · difficulty 4 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="131.15,234.00 131.15,126.35 184.97,180.18" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="184.97,180.18 108.85,104.06 184.97,104.06" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="146.91,66.00 184.97,104.06 108.85,104.06" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="93.09,195.94 131.15,195.94 131.15,234.00 93.09,234.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="70.79,104.06 108.85,66.00 146.91,66.00 108.85,104.06" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="93.09,234.00 55.03,195.94 93.09,195.94" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+<polygon points="93.09,195.94 131.15,157.88 131.15,195.94" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.15" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="346.15,234.00 346.15,126.35 399.97,180.18" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="399.97,180.18 323.85,104.06 399.97,104.06" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="361.91,66.00 399.97,104.06 323.85,104.06" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="308.09,195.94 346.15,195.94 346.15,234.00 308.09,234.00" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="285.79,104.06 323.85,66.00 361.91,66.00 323.85,104.06" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="308.09,234.00 270.03,195.94 308.09,195.94" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+<polygon points="308.09,195.94 346.15,157.88 346.15,195.94" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.08" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-nature-crescent-moon"><polygon points="561.15,234.00 561.15,126.35 614.97,180.18" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="614.97,180.18 538.85,104.06 614.97,104.06" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="576.91,66.00 614.97,104.06 538.85,104.06" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="523.09,195.94 561.15,195.94 561.15,234.00 523.09,234.00" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="500.79,104.06 538.85,66.00 576.91,66.00 538.85,104.06" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="523.09,234.00 485.03,195.94 523.09,195.94" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/><polygon points="523.09,195.94 561.15,157.88 561.15,195.94" stroke="#000" stroke-width="0.54" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-nature-crescent-moon)">
+<rect x="483.02943725152284" y="64.0" width="133.94112549695421" height="172.0" fill="#F6D86B"/>
+<circle cx="592.68" cy="119.82" r="8.07" fill="#E8C04E"/>
+<circle cx="600.75" cy="160.19" r="5.92" fill="#E8C04E"/>
+<circle cx="581.91" cy="192.48" r="6.73" fill="#E8C04E"/>
+<circle cx="544.24" cy="214.01" r="5.38" fill="#E8C04E"/>
+<circle cx="563.07" cy="84.84" r="5.38" fill="#E8C04E"/>
+<path d="M 569.80,142.70 Q 576.53,148.08 583.26,142.70" fill="none" stroke="#B98A2E" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="580.57" cy="156.15" rx="5.38" ry="3.50" fill="#F4A88A"/>
+<path d="M 565.76,161.54 Q 571.15,169.61 577.87,168.26" fill="none" stroke="#B98A2E" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

@@ -39,12 +39,16 @@ class BoardTrayKitTest {
         // the whole silhouette." Oracle: every pixel more than 3 px inside the silhouette (the union of the
         // solution polygons through BoardMapping) is the silhouette colour — including the pixels on the
         // edges the solution pieces share, where an inner line or an anti-aliasing seam would show.
+        // Amended WO-010 (F3, recirculation 6, a look-alike; a corrected check — decisions.md 2026-10-20 "F3's cause is the
+        // REQ-023 A1 leg's inside mask, not the product or the data"): "more than 3 px inside" is measured from the exact outline
+        // (`kit.silhouetteBands`), no longer as the polygons widened 0.75 px and eroded by a 7 × 7 square. At a 315° notch that
+        // mask held pixels 0.46 px from the outline, whose anti-aliased edge blend with the board may differ from the silhouette
+        // colour by more than the tolerance: a false red where grid and notch fall badly. The rule is unchanged.
         kit.show()
         for (p in kitLibrary.puzzles) {
             kit.open(p.id)
             val board = kit.capture(PlayTags.BOARD)
-            val mask = kit.silhouetteMask(p)
-            val deep = mask.erode(3)
+            val deep = kit.silhouetteBands(p).inside
             assertTrue("${p.id}: the silhouette fixture is not empty", deep.count() > 1000)
             var wrong = 0
             var first = ""
@@ -57,13 +61,17 @@ class BoardTrayKitTest {
             }
             assertEquals("${p.id}: pixels inside the silhouette that are not ${kitHex(PlayPalette.silhouette)}; first at $first", 0, wrong)
 
-            // The shared edges themselves: the fixture reads them against the geometry (they lie inside the
-            // eroded mask because each polygon is widened by 0.75 px), then every one is the one colour.
+            // The shared edges themselves: the fixture reads them against the geometry (they lie in the inside
+            // set: a centre on an edge two pieces share is in the union, `kitBands`), then every one is the one colour.
             val origin = kit.bounds(PlayTags.BOARD).topLeft
+            // Amended WO-010 (recirculation 3, a look-alike of F2; a corrected check — run time only): `BoardMappingKey` is read
+            // once per puzzle, on this board under the paused clock, instead of one semantics read per sample and per edge
+            // (`kit.toPx`, `kit.pxPerUnit`, each waiting for a frame). Nothing moves between the samples: every point maps as before.
+            val mapping = kit.mapping()
             var seamSamples = 0
             for (seg in kitInternalEdges(p)) {
-                for (q in kitSamplesAlong(seg, 4.0 / kit.pxPerUnit())) {
-                    val px = kit.toPx(q) - origin
+                for (q in kitSamplesAlong(seg, 4.0 / mapping.pxPerUnit)) {
+                    val px = mapping.toPx(q) - origin
                     val x = px.x.toInt()
                     val y = px.y.toInt()
                     if (!deep[x, y]) continue
@@ -80,13 +88,20 @@ class BoardTrayKitTest {
         // REQ-011 A2: "The silhouette outline matches the puzzle's solution outline exactly." Oracle, over every
         // puzzle: inside the union of the solution polygons (3 px in) every pixel is the silhouette colour;
         // outside it (3 px out) no pixel is; and the `silhouette` node's box is the union's box (tag table).
+        // Amended WO-010 (F3, recirculation 6, a look-alike; a corrected check — decisions.md 2026-10-20 "F3's cause is the
+        // REQ-023 A1 leg's inside mask, not the product or the data"): "3 px in" and "3 px out" are measured from the exact
+        // outline (`kit.silhouetteBands`), no longer as the polygons widened 0.75 px, then eroded or dilated by a 7 × 7 square.
+        // That inside set held pixels 0.46 px from the outline at a 315° notch, whose anti-aliased blend may miss the tolerance
+        // (a false red); that outside set never judged the pixels 3–3.8 px off an edge (to 5 px off a 45° one), nor a notch's tip
+        // out to 11–13 px, where a silhouette bulging past the solution outline would show (decisions.md 2026-10-12 "The solve,
+        // as drawn": "so a concave 45° notch is not bulged"): a hollow check. The rule is unchanged.
         kit.show()
         for (p in kitLibrary.puzzles) {
             kit.open(p.id)
             val board = kit.capture(PlayTags.BOARD)
-            val mask = kit.silhouetteMask(p)
-            val inside = mask.erode(3)
-            val outside = mask.dilate(3).not()
+            val bands = kit.silhouetteBands(p)
+            val inside = bands.inside
+            val outside = bands.outside
             assertTrue("${p.id}: the inside fixture is not empty", inside.count() > 1000)
             assertTrue("${p.id}: the outside fixture is not empty", outside.count() > 1000)
             var missing = 0

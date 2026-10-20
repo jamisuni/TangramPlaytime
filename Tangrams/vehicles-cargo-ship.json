@@ -18,8 +18,19 @@
     {"piece": "ST2", "polygon": [[[0, 5], [0, 1]], [[0, 6], [0, 2]], [[0, 5], [0, 2]]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#1F3A5F",
+    "shapes": [
+      {"type": "rect", "x": -0.2, "y": 2.3, "w": 10.3, "h": 0.7, "fill": "#B5452F"},
+      {"type": "rect", "x": -0.2, "y": 1.41, "w": 10.3, "h": 0.24, "fill": "#EAD9BC"},
+      {"type": "rect", "x": 2.6, "y": -0.2, "w": 1.15, "h": 0.86, "fill": "#B5452F"},
+      {"type": "rect", "x": 3.81, "y": -0.2, "w": 0.89, "h": 0.86, "fill": "#E9B44C"},
+      {"type": "rect", "x": 4.76, "y": -0.2, "w": 1.1, "h": 0.86, "fill": "#2A9D8F"},
+      {"type": "rect", "x": 2.6, "y": 0.72, "w": 1.15, "h": 0.69, "fill": "#2A9D8F"},
+      {"type": "rect", "x": 3.81, "y": 0.72, "w": 0.89, "h": 0.69, "fill": "#B5452F"},
+      {"type": "rect", "x": 4.76, "y": 0.72, "w": 1.1, "h": 0.69, "fill": "#E9B44C"},
+      {"type": "circle", "c": [1.75, 1.98], "r": 0.17, "fill": "#EAD9BC"},
+      {"type": "circle", "c": [8.15, 1.98], "r": 0.17, "fill": "#EAD9BC"}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

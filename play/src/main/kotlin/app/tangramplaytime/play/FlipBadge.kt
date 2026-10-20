@@ -11,6 +11,10 @@
 // rest of the area and the rest of the cell or a piece's 12 dp margin are hit in that order (`HitTest`;
 // decisions.md 2026-10-12 "Inside the parallelogram's tray cell the visible thing wins";
 // capture-outbox/chg-draft-req018-badge-touch-precedence.md, amended twice on 2026-10-12).
+// WO-010 F1 (the floor's DecorationKitTest run, 2026-10-19: the board badge's area reached past the board and the
+// screen on letters-m) · decisions.md 2026-10-12 "Tray decoration numbers from DI-1/DI-2" ("clamped onto the board"):
+// the board badge's whole 60 dp area lies on the board as its disc does; at an edge the area ends at the board's edge
+// and the disc keeps its place, off the area's centre (proposed decisions row of F1).
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
@@ -25,6 +29,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
 import app.tangramplaytime.contracts.PieceId
 import app.tangramplaytime.contracts.PuzzleState
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /** REQ-018 rule (REQ-037): the badge's touch area, dp across. */
@@ -53,7 +59,7 @@ private const val GLYPH_HEAD_DP = 5f
  */
 private const val TRAY_BADGE_DISC_INSET_DP = 21f
 
-/** The board badge: the disc's centre is this far right of the placed PG's box and this far above its top, dp (DI-1 `updateFlip`; decisions row of TASK-014); the 60 dp area is centred on it. */
+/** The board badge: the disc's centre is this far right of the placed PG's box and this far above its top, dp (DI-1 `updateFlip`; decisions row of TASK-014), clamped onto the board; the 60 dp area is centred on it, clamped onto the board on its own (WO-010 F1). */
 private const val BOARD_BADGE_DX_DP = 22f
 private const val BOARD_BADGE_DY_DP = 4f
 
@@ -100,12 +106,19 @@ internal fun badgeSlots(controller: PlayController, g: ScreenGeometry): BadgeSlo
         val cx = (box.right + BOARD_BADGE_DX_DP * density).coerceIn(b.leftPx + radius, b.leftPx + b.width - radius)
         val cy = (box.top - BOARD_BADGE_DY_DP * density).coerceIn(b.topPx + radius, b.topPx + b.height - radius)
         val disc = Offset(cx, cy)
-        BadgePlace(Slot((cx - size / 2f).roundToInt(), (cy - size / 2f).roundToInt(), size, size), disc, radius)
+        // WO-010 F1: the 60 dp area is centred on the disc and then kept on the board too, on its own, so at an edge
+        // it ends at the board's edge and the disc sits off its centre (as in the tray), still wholly inside it.
+        val left = clampOnto((cx - size / 2f).roundToInt(), size, b.left, b.width)
+        val top = clampOnto((cy - size / 2f).roundToInt(), size, b.top, b.height)
+        BadgePlace(Slot(left, top, size, size), disc, radius)
     } else {
         null
     }
     return BadgeSlots(tray, board)
 }
+
+/** [start] moved so that the [size] px from it lie inside the [span] px from [from]; [from] when they cannot. */
+private fun clampOnto(start: Int, size: Int, from: Int, span: Int): Int = max(from, min(start, from + span - size))
 
 /**
  * One flip badge: a node at its 60 dp touch area carrying [tag] (bounds = the touch area, as the tag table

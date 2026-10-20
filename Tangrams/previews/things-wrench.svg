@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Wrench  <tspan fill="#8A8FA8" font-size="14" font-weight="400">things-wrench · difficulty 2 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="144.06,148.16 144.06,234.00 101.14,191.08" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="79.68,126.70 165.52,126.70 122.60,169.62" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="104.83,66.00 135.17,96.35 74.48,96.35" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="135.17,96.35 165.52,96.35 165.52,126.70 135.17,126.70" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="104.83,66.00 135.17,96.35 165.52,96.35 135.17,66.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="113.71,203.65 144.06,234.00 113.71,234.00" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="101.14,191.08 101.14,148.16 122.60,169.62" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="359.06,148.16 359.06,234.00 316.14,191.08" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="294.68,126.70 380.52,126.70 337.60,169.62" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="319.83,66.00 350.17,96.35 289.48,96.35" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="350.17,96.35 380.52,96.35 380.52,126.70 350.17,126.70" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="319.83,66.00 350.17,96.35 380.52,96.35 350.17,66.00" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="328.71,203.65 359.06,234.00 328.71,234.00" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="316.14,191.08 316.14,148.16 337.60,169.62" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-things-wrench"><polygon points="574.06,148.16 574.06,234.00 531.14,191.08" stroke="#000" stroke-width="0.43" stroke-linejoin="round"/><polygon points="509.68,126.70 595.52,126.70 552.60,169.62" stroke="#000" stroke-width="0.43" stroke-linejoin="round"/><polygon points="534.83,66.00 565.17,96.35 504.48,96.35" stroke="#000" stroke-width="0.43" stroke-linejoin="round"/><polygon points="565.17,96.35 595.52,96.35 595.52,126.70 565.17,126.70" stroke="#000" stroke-width="0.43" stroke-linejoin="round"/><polygon points="534.83,66.00 565.17,96.35 595.52,96.35 565.17,66.00" stroke="#000" stroke-width="0.43" stroke-linejoin="round"/><polygon points="543.71,203.65 574.06,234.00 543.71,234.00" stroke="#000" stroke-width="0.43" stroke-linejoin="round"/><polygon points="531.14,191.08 531.14,148.16 552.60,169.62" stroke="#000" stroke-width="0.43" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-things-wrench)">
+<rect x="502.4759359652883" y="64.0" width="95.04812806942346" height="172.0" fill="#8D99A6"/>
+<line x1="528.08" y1="79.31" x2="573.15" y2="79.31" fill="none" stroke="#C3CCD6" stroke-width="3.43" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="525.94" y1="135.75" x2="579.59" y2="135.75" fill="none" stroke="#C3CCD6" stroke-width="3.43" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="525.94" y="181.89" width="53.65" height="55.80" rx="0.00" fill="#2E86AB"/>
+<line x1="525.94" y1="194.76" x2="579.59" y2="194.76" fill="none" stroke="#1F5F7F" stroke-width="1.72" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="525.94" y1="205.49" x2="579.59" y2="205.49" fill="none" stroke="#1F5F7F" stroke-width="1.72" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="560.27" cy="221.59" r="3.65" fill="#1F5F7F"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

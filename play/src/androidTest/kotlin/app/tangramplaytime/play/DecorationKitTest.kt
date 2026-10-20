@@ -28,6 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
@@ -260,9 +261,11 @@ class DecorationKitTest {
         // drawn where it was (within 1 px) over the next 40 frames. Preferred: a neighbour the engine lets turn (a
         // visible turn), then a PG whose mirror locks (the wrong outcome would be a visible mirror); the bundled
         // puzzles may offer neither, and then the shake tells the two pieces apart.
+        // Amended WO-010 (F1 kit half, a corrected check): a candidate board whose drawn disc cannot be read without doubt
+        // is passed over by the search (named in the failure below), instead of ending the search; the oracle is unchanged.
         kit.show()
-        val case = findBoardBadgeOverlap()
-            ?: throw AssertionError("kit: no bundled puzzle places another piece's drawn shape inside the board badge's 60 dp area outside its 38 dp disc")
+        val passedOver = ArrayList<String>()
+        val case = badgeOverlapOrFail(findBoardBadgeOverlap(passedOver), passedOver)
         val p = case.puzzle
         val n = case.neighbour
         kit.open(p.id)
@@ -542,6 +545,121 @@ class DecorationKitTest {
         assertTrue("${p.id}: outline pixels in the cell of the placed $piece", outlineInk >= 10)
     }
 
+    // ── Kit self-checks (no token): the disc reading and the badge search (reviews/WO-010-code-review-delta.md S-1) ────
+    // The two readings the board-badge pin rests on are shown to discriminate, as WO-010 TASK-041 showed its pins. The disc
+    // reading gets crafted images of the TASK-014 row's badge (a 38 dp white disc, a 2.5 dp accent ring, an accent ⇋
+    // glyph) at the floor image's 2.625 px/dp. The search runs on the bundled boards with a reading made to doubt.
+
+    @Test // kit self-check, no token: reviews/WO-010-code-review-delta.md S-1 — the disc reading keeps the floor's seam pockets and doubts a second disc or ring
+    fun kitSelfCheckTheDiscReadingKeepsSeamPocketsAndDoubtsASecondDiscOrRing() {
+        val d = 2.625f // px per dp of the floor image (1080 × 2400 px at 420 dpi)
+        val cx = 110f
+        val cy = 106f
+        fun read(name: String, image: KitDiscImage) = readDiscIn(image.w, image.h, image::at, null, d, "in the self-check image `$name`")
+        fun badge(i: KitDiscImage) { i.ring(cx, cy, d); i.glyph(cx, cy, d) }
+        // A solid accent triangle (LT2's colour) whose corner lies inside the ring band, as LT2's corner did on the floor's letters-m.
+        fun lt2(i: KitDiscImage) = i.triangle(Offset(cx - 17f * d, cy + 4f * d), Offset(cx - 17f * d - 70f, cy + 4f * d), Offset(cx - 17f * d, cy + 4f * d + 70f))
+        val pocketsRight = (cx - 19f * d).toInt() - 2 // left of the ring's outer edge: outside the inside's box, as the floor's pockets were
+        val reads = linkedMapOf(
+            "a plain disc" to KitDiscImage(212, 212).also { badge(it) },
+            "a disc with a solid accent triangle on its ring" to KitDiscImage(212, 212).also { badge(it); lt2(it) },
+            // run log f2-s1: letters-m (PG + LT2) left 24 enclosed px in 6 regions outside the inside's box, the largest 12 px
+            "letters-m's case: the triangle on the ring and seam pockets of 24 px in 6 regions" to
+                KitDiscImage(212, 212).also { badge(it); lt2(it); it.pockets(pocketsRight, 4, listOf(4 to 3, 2 to 2, 2 to 2, 2 to 1, 1 to 1, 1 to 1)) },
+            // run log f2-s1: the floor's largest, 137 px in 50 regions, the largest 15 px (shapes-warmup-4, shapes-trapezoid)
+            "the floor's largest seam: pockets of 137 px in 50 regions" to
+                KitDiscImage(212, 212).also { badge(it); it.pockets(pocketsRight, 4, listOf(5 to 3) + List(24) { 3 to 1 } + List(25) { 2 to 1 }) },
+        )
+        for ((name, image) in reads) {
+            val r = read(name, image)
+            val disc = r.disc ?: throw AssertionError("kit self-check: $name must read; it is in doubt: ${r.doubt}")
+            assertTrue("kit self-check: $name — the centre ${disc.centre}, expected ($cx, $cy) within 1 px", abs(disc.centre.x - cx) <= 1f && abs(disc.centre.y - cy) <= 1f)
+            assertTrue("kit self-check: $name — the drawn radius ${disc.radiusPx} px, expected 19 dp (${19f * d} px) within 2 px", abs(disc.radiusPx - 19f * d) <= 2f)
+        }
+        val doubts = linkedMapOf(
+            "a second disc beside the first" to
+                KitDiscImage(212, 212).also { it.ring(55f, cy, d); it.glyph(55f, cy, d); it.ring(158f, cy, d); it.glyph(158f, cy, d) },
+            "a doubled ring 10 px off the first" to KitDiscImage(212, 212).also { badge(it); it.ring(cx + 10f, cy, d) },
+            "a doubled ring 20 px off the first" to KitDiscImage(212, 212).also { badge(it); it.ring(cx + 20f, cy, d) },
+            "seam pockets of 600 px, more than a tenth of the inside" to KitDiscImage(212, 212).also { badge(it); it.pockets(pocketsRight, 4, List(300) { 2 to 1 }) },
+            "no ring, the glyph alone" to KitDiscImage(212, 212).also { it.glyph(cx, cy, d) },
+        )
+        for ((name, image) in doubts) {
+            val r = read(name, image)
+            assertTrue("kit self-check: $name must be a reading in doubt; it read ${r.disc}", r.disc == null && r.doubt != null)
+            android.util.Log.i("KitScreen", "self-check: $name — in doubt: ${r.doubt}")
+        }
+    }
+
+    @Test // kit self-check, no token: reviews/WO-010-code-review-delta.md S-1 — the badge search passes over a board in doubt and goes on, and the leg fails loudly when no case is left
+    fun kitSelfCheckTheBadgeSearchPassesOverABoardInDoubtAndFailsLoudlyWithNoneLeft() {
+        kit.show()
+        val doubt = "kit: a reading the self-check made to doubt"
+        // (1) The first board that gives the pin's case, read as the leg reads it.
+        val a = findBoardBadgeOverlap(ArrayList(), firstCaseOnly = true) ?: throw AssertionError("kit self-check: no bundled board gives the pin's case at all")
+        // (2) That board's reading in doubt: it is passed over and named, and the search goes on to another case.
+        val passed = ArrayList<String>()
+        val b = findBoardBadgeOverlap(passed, firstCaseOnly = true, read = { c, n -> if (kit.puzzle.id == a.puzzle.id) DiscReading(null, doubt) else readDrawnDisc(c, n) })
+        assertTrue("kit self-check: ${a.puzzle.id}'s board, in doubt, is named among the boards passed over: $passed", passed.any { it.startsWith("${a.puzzle.id} (") && it.endsWith(doubt) })
+        assertTrue("kit self-check: the search goes on past ${a.puzzle.id} to another case (found ${b?.puzzle?.id})", b != null && b.puzzle.id != a.puzzle.id)
+        // (3) Every reading in doubt, over the bundled puzzles up to and including that board's: no case is left, and the leg's
+        // failure is loud and names each board passed over.
+        val upToA = kitLibrary.puzzles.subList(0, kitLibrary.puzzles.indexOf(a.puzzle) + 1)
+        val all = ArrayList<String>()
+        val c = findBoardBadgeOverlap(all, puzzles = upToA, read = { _, _ -> DiscReading(null, doubt) })
+        assertTrue("kit self-check: with every reading in doubt no case is left (found ${c?.puzzle?.id})", c == null)
+        assertTrue("kit self-check: ${a.puzzle.id}'s board is among the boards passed over: $all", all.any { it.startsWith("${a.puzzle.id} (") })
+        val failure = try {
+            badgeOverlapOrFail(c, all)
+            null
+        } catch (e: AssertionError) {
+            e
+        }
+        assertTrue("kit self-check: the leg fails loudly when no case is left", failure != null)
+        for (entry in all) assertTrue("kit self-check: the failure names the board passed over `$entry`: ${failure?.message}", failure?.message?.contains(entry) == true)
+    }
+
+    /** A crafted accent image for the disc reading's self-check: `true` where the accent colour is drawn, read at pixel centres. */
+    private class KitDiscImage(val w: Int, val h: Int) {
+        private val accent = BooleanArray(w * h)
+
+        fun at(x: Float, y: Float): Boolean = x >= 0f && y >= 0f && x.toInt() < w && y.toInt() < h && accent[y.toInt() * w + x.toInt()]
+
+        private fun paint(inside: (Float, Float) -> Boolean) {
+            for (y in 0 until h) for (x in 0 until w) if (inside(x + 0.5f, y + 0.5f)) accent[y * w + x] = true
+        }
+
+        /** The TASK-014 row's ring: a 2.5 dp accent band whose outer edge is the 38 dp disc's. */
+        fun ring(cx: Float, cy: Float, d: Float) = paint { x, y -> hypot(x - cx, y - cy).let { it >= 16.5f * d && it <= 19f * d } }
+
+        /** A ⇋-like glyph: two accent bars 18 dp long and 2 dp thick, 4 dp above and below the centre, clear of the ring. */
+        fun glyph(cx: Float, cy: Float, d: Float) = paint { x, y -> abs(x - cx) <= 9f * d && (abs(y - cy - 4f * d) <= d || abs(y - cy + 4f * d) <= d) }
+
+        /** A solid accent triangle. */
+        fun triangle(a: Offset, b: Offset, c: Offset) = paint { x, y ->
+            fun side(p: Offset, q: Offset) = (x - q.x) * (p.y - q.y) - (p.x - q.x) * (y - q.y)
+            val s1 = side(a, b)
+            val s2 = side(b, c)
+            val s3 = side(c, a)
+            !((s1 < 0f || s2 < 0f || s3 < 0f) && (s1 > 0f || s2 > 0f || s3 > 0f))
+        }
+
+        /** Seam pockets: each hole (`width` × `height` px) inside a 1 px accent frame, the frames stacked 1 px apart in columns ending at [xRight]. */
+        fun pockets(xRight: Int, yTop: Int, holes: List<Pair<Int, Int>>) {
+            var x = xRight
+            var y = yTop
+            for ((hw, hh) in holes) {
+                val fw = hw + 2
+                val fh = hh + 2
+                if (y + fh > h - 12) { y = yTop; x -= 6 }
+                for (j in 0 until fh) for (i in 0 until fw) {
+                    if (i == 0 || j == 0 || i == fw - 1 || j == fh - 1) accent[(y + j) * w + (x - fw + 1 + i)] = true
+                }
+                y += fh + 1
+            }
+        }
+    }
+
     // ── helpers of this file ───────────────────────────────────────────────────────────────────────────
 
     private class MirrorCase(val puzzle: PuzzleDefinition, val neighbour: PieceId?, val before: Placement, val after: Placement)
@@ -775,19 +893,36 @@ class DecorationKitTest {
     /** The flip badge's disc as drawn: its centre and its radius to the ring's outer edge, in `play-screen` px. */
     private data class DrawnDisc(val centre: Offset, val radiusPx: Float)
 
+    /** A reading of the drawn disc: the disc, or (`disc` null) the `kit:` reason it cannot be read without doubt. */
+    private class DiscReading(val disc: DrawnDisc?, val doubt: String?)
+
+    /** The badge's disc read from the drawing ([readDrawnDisc]); a reading in doubt fails the test with its `kit:` reason. */
+    private fun drawnDisc(captureTag: String, nodeTag: String): DrawnDisc {
+        val reading = readDrawnDisc(captureTag, nodeTag)
+        return reading.disc ?: throw IllegalStateException(reading.doubt)
+    }
+
     /**
      * The badge's disc located from the drawing, never from its node or a constant (decisions.md 2026-10-12 "What
      * 'drawn' means in the touch order": the disc is not centred in its 60 dp area). The disc is a white disc with
      * an accent ring and an accent ⇋ glyph inside (decisions.md TASK-014 row). In the [captureTag] capture, within
      * the [nodeTag] node's bounds grown by 8 dp: the pixels not of the accent colour that cannot be reached from the
-     * region's border without crossing an accent pixel are the disc's inside, enclosed by its ring. Colour alone is
-     * not enough: LT2 is drawn in the accent colour and can lie under the board badge; a solid piece only thickens
-     * the walls and encloses nothing. The bounding box of the inside gives the centre; the drawn radius is the
-     * ring's outer edge, measured on 16 rays from the centre (a ray that runs on into an accent-coloured piece,
-     * more than 5 dp past the inside, is skipped; the median of the rest). Checked: the inside is square within
-     * 3 px, 20–46 dp across and fills at least half its circle; at least 8 rays measure the ring.
+     * region's border without crossing an accent pixel are enclosed. Colour alone is not enough: LT2 is drawn in the
+     * accent colour and can lie under the board badge; a solid piece only thickens the walls. The disc's inside is
+     * the largest enclosed region (4-connected), with the regions lying wholly inside its bounding box (pockets of
+     * the glyph's strokes). *Amended WO-010 (F1 kit half, a corrected check):* where an accent piece touches the ring
+     * from outside, the anti-aliased seam between the two can enclose a few pixels beyond the ring (on the floor,
+     * `letters-m` with PG + LT2: the box read 94 × 88 px); such a pocket is cut off from the inside by the ring, is
+     * not the disc's, and no longer widens the box. The bounding box of the inside gives the centre; the drawn radius
+     * is the ring's outer edge, measured on 16 rays from the centre (a ray that runs on into an accent-coloured piece,
+     * more than 5 dp past the inside, is skipped; the median of the rest). Checked: the inside is square within 3 px,
+     * 20–46 dp across and fills at least half its circle; at least 8 rays measure the ring. A check that fails is a
+     * reading in doubt: the `kit:` reason is returned, never a guess. *Amended WO-010 (recirculation 4, delta code review
+     * S-1; a corrected check):* the pixels enclosed outside the inside's box may be a seam pocket, never a second disc or
+     * ring: more than a tenth of the inside there is a reading in doubt ([readDiscIn]). The reading of the region is
+     * [readDiscIn], which the kit's self-checks feed with crafted images.
      */
-    private fun drawnDisc(captureTag: String, nodeTag: String): DrawnDisc {
+    private fun readDrawnDisc(captureTag: String, nodeTag: String): DiscReading {
         val captureBounds = kit.bounds(captureTag)
         val image = kit.capture(captureTag)
         val region = kit.bounds(nodeTag).inflate(kit.dp(8f)).intersect(captureBounds)
@@ -795,10 +930,27 @@ class DecorationKitTest {
         val y0 = (region.top - captureBounds.top).toInt().coerceIn(0, image.height - 1)
         val w = ((region.right - captureBounds.left).toInt().coerceIn(0, image.width)) - x0
         val h = ((region.bottom - captureBounds.top).toInt().coerceIn(0, image.height)) - y0
-        check(w > 2 && h > 2) { "kit: no capture area around `$nodeTag`" }
+        if (!(w > 2 && h > 2)) return DiscReading(null, "kit: no capture area around `$nodeTag`")
         fun accentAt(cx: Int, cy: Int): Boolean =
             cx in 0 until image.width && cy in 0 until image.height && kitNear(image[cx, cy], PlayPalette.accent, 24f / 255f)
-        val accent = BooleanArray(w * h) { i -> accentAt(x0 + i % w, y0 + i / w) }
+        // Amended WO-004 (TASK-019): In progress the Restart pill is drawn at the board's top-left, above the silhouette
+        // (S-22 "Restart"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn"); see [readDiscIn].
+        val pill = if (captureTag == PlayTags.BOARD && kit.exists(KitTag.RESTART)) kit.bounds(KitTag.RESTART) else null
+        val inPill: ((Int, Int) -> Boolean)? = pill?.let { r -> { x, y -> r.contains(Offset(captureBounds.left + x0 + x + 0.5f, captureBounds.top + y0 + y + 0.5f)) } }
+        val context = "near `$nodeTag` ${kit.bounds(nodeTag)} in ${kit.puzzle.id} (placed ${kit.placed().map { it.piece }})"
+        val reading = readDiscIn(w, h, { x, y -> accentAt((x0 + x).toInt(), (y0 + y).toInt()) }, inPill, kit.density, context)
+        val inRegion = reading.disc ?: return reading
+        return DiscReading(DrawnDisc(Offset(captureBounds.left + x0 + inRegion.centre.x, captureBounds.top + y0 + inRegion.centre.y), inRegion.radiusPx), null)
+    }
+
+    /**
+     * [readDrawnDisc]'s reading of one region, `w` × `h` px, in the region's own px: [accentAt] says whether a point is the
+     * accent colour (pixel `(x, y)` is asked at `(x.toFloat(), y.toFloat())`; a ray may ask outside the region), [inPill]
+     * whether a region pixel lies in the Restart pill, [pxPerDp] the density. The disc it returns has its centre in region px.
+     */
+    private fun readDiscIn(w: Int, h: Int, accentAt: (Float, Float) -> Boolean, inPill: ((Int, Int) -> Boolean)?, pxPerDp: Float, context: String): DiscReading {
+        fun doubt(reason: String) = DiscReading(null, reason)
+        val accent = BooleanArray(w * h) { i -> accentAt((i % w).toFloat(), (i / w).toFloat()) }
         // Flood the non-accent pixels from the region's border; what stays unreached is enclosed by accent pixels.
         val reached = BooleanArray(w * h)
         val queue = IntArray(w * h)
@@ -823,8 +975,7 @@ class DecorationKitTest {
         // (S-22 "Restart"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn"). Where it lies in
         // the region, its own outline or label can enclose pixels too (the pill's inside, a letter's counter). An enclosed
         // component lying wholly inside the `restart` node is the pill's, never the disc's, and is not counted.
-        if (captureTag == PlayTags.BOARD && kit.exists(KitTag.RESTART)) {
-            val pill = kit.bounds(KitTag.RESTART)
+        if (inPill != null) {
             val component = IntArray(w * h)
             for (start in 0 until w * h) {
                 if (!enclosed[start]) continue
@@ -837,7 +988,7 @@ class DecorationKitTest {
                     val i = component[k++]
                     val x = i % w
                     val y = i / w
-                    if (!pill.contains(Offset(captureBounds.left + x0 + x + 0.5f, captureBounds.top + y0 + y + 0.5f))) allInPill = false
+                    if (!inPill(x, y)) allInPill = false
                     for (j in listOf(if (x > 0) i - 1 else -1, if (x < w - 1) i + 1 else -1, if (y > 0) i - w else -1, if (y < h - 1) i + w else -1)) {
                         if (j >= 0 && !accent[j] && !reached[j] && enclosed[j]) { enclosed[j] = false; component[n++] = j }
                     }
@@ -847,44 +998,91 @@ class DecorationKitTest {
             }
             for (i in 0 until w * h) enclosed[i] = !accent[i] && !reached[i]
         }
-        var minX = Int.MAX_VALUE
-        var minY = Int.MAX_VALUE
-        var maxX = -1
-        var maxY = -1
-        var inside = 0
-        for (i in 0 until w * h) {
-            if (!enclosed[i]) continue
-            val x = i % w
-            val y = i / w
-            inside++
-            minX = min(minX, x); maxX = max(maxX, x)
-            minY = min(minY, y); maxY = max(maxY, y)
+        // The enclosed regions (4-connected, as the flood), each with its size and bounding box.
+        val label = IntArray(w * h) { -1 }
+        val stack = IntArray(w * h)
+        val sizes = ArrayList<Int>()
+        val boxes = ArrayList<IntArray>() // minX, minY, maxX, maxY
+        for (start in 0 until w * h) {
+            if (!enclosed[start] || label[start] >= 0) continue
+            val id = sizes.size
+            var top = 0
+            var n = 0
+            var bx0 = Int.MAX_VALUE
+            var by0 = Int.MAX_VALUE
+            var bx1 = -1
+            var by1 = -1
+            label[start] = id
+            stack[top++] = start
+            while (top > 0) {
+                val i = stack[--top]
+                n++
+                val x = i % w
+                val y = i / w
+                bx0 = min(bx0, x); bx1 = max(bx1, x)
+                by0 = min(by0, y); by1 = max(by1, y)
+                for (j in intArrayOf(if (x > 0) i - 1 else -1, if (x < w - 1) i + 1 else -1, if (y > 0) i - w else -1, if (y < h - 1) i + w else -1)) {
+                    if (j >= 0 && enclosed[j] && label[j] < 0) { label[j] = id; stack[top++] = j }
+                }
+            }
+            sizes += n
+            boxes += intArrayOf(bx0, by0, bx1, by1)
         }
-        val context = "near `$nodeTag` ${kit.bounds(nodeTag)} in ${kit.puzzle.id} (placed ${kit.placed().map { it.piece }})"
-        check(inside > 0) { "kit: no pixel enclosed by the badge's accent ring $context" }
+        if (sizes.isEmpty()) return doubt("kit: no pixel enclosed by the badge's accent ring $context")
+        val main = sizes.indices.maxByOrNull { sizes[it] }!!
+        val (minX, minY, maxX, maxY) = boxes[main]
+        var inside = 0
+        var outsideBox = 0
+        var outsideRegions = 0
+        var largestOutside = 0
+        for (k in sizes.indices) {
+            val b = boxes[k]
+            if (b[0] >= minX && b[1] >= minY && b[2] <= maxX && b[3] <= maxY) {
+                inside += sizes[k]
+            } else {
+                outsideBox += sizes[k]
+                outsideRegions++
+                largestOutside = max(largestOutside, sizes[k])
+            }
+        }
+        if (outsideBox > 0) {
+            android.util.Log.i(
+                "KitScreen",
+                "drawn disc $context: $outsideBox enclosed px in $outsideRegions regions outside the inside's box (largest $largestOutside px), " +
+                    "inside $inside px (${"%.1f".format(100.0 * outsideBox / max(1, inside))} %)",
+            )
+        }
+        // Amended WO-010 (recirculation 4, delta code review S-1; a corrected check): outside the inside's box, an enclosed
+        // region may only be a seam pocket where an accent piece meets the ring. On the floor, over every PG board, the largest
+        // total was 137 px in 50 regions, none above 15 px: 2.6 % of a 5,370 px inside (shapes-warmup-4 and shapes-trapezoid,
+        // with LT2 on the ring; run log f2-s1, as in f2-sA and f2-sC). More than a tenth of the inside outside its box is a
+        // second disc or ring drawn beside the first, never a seam (the kit self-check below shows both sides).
+        if (outsideBox * 10 > inside) {
+            return doubt("kit: $outsideBox enclosed px in $outsideRegions regions lie outside the disc's inside ($inside px), more than a tenth of it — a second disc or ring? $context")
+        }
         val bw = (maxX - minX + 1).toFloat()
         val bh = (maxY - minY + 1).toFloat()
-        check(kotlin.math.abs(bw - bh) <= 3f) { "kit: the enclosed pixels span $bw × $bh px — not one disc's inside $context" }
-        check(bw >= kit.dp(20f) && bw <= kit.dp(46f)) { "kit: the disc's inside is ${bw / kit.density} dp across $context" }
+        if (kotlin.math.abs(bw - bh) > 3f) return doubt("kit: the enclosed pixels span $bw × $bh px — not one disc's inside $context")
+        if (!(bw >= 20f * pxPerDp && bw <= 46f * pxPerDp)) return doubt("kit: the disc's inside is ${bw / pxPerDp} dp across $context")
         val rIn = bw / 2f
-        check(inside >= 0.5 * Math.PI * rIn * rIn) { "kit: only $inside enclosed pixels in a ${bw / kit.density} dp box $context" }
-        val cx = x0 + (minX + maxX + 1) / 2f
-        val cy = y0 + (minY + maxY + 1) / 2f
+        if (inside < 0.5 * Math.PI * rIn * rIn) return doubt("kit: only $inside enclosed pixels in a ${bw / pxPerDp} dp box $context")
+        val cx = (minX + maxX + 1) / 2f
+        val cy = (minY + maxY + 1) / 2f
         val radii = ArrayList<Float>()
         for (k in 0 until 16) {
             val rad = Math.toRadians(k * 22.5)
             var r = rIn - 2f
             var sawRing = false
-            while (r <= rIn + kit.dp(5f)) {
-                val a = accentAt((cx + r * kotlin.math.cos(rad)).toInt(), (cy + r * kotlin.math.sin(rad)).toInt())
+            while (r <= rIn + 5f * pxPerDp) {
+                val a = accentAt(cx + r * kotlin.math.cos(rad).toFloat(), cy + r * kotlin.math.sin(rad).toFloat())
                 if (a) sawRing = true
                 if (sawRing && !a) break
                 r += 0.5f
             }
-            if (sawRing && r <= rIn + kit.dp(5f)) radii += r
+            if (sawRing && r <= rIn + 5f * pxPerDp) radii += r
         }
-        check(radii.size >= 8) { "kit: the ring's outer edge was measured on ${radii.size} of 16 rays $context" }
-        return DrawnDisc(Offset(captureBounds.left + cx, captureBounds.top + cy), radii.sorted()[radii.size / 2])
+        if (radii.size < 8) return doubt("kit: the ring's outer edge was measured on ${radii.size} of 16 rays $context")
+        return DiscReading(DrawnDisc(Offset(cx, cy), radii.sorted()[radii.size / 2]), null)
     }
 
     /**
@@ -917,17 +1115,36 @@ class DecorationKitTest {
      * solution piece whose shape reaches deepest into the badge area outside the disc placed beside it. Ranked:
      * 0 when the engine lets that piece turn in place (the right outcome is a visible turn), 1 when the PG's
      * mirror locks in place (the wrong outcome is a visible mirror), 2 otherwise (told apart by the shake's piece).
+     * *Amended WO-010 (F1 kit half, a corrected check):* a board whose drawn disc cannot be read without doubt
+     * ([readDrawnDisc]) is passed over — the puzzle with the PG alone, or that neighbour with the PG — and named in
+     * [passedOver]; it no longer stops the search over the other puzzles. The caller fails loudly when no case is left
+     * ([badgeOverlapOrFail]).
+     * *Amended WO-010 (recirculation 4, delta code review S-1):* the leg calls it with the defaults (every bundled puzzle,
+     * [readDrawnDisc], the best rank over all). The kit's self-check gives it a [read] that doubts chosen boards, a shorter
+     * [puzzles] list, or [firstCaseOnly] (the first case found, not the best), so that the pass-over can be shown to run.
      */
-    private fun findBoardBadgeOverlap(): BadgeOverlap? {
+    private fun findBoardBadgeOverlap(
+        passedOver: MutableList<String>,
+        puzzles: List<PuzzleDefinition> = kitLibrary.puzzles,
+        read: (String, String) -> DiscReading = { captureTag, nodeTag -> readDrawnDisc(captureTag, nodeTag) },
+        firstCaseOnly: Boolean = false,
+    ): BadgeOverlap? {
         val found = ArrayList<BadgeOverlap>()
-        for (p in kitLibrary.puzzles) {
+        fun passOver(p: PuzzleDefinition, doubt: String?) {
+            passedOver += "${p.id} (placed ${kit.placed().map { it.piece }}): $doubt"
+            android.util.Log.i("KitScreen", "board badge overlap: passed over ${passedOver.last()}")
+        }
+        for (p in puzzles) {
+            if (firstCaseOnly && found.isNotEmpty()) break
             if (PieceId.PG !in p.pieces) continue
             kit.open(p.id)
             if (!setUpBoard(p, setOf(PieceId.PG))) continue
             settle()
             if (!kit.exists(PlayTags.FLIP_BADGE_BOARD)) continue
             val area = kit.bounds(PlayTags.FLIP_BADGE_BOARD)
-            val disc = drawnDisc(PlayTags.BOARD, PlayTags.FLIP_BADGE_BOARD)
+            val first = read(PlayTags.BOARD, PlayTags.FLIP_BADGE_BOARD)
+            val disc = first.disc
+            if (disc == null) { passOver(p, first.doubt); continue }
             val reaching = p.solution.filter { it.piece != PieceId.PG }
                 .mapNotNull { sp -> badgeTapPoint(area, disc, sp.polygon.map { kit.toPx(it) })?.let { sp.piece to it.second } }
                 .sortedByDescending { it.second }
@@ -935,7 +1152,10 @@ class DecorationKitTest {
                 if (!setUpBoard(p, setOf(PieceId.PG, n))) continue
                 settle()
                 if (!kit.exists(PlayTags.FLIP_BADGE_BOARD)) continue
-                badgeTapPoint(kit.bounds(PlayTags.FLIP_BADGE_BOARD), drawnDisc(PlayTags.BOARD, PlayTags.FLIP_BADGE_BOARD), kit.boardPolygonPx(PlayTags.boardPiece(n))) ?: continue
+                val again = read(PlayTags.BOARD, PlayTags.FLIP_BADGE_BOARD)
+                val discNow = again.disc
+                if (discNow == null) { passOver(p, again.doubt); continue }
+                badgeTapPoint(kit.bounds(PlayTags.FLIP_BADGE_BOARD), discNow, kit.boardPolygonPx(PlayTags.boardPiece(n))) ?: continue
                 val dp = kit.onMain { kit.controller.boardDpPerUnit }
                 val placed = kit.placed()
                 val q = placed.single { it.piece == n }
@@ -952,6 +1172,13 @@ class DecorationKitTest {
         }
         return found.minByOrNull { it.rank }
     }
+
+    /** The leg's case, or its loud failure when the search left none, naming the boards it passed over (S-1). */
+    private fun badgeOverlapOrFail(case: BadgeOverlap?, passedOver: List<String>): BadgeOverlap =
+        case ?: throw AssertionError(
+            "kit: no bundled puzzle places another piece's drawn shape inside the board badge's 60 dp area outside its 38 dp disc" +
+                if (passedOver.isEmpty()) "" else "; ${passedOver.size} boards passed over, their drawn disc not read without doubt: $passedOver",
+        )
 
     /** The drawn shape is [drawn] and not [other]: the pixels only [drawn] covers are the PG colour, the pixels only [other] covers are not. */
     private fun assertDrawnPose(what: String, drawn: List<Offset>, other: List<Offset>, captureTag: String, avoid: List<Rect>) {

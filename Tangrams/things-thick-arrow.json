@@ -18,8 +18,11 @@
     {"piece": "ST2", "polygon": [[[0, 1], 2], [0, [2, 1]], [0, 2]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#3A7CA5",
+    "shapes": [
+      {"type": "polygon", "points": [[4.243, -0.3], [6.6, 2.0], [4.243, 4.3]], "fill": "#2B5F80"},
+      {"type": "polygon", "points": [[0.4, 1.7], [4.5, 1.7], [4.5, 1.25], [5.3, 2.0], [4.5, 2.75], [4.5, 2.3], [0.4, 2.3]], "fill": "#9CC9E8"}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

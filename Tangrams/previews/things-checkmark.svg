@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="665" height="290" viewBox="0 0 665 290" font-family="Nunito, Arial, sans-serif">
+<rect width="665" height="290" fill="#FBF8F2"/>
+<text x="20" y="32" font-size="20" font-weight="700" fill="#2B2D42">Checkmark  <tspan fill="#8A8FA8" font-size="14" font-weight="400">things-checkmark · difficulty 3 · 7 pieces</tspan></text>
+<rect x="20" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="90.89,216.26 36.00,161.37 90.89,161.37" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="145.78,161.37 90.89,216.26 90.89,161.37" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="145.78,161.37 106.97,161.37 145.78,122.55" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="165.19,103.15 184.59,83.74 204.00,103.15 184.59,122.55" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="145.78,161.37 145.78,122.55 165.19,103.15 165.19,141.96" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="74.81,161.37 36.00,161.37 55.41,141.96" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+<polygon points="165.19,141.96 165.19,103.15 184.59,122.55" fill="#4A4E69" stroke="#4A4E69" stroke-width="2.00" stroke-linejoin="round"/>
+</g>
+<text x="120.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Silhouette (what the player sees)</text>
+<rect x="235" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<g>
+<polygon points="305.89,216.26 251.00,161.37 305.89,161.37" fill="#E8505B" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="360.78,161.37 305.89,216.26 305.89,161.37" fill="#3D8BFD" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="360.78,161.37 321.97,161.37 360.78,122.55" fill="#F9A826" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="380.19,103.15 399.59,83.74 419.00,103.15 399.59,122.55" fill="#FFD23F" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="360.78,161.37 360.78,122.55 380.19,103.15 380.19,141.96" fill="#FF7AB8" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="289.81,161.37 251.00,161.37 270.41,141.96" fill="#2DBE7E" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+<polygon points="380.19,141.96 380.19,103.15 399.59,122.55" fill="#9B5DE5" stroke="#FFFFFF" stroke-width="1.00" stroke-linejoin="round"/>
+</g>
+<text x="335.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Pieces (the moment of solving)</text>
+<rect x="450" y="50" width="200" height="200" rx="14" fill="#FFFFFF" stroke="#E6E1D6"/>
+<clipPath id="clip-things-checkmark"><polygon points="520.89,216.26 466.00,161.37 520.89,161.37" stroke="#000" stroke-width="0.39" stroke-linejoin="round"/><polygon points="575.78,161.37 520.89,216.26 520.89,161.37" stroke="#000" stroke-width="0.39" stroke-linejoin="round"/><polygon points="575.78,161.37 536.97,161.37 575.78,122.55" stroke="#000" stroke-width="0.39" stroke-linejoin="round"/><polygon points="595.19,103.15 614.59,83.74 634.00,103.15 614.59,122.55" stroke="#000" stroke-width="0.39" stroke-linejoin="round"/><polygon points="575.78,161.37 575.78,122.55 595.19,103.15 595.19,141.96" stroke="#000" stroke-width="0.39" stroke-linejoin="round"/><polygon points="504.81,161.37 466.00,161.37 485.41,141.96" stroke="#000" stroke-width="0.39" stroke-linejoin="round"/><polygon points="595.19,141.96 595.19,103.15 614.59,122.55" stroke="#000" stroke-width="0.39" stroke-linejoin="round"/></clipPath>
+<g clip-path="url(#clip-things-checkmark)">
+<rect x="464.0" y="81.74176554811305" width="172.0" height="136.5164689037739" fill="#3A9D5D"/>
+<path d="M 460.18,155.55 L 520.92,216.29 L 639.88,97.33" fill="none" stroke="#2B7A47" stroke-width="13.58" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 485.41,161.37 L 520.92,196.88 L 611.55,106.25" fill="none" stroke="#7BC67E" stroke-width="6.79" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="550.0" y="275" text-anchor="middle" font-size="13" fill="#5C5F77">Picture (after solving)</text>
+</svg>

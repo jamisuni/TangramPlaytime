@@ -18,8 +18,24 @@
     {"piece": "ST2", "polygon": [[0, [3, 3]], [[0, 1], [3, 2]], [[0, 1], [3, 3]]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#C8A27A",
+    "shapes": [
+      {"type": "circle", "c": [3.3, 3.7], "r": 0.22, "fill": "#E3CBA8"},
+      {"type": "circle", "c": [3.7, 4.5], "r": 0.22, "fill": "#E3CBA8"},
+      {"type": "circle", "c": [3.0, 5.3], "r": 0.22, "fill": "#E3CBA8"},
+      {"type": "circle", "c": [3.85, 5.4], "r": 0.2, "fill": "#E3CBA8"},
+      {"type": "circle", "c": [0.6, 6.0], "r": 0.22, "fill": "#E3CBA8"},
+      {"type": "circle", "c": [1.3, 5.75], "r": 0.2, "fill": "#E3CBA8"},
+      {"type": "rect", "x": 0.25, "y": 4.3, "w": 2.35, "h": 1.1, "fill": "#D64545"},
+      {"type": "line", "from": [0.25, 4.75], "to": [2.6, 4.75], "stroke": "#F2C14E", "width": 0.14},
+      {"type": "line", "from": [0.25, 5.1], "to": [2.6, 5.1], "stroke": "#2A9D8F", "width": 0.14},
+      {"type": "rect", "x": 2.83, "y": 6.9, "w": 1.41, "h": 0.4, "fill": "#8E6A48"},
+      {"type": "rect", "x": -0.1, "y": 6.9, "w": 1.6, "h": 0.4, "fill": "#8E6A48"},
+      {"type": "line", "from": [3.53, 6.2], "to": [3.53, 7.3], "stroke": "#8E6A48", "width": 0.08},
+      {"type": "polygon", "points": [[3.3, 0.95], [3.83, 0.25], [4.36, 0.95]], "fill": "#8E6A48"},
+      {"type": "circle", "c": [4.35, 1.25], "r": 0.06, "fill": "#2A2420"},
+      {"type": "circle", "c": [3.5, 1.5], "r": 0.11, "fill": "#2A2420"}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

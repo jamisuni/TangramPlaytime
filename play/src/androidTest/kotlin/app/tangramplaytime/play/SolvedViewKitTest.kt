@@ -220,7 +220,12 @@ class SolvedViewKitTest {
         if (!pixels) return
         assertTrue("$what: the `solved-picture` node", kit.exists(PlayTags.SOLVED_PICTURE))
         val board = kit.capture(PlayTags.BOARD)
-        val inside = kit.silhouetteMask(p).erode(3)
+        // Amended WO-010 (F3, recirculation 6, a look-alike; a corrected check — decisions.md 2026-10-20 "F3's cause is the
+        // REQ-023 A1 leg's inside mask, not the product or the data"): "3 px inside" is measured from the exact outline
+        // (`kit.silhouetteBands`), no longer the polygons widened 0.75 px and eroded by a 7 × 7 square, which at a 315° notch held
+        // pixels 0.46 px from the outline, where the picture's own outline stroke rightly paints the flat silhouette colour
+        // (decisions.md 2026-10-12 "The solve, as drawn"): F3's false red, and shapes-warmup-1 (list[2]) has such a notch.
+        val inside = kit.silhouetteBands(p).inside
         val artColours = kitArtColours(p.art)
         val foreign = kitPieceColours().filterValues { pc -> artColours.none { kitNear(it, pc, 6f / 255f) } }
         val silhouetteInArt = artColours.any { kitNear(it, PlayPalette.silhouette, 6f / 255f) }
@@ -257,7 +262,11 @@ class SolvedViewKitTest {
         assertFalse("$what: no solved row", kit.exists(KitTag.SOLVED_ROW))
         kit.advance(500) // the pixels once any fade the drawing may play is over (no REQ or row times one)
         val board = kit.capture(PlayTags.BOARD)
-        val inside = kit.silhouetteMask(p).erode(3)
+        // Amended WO-010 (F3, recirculation 6, a look-alike; a corrected check — decisions.md 2026-10-20 "F3's cause is the
+        // REQ-023 A1 leg's inside mask, not the product or the data"): "3 px inside" is measured from the exact outline
+        // (`kit.silhouetteBands`), no longer the polygons widened 0.75 px and eroded by a 7 × 7 square, which at a 315° notch held
+        // pixels 0.46 px from the outline, whose anti-aliased blend with the board may miss the tolerance (a false red).
+        val inside = kit.silhouetteBands(p).inside
         var wrong = 0
         var first = ""
         inside.forEachSet { x, y ->

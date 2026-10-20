@@ -3,14 +3,18 @@
 // timeline's arithmetic (no token; the acceptance verdict is the device kit's DecorationKitTest,
 // CornerPulseKitTest and SolvedPictureKitTest). WO-004 TASK-020 updated it for S-11Δ (the `PlayTexts` literal),
 // S-22 (`HitTest.at` takes the controls shown; none here) and S-3Δ (`SolveVisual` is one frame's value).
+// WO-010 F1 added the board badge's clamp: its whole 60 dp area and its disc lie on the board (letters-m, the bundle).
 package app.tangramplaytime.play.scaffolding
 
 import androidx.compose.ui.geometry.Offset
 import app.tangramplaytime.content.PuzzleLibraries
 import app.tangramplaytime.contracts.PieceId
+import app.tangramplaytime.contracts.Point
 import app.tangramplaytime.contracts.PuzzleKind
+import app.tangramplaytime.contracts.Turn
 import app.tangramplaytime.kernel.LockEngine
 import app.tangramplaytime.play.BADGE_TOUCH_DP
+import app.tangramplaytime.play.BadgePlace
 import app.tangramplaytime.play.CONFETTI_MS
 import app.tangramplaytime.play.FADE_DELAY_MS
 import app.tangramplaytime.play.FADE_MS
@@ -22,6 +26,7 @@ import app.tangramplaytime.play.PlayLayout
 import app.tangramplaytime.play.PlayTexts
 import app.tangramplaytime.play.ScreenGeometry
 import app.tangramplaytime.play.ShownControls
+import app.tangramplaytime.play.Slot
 import app.tangramplaytime.play.SolveVisual
 import app.tangramplaytime.play.artColour
 import app.tangramplaytime.play.badgeSlots
@@ -35,6 +40,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.hypot
 
 class DecorationScaffoldTest {
 
@@ -119,6 +125,122 @@ class DecorationScaffoldTest {
             assertFalse("the row gap above the PG cell is not the badge", HitTest.at(gapAbove, g, controller, margin, ShownControls.NONE) is Hit.Badge)
         }
     }
+
+    @Test
+    fun theBoardBadgesWholeAreaAndItsDiscLieOnTheBoardWithThePgAtTheBoardsRightEdge() {
+        // WO-010 F1 (the floor's DecorationKitTest run, 2026-10-19: `flip-badge-board` at x 930–1088 on a 1080 px
+        // screen). decisions.md 2026-10-12 "Tray decoration numbers from DI-1/DI-2": the board badge sits 22 dp right
+        // of the placed PG's box and 4 dp above it, clamped onto the board; its touch area is 60 dp. letters-m puts
+        // the PG at the silhouette's right edge, so on the 411 dp phone the unclamped badge would leave the board.
+        // The 1080 px phone at 2.625 px/dp, the kit's literal layout, no insets; the composable's height varies with
+        // the host (the whole 914 dp screen, or less the bars), so a few heights are checked.
+        val cases = listOf(2400, 2337, 2274, 2211).map { heightPx ->
+            val controller = PlayController(library, engine)
+            assertTrue(controller.open("letters-m"))
+            val g = ScreenGeometry.of(1080, heightPx, density, layout, controller.puzzle)
+            controller.boardDpPerUnit = (g.mapping.pxPerUnit / density).toDouble()
+            assertTrue("letters-m: the PG locks at its solution pose", setUpBoard(controller, setOf(PieceId.PG)))
+            val board = badgeSlots(controller, g).board ?: throw AssertionError("a board badge with the PG placed")
+            val pg = controller.placed.single { it.piece == PieceId.PG }
+            val box = engine.vertices(pg.piece, pg.turn, pg.mirrored, pg.centre).map(g.mapping::toPx)
+            val facts = "1080 × $heightPx px: board ${rectOf(g.board)}; PG box ${rectOf(box)}; area ${rectOf(board.area)}; " +
+                "disc ${rectOf(board.disc, board.discRadius)}"
+            println("facts — $facts")
+            Triple(facts, board, g)
+        }
+        for ((facts, board, g) in cases) {
+            assertBadgeOnBoard(facts, board, g)
+            // At the right edge the area ends at the board's edge, and the disc keeps its clamped place there.
+            val right = g.board.left + g.board.width
+            assertEquals("$facts: the area ends at the board's right edge", right, board.area.left + board.area.width)
+            assertEquals("$facts: the disc ends at the board's right edge", right.toFloat(), board.disc.x + board.discRadius, 0.01f)
+        }
+    }
+
+    @Test
+    fun everyBundledPuzzlesBoardBadgeLiesWhollyOnTheBoard() {
+        // The same clamp over the bundle: the PG placed at its solution pose (other pieces first where the engine
+        // needs them, one piece always left in the tray), on the 411 dp phone and the 360 dp one.
+        var checked = 0
+        val off = ArrayList<String>()
+        for ((widthPx, heightPx) in listOf(1080 to 2211, 1080 to 2400, 945 to 2100)) {
+            for (p in library.puzzles.filter { PieceId.PG in it.pieces }) {
+                val controller = PlayController(library, engine)
+                assertTrue(controller.open(p.id))
+                val g = ScreenGeometry.of(widthPx, heightPx, density, layout, controller.puzzle)
+                controller.boardDpPerUnit = (g.mapping.pxPerUnit / density).toDouble()
+                if (!setUpBoard(controller, setOf(PieceId.PG))) continue
+                val board = badgeSlots(controller, g).board ?: throw AssertionError("${p.id}: a board badge with the PG placed")
+                checked++
+                try {
+                    assertBadgeOnBoard("${p.id} at $widthPx × $heightPx px", board, g)
+                } catch (e: AssertionError) {
+                    off += e.message.orEmpty()
+                }
+            }
+        }
+        println("sweep — $checked boards with the PG placed; ${off.size} off the board")
+        assertTrue("the PG was placed in some puzzles ($checked)", checked > 0)
+        assertTrue("${off.size} of $checked board badges leave the board:\n${off.joinToString("\n")}", off.isEmpty())
+    }
+
+    /** The board badge's 60 dp area and its whole 38 dp disc lie inside the board, and the disc inside the area. */
+    private fun assertBadgeOnBoard(what: String, place: BadgePlace, g: ScreenGeometry) {
+        val b = g.board
+        val a = place.area
+        val r = place.discRadius
+        val sixty = Math.round(BADGE_TOUCH_DP * density)
+        assertEquals("$what: the area is 60 dp wide", sixty, a.width)
+        assertEquals("$what: the area is 60 dp tall", sixty, a.height)
+        assertTrue("$what: the area lies inside the board", a.left >= b.left && a.top >= b.top && a.left + a.width <= b.left + b.width && a.top + a.height <= b.top + b.height)
+        assertTrue("$what: the disc lies inside the board", place.disc.x - r >= b.left && place.disc.y - r >= b.top && place.disc.x + r <= b.left + b.width && place.disc.y + r <= b.top + b.height)
+        assertTrue("$what: the disc lies inside the area", place.disc.x - r >= a.left && place.disc.y - r >= a.top && place.disc.x + r <= a.left + a.width && place.disc.y + r <= a.top + a.height)
+    }
+
+    /** Places [must] at their solution poses through S-2, other pieces first where the engine needs them, always leaving one piece in the tray (as the device kit's set-up). */
+    private fun setUpBoard(controller: PlayController, must: Set<PieceId>): Boolean {
+        val p = controller.puzzle
+        fun placedNow(): Set<PieceId> = controller.placed.map { it.piece }.toSet()
+        repeat(p.pieces.size + 1) {
+            var progress = false
+            for (m in must) {
+                if (m !in placedNow() && p.pieces.count { it !in placedNow() } > 1 && placeAtSolution(controller, m)) progress = true
+            }
+            if (must.all { it in placedNow() }) return true
+            val helpers = p.pieces.filter { it !in placedNow() && it !in must }
+            if (helpers.size > 1) {
+                for (h in helpers) if (placeAtSolution(controller, h)) { progress = true; break }
+            }
+            if (!progress) return false
+        }
+        return must.all { it in placedNow() }
+    }
+
+    /** Drags [piece] from the tray to its solution pose (the tray mirror by the badge for the PG) and drops it; true when it locked there. */
+    private fun placeAtSolution(controller: PlayController, piece: PieceId): Boolean {
+        val sp = controller.puzzle.solution.single { it.piece == piece }
+        val centre = Point(sp.polygon.sumOf { it.x } / sp.polygon.size, sp.polygon.sumOf { it.y } / sp.polygon.size)
+        fun matches(turn: Turn, mirrored: Boolean, at: Point): Boolean =
+            engine.vertices(piece, turn, mirrored, at).all { v -> sp.polygon.any { q -> hypot(v.x - q.x, v.y - q.y) < 1e-6 } }
+        val trayMirror = controller.trayMirrored(piece)
+        val pose = listOf(trayMirror, !trayMirror).flatMap { m -> (0..7).map { Turn(it) to m } }.firstOrNull { (t, m) -> matches(t, m, centre) } ?: return false
+        if (pose.second != trayMirror && !(piece == PieceId.PG && controller.pressBadge())) return false
+        if (!controller.startDrag(piece, centre)) return false
+        val steps = ((pose.first.step - controller.dragged!!.turn.step) % 8 + 8) % 8
+        if (steps != 0) controller.twistDrag(if (steps <= 4) steps else steps - 8)
+        controller.moveDrag(centre, overBoard = true)
+        val lock = controller.drop() ?: return false
+        return matches(lock.turn, lock.mirrored, lock.centre)
+    }
+
+    private fun rectOf(s: Slot): String = rectOf(s.leftPx, s.topPx, s.leftPx + s.width, s.topPx + s.height)
+
+    private fun rectOf(points: List<Offset>): String = rectOf(points.minOf { it.x }, points.minOf { it.y }, points.maxOf { it.x }, points.maxOf { it.y })
+
+    private fun rectOf(c: Offset, r: Float): String = rectOf(c.x - r, c.y - r, c.x + r, c.y + r)
+
+    private fun rectOf(l: Float, t: Float, r: Float, b: Float): String =
+        "x %.1f–%.1f y %.1f–%.1f px (x %.1f–%.1f y %.1f–%.1f dp)".format(l, r, t, b, l / density, r / density, t / density, b / density)
 
     @Test
     fun noBadgeWithoutThePgOrAfterTheSolve() {

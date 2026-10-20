@@ -60,3 +60,10 @@
 {"ts": "2026-10-18T20:04:51", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
 {"ts": "2026-10-18T20:04:53", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
 {"ts": "2026-10-18T20:04:56", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-19T20:38:16", "hook": "stop", "event": "progress-reminder", "age_min": 65}
+{"ts": "2026-10-20T07:21:18", "hook": "stop", "event": "progress-reminder", "age_min": 62}
+{"ts": "2026-10-20T08:27:43", "hook": "stop", "event": "progress-reminder", "age_min": 66}
+{"ts": "2026-10-20T10:38:35", "hook": "stop", "event": "progress-reminder", "age_min": 63}
+{"ts": "2026-10-20T13:51:33", "hook": "stop", "event": "progress-reminder", "age_min": 61}
+{"ts": "2026-10-20T15:24:38", "hook": "stop", "event": "progress-reminder", "age_min": 72}
+{"ts": "2026-10-20T16:43:22", "hook": "stop", "event": "progress-reminder", "age_min": 78}

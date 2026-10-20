@@ -6,19 +6,25 @@
 // REQ-024 A2 lives here because its adversarial leg — the grid open — needs the overview TASK-021 builds.
 package app.tangramplaytime.play
 
+import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.PixelMap
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.unit.IntRect
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.tangramplaytime.contracts.PuzzleDefinition
 import app.tangramplaytime.contracts.PuzzleKind
 import app.tangramplaytime.contracts.PuzzleProgress
 import app.tangramplaytime.contracts.PuzzleState
@@ -29,6 +35,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 @RunWith(AndroidJUnit4::class)
@@ -53,6 +60,15 @@ class OverviewKitTest {
         // silhouette colour and at most 0.5 % in its picture's own colours; the In-progress cell has a dot (at least 4 px of
         // the accent, decisions.md 2026-10-15 "The grid overview, as drawn": "the silhouette with an accent dot") and the New
         // cells other than the open one none (at most 2 px).
+        // Amended WO-010 (F2, recirculation 3 — a corrected check: the leg did not finish at 106 puzzles; every assertion,
+        // threshold and message above unchanged). The first scroll to a cell below the first screenful never returned under
+        // the paused clock (`KitScreen.scrollTo` says why and is the remedy). And the cells are judged a screenful at a time,
+        // not by one scroll, settle and capture per cell: the grid is scrolled (the semantics scroll of S-22's vertically
+        // scrolling grid) so that the first cell not yet judged, and the cells after it that fit, lie wholly in view; then
+        // 500 ms on the paused clock (what each cell had) and one capture of `overview`. Each cell wholly in view and not yet judged is read from that capture at its
+        // own bounds, 4 dp inside — the pixels its own capture holds (`captureToImage` copies the window at a node's bounds) —
+        // and its PuzzleIdKey and PuzzleStateKey from its node of the same read. Every listed puzzle's cell is judged exactly
+        // once: "every" stays every (decisions.md 2026-10-19 "The tests that pinned the 13-puzzle bundle").
         val list = kitLibrary.puzzles
         val colourful = list.filter { kitDistinctArtColours(it.art).isNotEmpty() }
         assertTrue("the library has three puzzles whose pictures have a colour of their own (${colourful.size})", colourful.size >= 3)
@@ -67,29 +83,30 @@ class OverviewKitTest {
         openGrid(kit)
         val cells = kit.nodesWithTagPrefix(KitTag.OVERVIEW_CELL_PREFIX)
         assertEquals("one cell per listed puzzle: ${cells.map { it.first }}", list.map { KitTag.overviewCell(it.id) }.sorted(), cells.map { it.first }.sorted())
-        for (p in list) {
-            val tag = KitTag.overviewCell(p.id)
-            val expected = (seed[p.id] ?: PuzzleProgress.FRESH).state
-            assertEquals("`$tag` PuzzleIdKey", p.id, kit.key(tag, PlaySemantics.PuzzleIdKey))
-            assertEquals("`$tag` PuzzleStateKey: the store's state", expected, kit.key(tag, PlaySemantics.PuzzleStateKey))
-            val shot = cellShot(kit, tag)
-            val art = kitDistinctArtColours(p.art)
-            val artPx = shot.count { c -> art.any { kitNear(c, it, 6f / 255f) } }
-            val flatPx = shot.count { c -> kitNear(c, PlayPalette.silhouette, 6f / 255f) }
-            val accentPx = shot.count { c -> kitNear(c, PlayPalette.accent, 24f / 255f) }
-            val n = shot.size
-            val report = "${p.id} ($expected): ${pct(artPx, n)} picture colours, ${pct(flatPx, n)} silhouette, $accentPx accent px of $n"
-            android.util.Log.i("KitScreen", "overview cell $report")
-            when (expected) {
-                PuzzleState.SOLVED -> assertTrue("a Solved cell is in colour — its picture's own colours on at least 2 %: $report", artPx * 50 >= n)
-                PuzzleState.NEW, PuzzleState.IN_PROGRESS -> {
-                    assertTrue("an unsolved cell shows the flat silhouette on at least 2 %: $report", flatPx * 50 >= n)
-                    assertTrue("an unsolved cell is not in colour — its picture's own colours on at most 0.5 %: $report", artPx * 200 <= n)
-                }
+        val judged = LinkedHashSet<String>()
+        val started = SystemClock.elapsedRealtime()
+        var screenfuls = 0
+        while (judged.size < list.size) {
+            val pending = list.filter { it.id !in judged }
+            val view = screenfulOf(kit, pending.map { it.id })
+            screenfuls++
+            val judging = SystemClock.elapsedRealtime()
+            var here = 0
+            for (p in pending) {
+                val (node, at) = view.cells[p.id] ?: continue
+                judgeCell(kit, p, (seed[p.id] ?: PuzzleProgress.FRESH).state, open.id, node, at, view.image)
+                judged += p.id
+                here++
             }
-            if (expected == PuzzleState.IN_PROGRESS) assertTrue("the In-progress cell has a dot: $report", accentPx >= 4)
-            if (expected == PuzzleState.NEW && p.id != open.id) assertTrue("a New cell has no dot: $report", accentPx <= 2)
+            check(pending.first().id in judged) { "kit: `${KitTag.overviewCell(pending.first().id)}` is not wholly in view after the scroll" }
+            android.util.Log.i(
+                "KitScreen",
+                "overview A2: screenful $screenfuls judged $here cells (${judged.size} / ${list.size}): scroll and settle ${view.settleMs} ms, " +
+                    "capture ${view.captureMs} ms, judging ${SystemClock.elapsedRealtime() - judging} ms",
+            )
         }
+        assertEquals("every listed puzzle's cell judged once", list.map { it.id }.sorted(), judged.sorted())
+        android.util.Log.i("KitScreen", "overview A2: ${list.size} cells in $screenfuls screenfuls, ${SystemClock.elapsedRealtime() - started} ms")
     }
 
     // ── REQ-050 A3: choosing a cell changes no other puzzle ────────────────────────────────────────────
@@ -166,6 +183,7 @@ class OverviewKitTest {
         kit.show(reducedMotion = true)
         val n = list.size
         for ((i, origin) in list.withIndex()) {
+            val gridFrom = SystemClock.elapsedRealtime() // run-time record only (WO-010 F2): the grid choices, then the › walk
             if (kit.shownId() != origin.id) {
                 openGrid(kit)
                 chooseCell(kit, origin.id)
@@ -178,6 +196,7 @@ class OverviewKitTest {
             openGrid(kit)
             chooseCell(kit, origin.id)
             kit.assertShows(origin.id, "back to ${origin.id} by the grid")
+            val walkFrom = SystemClock.elapsedRealtime()
             val seen = ArrayList<String>()
             repeat(n - 1) {
                 kit.press(KitTag.NAV_NEXT)
@@ -186,6 +205,7 @@ class OverviewKitTest {
             assertEquals("› from ${origin.id} shows every other puzzle once", list.map { it.id }.filter { it != origin.id }.sorted(), seen.sorted())
             kit.press(KitTag.NAV_NEXT)
             kit.assertShows(origin.id, "› comes round to ${origin.id}")
+            android.util.Log.i("KitScreen", "REQ-003 A1 origin ${i + 1} / $n ${origin.id}: grid choices ${walkFrom - gridFrom} ms, › walk ${SystemClock.elapsedRealtime() - walkFrom} ms")
         }
         ps.flush()
         for (p in list) {
@@ -243,7 +263,7 @@ class OverviewKitTest {
         openGrid(kit)
         assertBarWithGridOpen(kit, list[5].id, closed, "the grid open")
         val lastCell = KitTag.overviewCell(list.last().id)
-        rule.onNode(hasTestTag(lastCell), useUnmergedTree = true).performScrollTo()
+        kit.scrollTo(lastCell) // WO-010 F2: a scroll that returns under the paused clock (KitScreen.scrollTo)
         kit.advance(500)
         assertBarWithGridOpen(kit, list[5].id, closed, "the grid scrolled to its last cell")
         kit.recreate(rule.activityRule.scenario)
@@ -347,10 +367,10 @@ class OverviewKitTest {
         assertTrue("a tap on the counter shows `overview`", kit.exists(KitTag.OVERVIEW))
     }
 
-    /** Scrolls [id]'s cell on screen (a semantics scroll of the grid) and taps its centre. */
+    /** Scrolls [id]'s cell on screen (a semantics scroll of the grid, `KitScreen.scrollTo` since WO-010 F2) and taps its centre. */
     private fun chooseCell(kit: KitScreen, id: String) {
         val tag = KitTag.overviewCell(id)
-        rule.onNode(hasTestTag(tag), useUnmergedTree = true).performScrollTo()
+        kit.scrollTo(tag)
         kit.advance(500)
         val n = kit.node(tag)
         val visible = kit.bounds(tag)
@@ -365,16 +385,116 @@ class OverviewKitTest {
         kit.advance(300)
     }
 
-    /** [tag]'s cell scrolled on screen and captured: its pixels 4 dp inside its bounds. */
-    private fun cellShot(kit: KitScreen, tag: String): List<androidx.compose.ui.graphics.Color> {
-        rule.onNode(hasTestTag(tag), useUnmergedTree = true).performScrollTo()
+    // ── REQ-050 A2 a screenful at a time (WO-010 F2) ─────────────────────────────────────────────────────
+
+    /** One screenful of the grid: the capture of `overview`, and each wholly visible pending cell with its node and its box in that capture. */
+    private class Screenful(val image: PixelMap, val cells: Map<String, Pair<SemanticsNode, IntRect>>, val settleMs: Long, val captureMs: Long)
+
+    /**
+     * Brings the first of [pending] (ids in ‹ › order) and the cells after it that fit wholly into the grid's view: when the
+     * first is not wholly in view, a semantics scroll (`KitScreen.scrollTo`, S-22's scrolling grid) to the last pending cell
+     * whose bottom lies within the grid's viewport height of the first one's top; then 500 ms on the paused clock (what each
+     * cell had before WO-010 F2); if the first is still not wholly in view, a scroll to it and 500 ms more. Then one capture of
+     * `overview`, and each pending cell wholly in view with its node and its box in that capture (the rounded node bounds,
+     * as `captureToImage` takes them).
+     */
+    private fun screenfulOf(kit: KitScreen, pending: List<String>): Screenful {
+        val t0 = SystemClock.elapsedRealtime()
+        val firstTag = KitTag.overviewCell(pending.first())
+        var nodes = cellNodes(kit)
+        val first = nodes[firstTag] ?: throw AssertionError("kit: no `$firstTag` node")
+        if (!whollyInView(first)) {
+            // − 2 px: the 1 px `whollyInView` allows at each end; the scroll puts the last cell's bottom at the view's bottom
+            // (ui-test 1.12.1 `performScrollTo`; platform-notes/android.md § Compose test kit, WO-010 "Under a paused clock …")
+            val room = scrollParent(first, firstTag).boundsInRoot.height - 2f
+            val top = first.positionInRoot.y
+            val last = pending.map { KitTag.overviewCell(it) }
+                .lastOrNull { t -> nodes[t]?.let { it.positionInRoot.y + it.size.height - top <= room } == true } ?: firstTag
+            kit.scrollTo(last)
+        }
         kit.advance(500)
-        val img: PixelMap = kit.capture(tag)
+        nodes = cellNodes(kit)
+        if (!whollyInView(nodes[firstTag] ?: throw AssertionError("kit: no `$firstTag` node after the scroll"))) {
+            android.util.Log.i("KitScreen", "overview A2: `$firstTag` not wholly in view after the screenful scroll; scrolled to it")
+            kit.scrollTo(firstTag)
+            kit.advance(500)
+            nodes = cellNodes(kit)
+        }
+        val t1 = SystemClock.elapsedRealtime()
+        val overview = kit.node(KitTag.OVERVIEW).boundsInRoot
+        val image = kit.capture(KitTag.OVERVIEW)
+        val t2 = SystemClock.elapsedRealtime()
+        val ox = overview.left.roundToInt()
+        val oy = overview.top.roundToInt()
+        val out = LinkedHashMap<String, Pair<SemanticsNode, IntRect>>()
+        for (id in pending) {
+            val n = nodes[KitTag.overviewCell(id)] ?: continue
+            if (!whollyInView(n)) continue
+            val b = n.boundsInRoot
+            out[id] = n to IntRect(b.left.roundToInt() - ox, b.top.roundToInt() - oy, b.right.roundToInt() - ox, b.bottom.roundToInt() - oy)
+        }
+        return Screenful(image, out, t1 - t0, t2 - t1)
+    }
+
+    /** Every `overview-cell-<id>` node of the unmerged tree, by tag (one walk). */
+    private fun cellNodes(kit: KitScreen): Map<String, SemanticsNode> = kit.nodesWithTagPrefix(KitTag.OVERVIEW_CELL_PREFIX).toMap()
+
+    /** The node's bounds as the grid clips them hold its whole size, within 1 px (the test `chooseCell` makes after a scroll). */
+    private fun whollyInView(n: SemanticsNode): Boolean {
+        // 1 px: the tolerance of `chooseCell`'s existing check after a scroll (WO-004 TASK-019: `visible.height >= n.size.height - 1f`)
+        val shown = n.boundsInRoot
+        return shown.width >= n.size.width - 1f && shown.height >= n.size.height - 1f
+    }
+
+    /** The nearest ancestor of [n] that scrolls: the node `performScrollTo` scrolls (S-22's vertically scrolling grid). */
+    private fun scrollParent(n: SemanticsNode, tag: String): SemanticsNode {
+        var p = n.parent
+        // The closest ancestor with `ScrollBy`: the node `performScrollTo` itself scrolls (ui-test 1.12.1 `scrollToNode`,
+        // `findClosestParentNode { hasScrollAction() }`); S-22's `verticalScroll` grid (designs/WO-004-design.md §2).
+        while (p != null && SemanticsActions.ScrollBy !in p.config) p = p.parent
+        return p ?: throw AssertionError("kit: `$tag` has no scrolling ancestor (S-22: the grid scrolls vertically)")
+    }
+
+    private fun <T> keyOf(n: SemanticsNode, tag: String, k: SemanticsPropertyKey<T>): T =
+        n.config.getOrNull(k) ?: throw AssertionError("kit: `$tag` carries no ${k.name}")
+
+    /**
+     * REQ-050 A2's reading of one cell, the oracle of the test's comment unchanged: its PuzzleIdKey and PuzzleStateKey from
+     * [node]; its pixels from [image] inside [at], 4 dp in, against the state the store holds ([expected]).
+     */
+    private fun judgeCell(kit: KitScreen, p: PuzzleDefinition, expected: PuzzleState, openId: String, node: SemanticsNode, at: IntRect, image: PixelMap) {
+        val tag = KitTag.overviewCell(p.id)
+        assertEquals("`$tag` PuzzleIdKey", p.id, keyOf(node, tag, PlaySemantics.PuzzleIdKey))
+        assertEquals("`$tag` PuzzleStateKey: the store's state", expected, keyOf(node, tag, PlaySemantics.PuzzleStateKey))
         val inset = kit.dp(4f).roundToInt()
-        val out = ArrayList<androidx.compose.ui.graphics.Color>()
-        for (y in inset until img.height - inset) for (x in inset until img.width - inset) out += img[x, y]
-        check(out.size > 1000) { "kit: `$tag` capture ${img.width} × ${img.height} px leaves ${out.size} px 4 dp inside" }
-        return out
+        val x0 = at.left + inset
+        val y0 = at.top + inset
+        val x1 = at.right - inset
+        val y1 = at.bottom - inset
+        check(x0 >= 0 && y0 >= 0 && x1 <= image.width && y1 <= image.height) { "kit: `$tag` at $at lies outside the `overview` capture (${image.width} × ${image.height} px)" }
+        val n = max(0, x1 - x0) * max(0, y1 - y0)
+        check(n > 1000) { "kit: `$tag` capture ${at.width} × ${at.height} px leaves $n px 4 dp inside" }
+        val art = kitDistinctArtColours(p.art)
+        var artPx = 0
+        var flatPx = 0
+        var accentPx = 0
+        for (y in y0 until y1) for (x in x0 until x1) {
+            val c = image[x, y]
+            if (art.any { kitNear(c, it, 6f / 255f) }) artPx++
+            if (kitNear(c, PlayPalette.silhouette, 6f / 255f)) flatPx++
+            if (kitNear(c, PlayPalette.accent, 24f / 255f)) accentPx++
+        }
+        val report = "${p.id} ($expected): ${pct(artPx, n)} picture colours, ${pct(flatPx, n)} silhouette, $accentPx accent px of $n"
+        android.util.Log.i("KitScreen", "overview cell $report")
+        when (expected) {
+            PuzzleState.SOLVED -> assertTrue("a Solved cell is in colour — its picture's own colours on at least 2 %: $report", artPx * 50 >= n)
+            PuzzleState.NEW, PuzzleState.IN_PROGRESS -> {
+                assertTrue("an unsolved cell shows the flat silhouette on at least 2 %: $report", flatPx * 50 >= n)
+                assertTrue("an unsolved cell is not in colour — its picture's own colours on at most 0.5 %: $report", artPx * 200 <= n)
+            }
+        }
+        if (expected == PuzzleState.IN_PROGRESS) assertTrue("the In-progress cell has a dot: $report", accentPx >= 4)
+        if (expected == PuzzleState.NEW && p.id != openId) assertTrue("a New cell has no dot: $report", accentPx <= 2)
     }
 
     private fun pct(k: Int, n: Int): String = "%.1f %%".format(100.0 * k / n)

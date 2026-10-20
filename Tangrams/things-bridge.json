@@ -18,8 +18,16 @@
     {"piece": "ST2", "polygon": [[[0, 5], [0, 2]], [[0, 4], [0, 1]], [[0, 5], [0, 1]]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#C8A882",
+    "shapes": [
+      {"type": "line", "from": [0, 1.75], "to": [9.9, 1.75], "stroke": "#A8865F", "width": 0.06},
+      {"type": "line", "from": [0, 2.3], "to": [9.9, 2.3], "stroke": "#A8865F", "width": 0.06},
+      {"type": "line", "from": [0, 1.2], "to": [9.9, 1.2], "stroke": "#A8865F", "width": 0.06},
+      {"type": "line", "from": [0, 0.65], "to": [9.9, 0.65], "stroke": "#A8865F", "width": 0.06},
+      {"type": "path", "d": "M2.83,3.2 L2.83,2.83 L4.24,1.41 L5.66,1.41 L7.07,2.83 L7.07,3.2", "stroke": "#8C6B48", "width": 0.5},
+      {"type": "path", "d": "M-0.4,3.23 L2.83,0 L7.07,0 L10.3,3.23", "stroke": "#6E4B33", "width": 0.7},
+      {"type": "rect", "x": -0.2, "y": 2.55, "w": 10.3, "h": 0.5, "fill": "#6A9A4B"}
+    ]
   },
   "provenance": {
     "author": "ai:claude",

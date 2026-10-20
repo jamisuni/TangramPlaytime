@@ -18,8 +18,27 @@
     {"piece": "ST2", "polygon": [[[0, 1], [6, -1]], [0, 6], [0, [6, -1]]]}
   ],
   "art": {
-    "base": "#D9DCE8",
-    "shapes": []
+    "base": "#CDB4F0",
+    "shapes": [
+      {"type": "ellipse", "c": [3.35, 2.468], "rx": 0.3, "ry": 0.102, "fill": "#E2D3F7"},
+      {"type": "circle", "c": [3.23, 2.42], "r": 0.12, "fill": "#E2D3F7"},
+      {"type": "circle", "c": [3.422, 2.384], "r": 0.156, "fill": "#E2D3F7"},
+      {"type": "ellipse", "c": [2.12, 6.918], "rx": 0.425, "ry": 0.145, "fill": "#E2D3F7"},
+      {"type": "circle", "c": [1.95, 6.85], "r": 0.17, "fill": "#E2D3F7"},
+      {"type": "circle", "c": [2.222, 6.799], "r": 0.221, "fill": "#E2D3F7"},
+      {"type": "path", "d": "M2.25,1.66 Q2.9,1.8 3.2,2.15", "stroke": "#6B5A8E", "width": 0.05},
+      {"type": "path", "d": "M3.68,5.81 Q3.5,6.15 3.45,6.5", "stroke": "#6B5A8E", "width": 0.05},
+      {"type": "path", "d": "M0.78,6.06 Q0.95,6.35 0.85,6.6", "stroke": "#6B5A8E", "width": 0.05},
+      {"type": "ellipse", "c": [2.25, 1], "rx": 0.5, "ry": 0.6, "fill": "#FF6B6B"},
+      {"type": "polygon", "points": [[2.17, 1.68], [2.33, 1.68], [2.25, 1.56]], "fill": "#FF6B6B"},
+      {"type": "ellipse", "c": [2.05, 0.76], "rx": 0.09, "ry": 0.15, "fill": "#FFFFFF", "opacity": 0.7},
+      {"type": "ellipse", "c": [3.68, 5.15], "rx": 0.5, "ry": 0.6, "fill": "#FFB627"},
+      {"type": "polygon", "points": [[3.6, 5.83], [3.76, 5.83], [3.68, 5.71]], "fill": "#FFB627"},
+      {"type": "ellipse", "c": [3.48, 4.91], "rx": 0.09, "ry": 0.15, "fill": "#FFFFFF", "opacity": 0.7},
+      {"type": "ellipse", "c": [0.78, 5.5], "rx": 0.42, "ry": 0.5, "fill": "#2EC4B6"},
+      {"type": "polygon", "points": [[0.7, 6.08], [0.86, 6.08], [0.78, 5.96]], "fill": "#2EC4B6"},
+      {"type": "ellipse", "c": [0.612, 5.3], "rx": 0.076, "ry": 0.125, "fill": "#FFFFFF", "opacity": 0.7}
+    ]
   },
   "provenance": {
     "author": "ai:claude",
