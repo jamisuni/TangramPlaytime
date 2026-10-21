@@ -34,12 +34,15 @@ class CounterDigitsKitTest {
          */
         val KIT_OTHER_DIGITS_LOCALE: Locale = Locale.forLanguageTag("ar-EG-u-nu-arab")
 
-        /** The English texts, from `app/src/main/res/values/strings.xml` (S-11Δ fields; S-11Δ2: unchanged). */
+        /**
+         * The English texts, from `app/src/main/res/values/strings.xml` (S-11Δ fields; S-11Δ2: unchanged; WO-008 S-11Δ3 adds
+         * `hoursMinutes`, "%1$d h %2$d min" in both languages, so the literals compile; it is not asserted here).
+         */
         val KIT_EN_TEXTS: PlayTexts = PlayTexts(
             sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = "en",
             restart = "Restart", retry = "Retry", next = "Next", bestTime = "Best time", noTime = "–",
             inProgress = "in progress", solved = "solved", counterFormat = "%1\$d / %2\$d",
-            allPuzzles = "All puzzles", done = "Done",
+            allPuzzles = "All puzzles", done = "Done", hoursMinutes = "%1\$d h %2\$d min",
         )
 
         /** The Finnish texts, from `app/src/main/res/values-fi/strings.xml` (data only; only the counter is asserted). */
@@ -47,7 +50,7 @@ class CounterDigitsKitTest {
             sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = "fi",
             restart = "Aloita alusta", retry = "Uudestaan", next = "Seuraava", bestTime = "Paras aika", noTime = "–",
             inProgress = "kesken", solved = "ratkaistu", counterFormat = "%1\$d / %2\$d",
-            allPuzzles = "Kaikki tehtävät", done = "Valmis",
+            allPuzzles = "Kaikki tehtävät", done = "Valmis", hoursMinutes = "%1\$d h %2\$d min",
         )
 
         /**

@@ -7,6 +7,9 @@
 // and the solution overlay (`DevAidLayers.kt`), the sheet (`DevAidSheet.kt`). The state and the solve above are
 // TASK-024's and unchanged.
 // WO-006 TASK-029 · S-33: `SheetLayer` passes the sheet's content area on to `DevSheetLayer`.
+// WO-008 TASK-046 · S-27Δ (designs/WO-008-design.md §2): `drive` runs inside `PlayController.solveWithoutBest`, so the
+// aid's solve keeps the best time as it was (REQ-030 rule 4, REQ-046 rule 4 and A3; decisions.md 2026-10-20 "An aid
+// solve keeps the best time through one generic controller member." as amended).
 package app.tangramplaytime.play.devaid
 
 import androidx.compose.runtime.Composable
@@ -145,7 +148,8 @@ internal class DevAid : DevAidHook() {
      * Solve this puzzle now (S-26, S-27; REQ-046 A3, rule 4): closes the sheet, then solves the open puzzle
      * through [controller]'s public actions only, in an order the engine confirms before anything changes. The
      * last lock is the ordinary solve (Solved, a new celebration, `Solved`, the save through `Persistence`); the
-     * best time is never written, and only TYPE-006's locked transitions are used.
+     * actions run inside `solveWithoutBest` (S-27Δ), so the best time stays as it was, and only TYPE-006's locked
+     * transitions are used.
      *
      * @return false, and nothing changes, while locked; false, with the sheet closed and the game unchanged,
      *   when the open puzzle is Solved or no order exists; true when it solved the puzzle.
@@ -157,7 +161,7 @@ internal class DevAid : DevAidHook() {
         val plan = planSolve(controller)
         close()
         if (plan == null) return false
-        drive(controller, plan)
+        controller.solveWithoutBest { drive(controller, plan) }
         return true
     }
 

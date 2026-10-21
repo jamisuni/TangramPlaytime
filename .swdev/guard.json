@@ -18,7 +18,8 @@
       "build-map.md",
       "contracts/src/main/kotlin/app/tangramplaytime/contracts/ILockEngine.kt",
       "contracts/src/main/kotlin/app/tangramplaytime/contracts/IProgressStore.kt",
-      "contracts/src/main/kotlin/app/tangramplaytime/contracts/Types.kt"
+      "contracts/src/main/kotlin/app/tangramplaytime/contracts/Types.kt",
+      "contracts/src/main/kotlin/app/tangramplaytime/contracts/IActiveTime.kt"
     ]
   },
   "_comment_contract_paths": "G2 (2026-10-11): tiers mirror architecture.md §4 — IPuzzleLibrary + the puzzle schema locked (a format change is a capture-side CHG), ILockEngine / IProgressStore / the contract types notify (logged contract-delta, summarized at WO close).",

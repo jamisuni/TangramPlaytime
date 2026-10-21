@@ -57,6 +57,7 @@ class DecorationScaffoldTest {
         sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = "en",
         restart = "Restart", retry = "Retry", next = "Next", bestTime = "Best time", noTime = "–",
         inProgress = "in progress", solved = "solved", counterFormat = "%1\$d / %2\$d", allPuzzles = "All puzzles", done = "Done",
+        hoursMinutes = "%1\$d h %2\$d min",
     )
     private val density = 2.625f
 

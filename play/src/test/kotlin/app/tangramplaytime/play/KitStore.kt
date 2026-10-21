@@ -13,8 +13,13 @@
 // - This file carries no acceptance token (tasks.md § WO-004 intro, "Lines covered twice").
 // - Helper names carry a `kit` / `Kit` / `KIT_` prefix (KitPlay.kt). Declarations that name `Persistence`
 //   are `internal`, so the kit compiles whether S-19 is public or internal.
+// - WO-008 (TASK-045) adds the kit's clock (`KitClock`) and the timed boot (`KitTimed`, `KitSession.startTimed`,
+//   `KitSession.restartTimed`): designs/WO-008-design.md §2 S-1Δ3, S-15Δ3, S-19Δ, S-45 and "Kit doors" (JVM: "a fake
+//   Clock, the real ActiveTime, and countTime() after each jump"). Nothing that was here changes.
 package app.tangramplaytime.play
 
+import app.tangramplaytime.contracts.Clock
+import app.tangramplaytime.contracts.IActiveTime
 import app.tangramplaytime.contracts.IProgressStore
 import app.tangramplaytime.contracts.LockResult
 import app.tangramplaytime.contracts.PieceId
@@ -28,6 +33,7 @@ import app.tangramplaytime.contracts.PuzzleState
 import app.tangramplaytime.contracts.Settings
 import app.tangramplaytime.contracts.SolvedPiece
 import app.tangramplaytime.contracts.Turn
+import app.tangramplaytime.kernel.ActiveTime
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +47,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import java.time.LocalDate
 import java.util.Collections
 import kotlin.math.PI
 import kotlin.math.abs
@@ -145,6 +152,48 @@ internal class KitProgressStore(
     fun kitMaxInFlight(): Int = synchronized(lock) { maxInFlight }
 }
 
+// ── The kit's clock (WO-008) ─────────────────────────────────────────────────────────────────────
+
+/** Where the kit's clock starts: far from zero, so a test can send it back minutes (Clock KDoc: "the zero point is unspecified"). */
+const val KIT_CLOCK_START_MS: Long = 50_000_000L
+
+/** The kit clock's local date unless a test sets another (any fixed date; Clock `today`). */
+val KIT_DAY: LocalDate = LocalDate.of(2026, 10, 20)
+
+/**
+ * The kit's [Clock] (ADR-006; G-14 "Tests set the clock"; tasks.md § WO-008 seam note 3: "The kit's clock moves, it never
+ * sleeps"). Its reading and its date change only when the test changes them, on the test's one thread (S-44 "One caller
+ * thread"). [back] sends the reading backwards, as the app kit's reset of `AppClock.override` does (review F5).
+ */
+internal class KitClock(start: Long = KIT_CLOCK_START_MS, var date: LocalDate = KIT_DAY) : Clock {
+    var millis: Long = start
+        private set
+
+    override fun nowMillis(): Long = millis
+
+    override fun today(): LocalDate = date
+
+    /** Moves the reading [seconds] forward. */
+    fun forward(seconds: Int) {
+        millis += seconds * 1000L
+    }
+
+    /** Moves the reading [seconds] back. */
+    fun back(seconds: Int) {
+        millis -= seconds * 1000L
+    }
+}
+
+/**
+ * One timed boot (KitSession.startTimed): the [run] (store, scope, Persistence, controller), the kit's [clock], and the
+ * kernel's [time] the controller was built with (S-1Δ3). The kit reports touches to [time] itself, in place of `:app`'s
+ * window hook (design §2 "Kit doors"; S-15Δ3 `AppGraph.touched()` "forwards to the kernel").
+ */
+internal class KitTimed(val run: KitRun, val clock: KitClock, val time: IActiveTime) {
+    val c: PlayController get() = run.c
+    val store: KitProgressStore get() = run.store
+}
+
 // ── Booting the controller over Persistence ──────────────────────────────────────────────────────
 
 /** One boot over [store]: the scope Persistence writes on, Persistence (S-19) and the controller over it (S-1Δ). */
@@ -203,6 +252,39 @@ internal class KitSession {
         flush(run)
         run.scope.cancel()
         return start(run.store, events)
+    }
+
+    /**
+     * A boot with a time source, in `AppGraph.start`'s order (designs/WO-008-design.md §2 S-15Δ3: it "builds
+     * ActiveTime(AppClock, persistence.playTimes) and the controller with it"): `Persistence.load(store, scope)` (S-19Δ:
+     * "`load` also reads both" the play times and the settings), then the real `ActiveTime` (S-45) over [clock] and the
+     * play times Persistence read, then `PlayController(library, engine, persistence, time)` (S-1Δ3). It does not call
+     * `setVisible`: each test makes the game visible itself, as `AppGraph.start` does last ("then calls
+     * setVisible(visibleNow)").
+     */
+    fun startTimed(store: KitProgressStore, clock: KitClock, events: MutableList<PlayEvent>? = null): KitTimed {
+        val scope = scope()
+        lateinit var persistence: Persistence
+        runBlocking { withTimeout(KIT_IO_TIMEOUT_MS) { persistence = Persistence.load(store, scope) } }
+        val time: IActiveTime = ActiveTime(clock, persistence.playTimes)
+        val c = if (events == null) {
+            PlayController(kitLibrary, kitEngine, persistence, time)
+        } else {
+            PlayController(kitLibrary, kitEngine, persistence, time) { event: PlayEvent -> events += event }
+        }
+        c.boardDpPerUnit = KIT_DP_PER_UNIT
+        assertNoFailures("the timed start")
+        return KitTimed(KitRun(store, scope, persistence, c), clock, time)
+    }
+
+    /**
+     * The seam-level restart of [restart] for a timed boot: flush, end the old writer's scope, then [startTimed] over the
+     * same store and the same clock — a new Persistence, a new `ActiveTime` over the play times it read, a new controller.
+     */
+    fun restartTimed(timed: KitTimed, events: MutableList<PlayEvent>? = null): KitTimed {
+        flush(timed.run)
+        timed.run.scope.cancel()
+        return startTimed(timed.store, timed.clock, events)
     }
 
     fun close() {

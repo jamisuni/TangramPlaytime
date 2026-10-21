@@ -16,8 +16,10 @@ package app.tangramplaytime.contracts
  *   It never fails the launch and never throws for it (G-15).
  * - A save is complete when the call returns: a later read — in this process or after a
  *   restart — returns what was saved (REQ-003.A2, REQ-025.A1).
- * - The store keeps what it is given; the rules that compute the values (TYPE-005
- *   accounting, TYPE-006 transitions, best-time keeping) are the kernel's (O-04).
+ * - The store keeps what it is given; the rules that compute the values are its callers'
+ *   (O-04): TYPE-005 accounting and the play times in `:kernel` (`IActiveTime`); the
+ *   TYPE-006 transitions, the puzzle time and best-time keeping in `:play`'s
+ *   `PlayController`.
  *
  * Must never: expose a file, preference, database or serialisation type across this
  * seam; lose one puzzle's progress when another is saved (REQ-003); be bypassed by any

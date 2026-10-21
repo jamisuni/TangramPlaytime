@@ -16,4 +16,6 @@
     <string name="counter_format">%1$d / %2$d</string>
     <string name="all_puzzles">Kaikki tehtävät</string>
     <string name="done">Valmis</string>
+    <!-- WO-008 (S-11Δ3): reference translation (G-10), listed in review-notes.md; "h" and "min" are the Finnish abbreviations too. -->
+    <string name="time_hours_minutes">%1$d h %2$d min</string>
 </resources>

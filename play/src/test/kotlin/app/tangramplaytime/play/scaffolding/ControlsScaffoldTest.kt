@@ -18,6 +18,7 @@ import app.tangramplaytime.play.Hit
 import app.tangramplaytime.play.HitTest
 import app.tangramplaytime.play.PlayController
 import app.tangramplaytime.play.PlayLayout
+import app.tangramplaytime.play.PlayTexts
 import app.tangramplaytime.play.ScreenGeometry
 import app.tangramplaytime.play.ShownControls
 import app.tangramplaytime.play.Slot
@@ -111,13 +112,25 @@ class ControlsScaffoldTest {
         }
     }
 
+    // WO-008 TASK-048 (review F4; designs/WO-008-design.md §2 S-48: `bestTimeText(seconds: Int?, texts: PlayTexts)` "returns
+    // `noTime` or `timeOf`"): the call moves to the texts. One hour reads "1 h 0 min", no longer "60:00" — a corrected check:
+    // its source was WO-004's m:ss-only rendering, and decisions.md 2026-10-20 "One format for every time the game shows …"
+    // makes it the h and min form from one hour (REQ-029 rule 2). The format's own pin is TimeFormatKitTest.
     @Test
     fun theBestTimeIsMinutesAndTwoDigitSecondsOrTheDash() {
-        assertEquals("–", bestTimeText(null, "–"))
-        assertEquals("1:15", bestTimeText(75, "–"))
-        assertEquals("0:05", bestTimeText(5, "–"))
-        assertEquals("60:00", bestTimeText(3600, "–"))
+        assertEquals("–", bestTimeText(null, texts))
+        assertEquals("1:15", bestTimeText(75, texts))
+        assertEquals("0:05", bestTimeText(5, texts))
+        assertEquals("1 h 0 min", bestTimeText(3600, texts))
     }
+
+    /** The English texts as `:app` hands them in (S-11Δ fields, S-11Δ3 `hoursMinutes`); only `noTime` and `hoursMinutes` are read here. */
+    private val texts = PlayTexts(
+        sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = "en",
+        restart = "Restart", retry = "Retry", next = "Next", bestTime = "Best time", noTime = "–",
+        inProgress = "in progress", solved = "solved", counterFormat = "%1\$d / %2\$d", allPuzzles = "All puzzles", done = "Done",
+        hoursMinutes = "%1\$d h %2\$d min",
+    )
 
     /** A full-set puzzle open with one piece (not the parallelogram) placed alone at its solution pose through S-2. */
     private fun placedAlone(): Triple<PlayController, ScreenGeometry, Placement> {

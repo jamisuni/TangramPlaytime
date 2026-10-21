@@ -46,6 +46,13 @@
 //     MainActivity, resumed, unchanged for [KIT_APP_SETTLE_MS], no Compose call) before its first Compose read;
 //   - every Compose call of the kit runs under [bounded]: if it does not return within [KIT_APP_COMPOSE_BOUND_MS], the kit
 //     interrupts it and fails with a [KitComposeStall], which no wait polls again (a stall is reported, never retried).
+// - Amended WO-008 (TASK-045; P5): the closed world and the language world admit the solved row's best time, read live
+//   ([KitWorldWithBest]). Amended WO-008 (the kit fix after TASK-043 hop 1): a constructed portrait tablet is started in
+//   landscape and turned ([useTablet]). Amended WO-008 (TASK-050; designs/WO-008-design.md §2 S-46, S-15Δ3 and "Kit doors",
+//   `app/` device): the kit's one new `:app` door is S-46's `AppClock.override` (ADR-006: tests set the clock), installed on
+//   the main thread and reset to null by a registered restore; touches for the time lines go through the window
+//   (`Instrumentation.sendPointerSync`), never `performTouchInput`; Home, the screen off and the lifecycle read back. No token
+//   lives in this file.
 package app.tangramplaytime.app
 
 import android.app.Activity
@@ -60,6 +67,8 @@ import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
 import android.view.Choreographer
+import android.view.InputDevice
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -86,6 +95,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import app.tangramplaytime.content.PuzzleLibraries
+import app.tangramplaytime.contracts.Clock
 import app.tangramplaytime.contracts.ILockEngine
 import app.tangramplaytime.contracts.IPuzzleLibrary
 import app.tangramplaytime.contracts.LockResult
@@ -108,6 +118,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.rules.TestRule
 import org.junit.runners.model.Statement
 import java.lang.reflect.Modifier
+import java.time.LocalDate
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -368,6 +379,37 @@ internal fun kitAppDistToBoundary(o: Offset, polygon: List<Offset>): Float {
     }
     return best
 }
+
+/** The distance from [o] to the rectangle [r], or −1 when [o] lies inside it (edges included). */
+internal fun kitAppDistToRect(o: Offset, r: Rect): Float {
+    if (o.x >= r.left && o.x <= r.right && o.y >= r.top && o.y <= r.bottom) return -1f
+    val dx = max(max(r.left - o.x, 0f), o.x - r.right)
+    val dy = max(max(r.top - o.y, 0f), o.y - r.bottom)
+    return hypot(dx, dy)
+}
+
+/**
+ * The `app/` device kit's `Clock`, installed as `AppClock.override` (designs/WO-008-design.md §2 S-46 and "Kit doors", `app/`
+ * device: "a kit clock that starts at `elapsedRealtime()`"; the brief: "and `LocalDate.now()`"). Its reading moves only when
+ * the kit moves it, on the main thread (KitApp `kitMoveClock`; G-14 "Tests set the clock"; ADR-006).
+ */
+internal class KitAppClock(start: Long, val date: LocalDate) : Clock {
+    @Volatile
+    var millis: Long = start
+        private set
+
+    override fun nowMillis(): Long = millis
+
+    override fun today(): LocalDate = date
+
+    /** Moves the reading [seconds] forward (on the main thread). */
+    fun forward(seconds: Int) {
+        millis += seconds * 1000L
+    }
+}
+
+/** What the controller reports after a fold (S-1Δ3): today's and all-time play time, and the open puzzle's seconds. */
+internal data class KitAppCounts(val today: Int, val allTime: Int, val puzzle: Int)
 
 internal fun kitAppOnCircle(centre: Offset, radius: Float, deg: Double): Offset {
     val rad = Math.toRadians(deg)
@@ -963,11 +1005,18 @@ internal class KitApp(private val rule: KitAppRule) {
      * - When that display is already in force (the tablet image's own; or a constructed tablet earlier in the test), only the
      *   rotation is frozen: a turn of the running activity, the turn REQ-036 A2 and "What survives a rotation" mean.
      * - Otherwise the tablet is constructed, and it is a tablet the game starts on (decisions.md 2026-10-18 "Worker wins three
-     *   contests", part 1): the override and the rotation are set under the running activity, then a new activity is started
-     *   in its place ([coldStart]). On API 26 an override over a running activity is no recreation (the instance keeps its
-     *   phone layout, measured), and on the API 37 images it is one; the kit takes the cold start on both phone images, so the
-     *   dev run takes the floor's route and every constructed tablet is the device REQ-036 A1 names, started on, never a phone
-     *   grown into one (no REQ names that).
+     *   contests", part 1): the override and the landscape rotation are set under the running activity, then a new activity is
+     *   started in its place ([coldStart]). On API 26 an override over a running activity is no recreation (the instance keeps
+     *   its phone layout, measured), and on the API 37 images it is one; the kit takes the cold start on both phone images, so
+     *   the dev run takes the floor's route and every constructed tablet is the device REQ-036 A1 names, started on, never a
+     *   phone grown into one (no REQ names that).
+     * - A portrait tablet that is constructed is started on in landscape and then turned, as above, once the started activity
+     *   reports the landscape tablet (seam note 4: "Portrait on a tablet is a frozen rotation"). Measured on `Phone_API_31`
+     *   (WO-008, after TASK-043 hop 1): the `wm density` change rebuilds SystemUI's 3-button navigation bar, and the new bar,
+     *   attaching while the rotation is locked, locks it again at the display's rotation of that moment. A freeze at 90 made
+     *   within a few hundred ms of the override, before the display had turned, was set back to 0 that way, and the tablet
+     *   started in landscape. A freeze at the landscape rotation is the display's own rotation then, so that reset changes
+     *   nothing, and the turn comes when no rebuild is pending (the route `TabletLayoutKitTest` takes).
      * With [needScreen] the activity and its insets then settle ([settledInsets]); without it (a paused clock) the caller
      * reads the first frames itself.
      */
@@ -975,17 +1024,22 @@ internal class KitApp(private val rule: KitAppRule) {
         val d = tabletDisplay()
         val landscapeAtZero = d.widthPx >= d.heightPx
         val rotation = if (portrait == landscapeAtZero) UiAutomation.ROTATION_FREEZE_90 else UiAutomation.ROTATION_FREEZE_0
+        val wide = max(d.widthDp, d.heightDp)
+        val narrow = min(d.widthDp, d.heightDp)
         if (wm().inForce == d) {
             freezeRotation(rotation, what)
         } else {
+            val landscape = if (landscapeAtZero) UiAutomation.ROTATION_FREEZE_0 else UiAutomation.ROTATION_FREEZE_90
             coldStart(what) {
                 applyDisplay(d, what)
-                freezeRotation(rotation, what)
+                freezeRotation(landscape, what)
             }
             awaitDisplay(d, "$what (started on the tablet)", needScreen = true)
+            if (rotation != landscape) {
+                awaitDisplayDp(wide, narrow, "$what (started on the tablet in landscape, before the turn)", needScreen = false)
+                freezeRotation(rotation, "$what (the turn to portrait)")
+            }
         }
-        val wide = max(d.widthDp, d.heightDp)
-        val narrow = min(d.widthDp, d.heightDp)
         if (portrait) awaitDisplayDp(narrow, wide, what, needScreen) else awaitDisplayDp(wide, narrow, what, needScreen)
         if (needScreen) settledInsets("$what, after the display change")
     }
@@ -1450,6 +1504,189 @@ internal class KitApp(private val rule: KitAppRule) {
         waitIdle()
     }
 
+    // ── WO-008 (TASK-050): the kit clock (S-46 `AppClock.override`), touches through the window, the lifecycle ──
+
+    /**
+     * Installs a kit clock as `AppClock.override` (designs/WO-008-design.md §2 S-46: "`@Volatile internal var override: Clock?`
+     * is the kit's door (ADR-006)"; "Kit doors", `app/` device: "a kit clock that starts at `elapsedRealtime()`"), on the main
+     * thread, and folds once there (S-2Δ3 `countTime()`), so every second the real clock gave before is in the counts read
+     * next and no later real second can reach them: from here the clock moves only when the kit moves it. No restore is
+     * registered: [kitUseClock] does that; `ProcessDeathKitTest` resets the override in its own `finally`.
+     */
+    fun kitInstallClock(what: String): KitAppClock = onMain {
+        val clock = KitAppClock(SystemClock.elapsedRealtime(), LocalDate.now())
+        AppClock.override = clock
+        controller().countTime()
+        clock
+    }
+
+    /**
+     * [kitInstallClock], with the override's reset to null registered first, in the app's phase, so it runs whatever the test
+     * does (the brief: "it is reset to null in `finally`"). The jump back to the real clock is S-45's backwards reading
+     * (decisions.md 2026-10-20, the F5 amendment: "the time since the last touch is kept"), so a leg that ends with the player
+     * idle leaves no real second to be counted after it.
+     */
+    fun kitUseClock(what: String): KitAppClock {
+        onRestore("the kit clock") { onMain { AppClock.override = null } }
+        return kitInstallClock(what)
+    }
+
+    /** One fold on the main thread (S-2Δ3 `countTime()`), then the counts as the controller reports them (S-1Δ3 reads). */
+    fun kitFold(): KitAppCounts = onController {
+        countTime()
+        KitAppCounts(playTimes.todaySeconds, playTimes.allTimeSeconds, timeSeconds)
+    }
+
+    /**
+     * The kit clock moved [seconds] forward and one fold, in one step on the main thread (the brief: the clock "moves on the
+     * main thread, and `countTime()` runs on the main thread after each move"), so the app's own ticker never sees the move
+     * unfolded; then the counts.
+     */
+    fun kitMoveClock(clock: KitAppClock, seconds: Int): KitAppCounts = onController {
+        clock.forward(seconds)
+        countTime()
+        KitAppCounts(playTimes.todaySeconds, playTimes.allTimeSeconds, timeSeconds)
+    }
+
+    /**
+     * An inert point of the screen in use, in `play-screen` px: the board's empty margin (design §2 "Kit doors", `app/` device:
+     * "at an inert point, the board's empty margin"). Among the points of a 4 dp grid inside `board`, the one farthest from the
+     * silhouette's box (so it lies in the margin around the puzzle), every `board-piece` drawn shape (S-14 keys through the
+     * engine) and every control or tagged display on the board (`restart`, the DEV button, the board's flip badge, the timer);
+     * its clearance must be at least 16 dp, beyond REQ-015's 12 dp touch margin of a piece, or this fails loudly. Read on the
+     * screen in use (the WO-005 lesson) and asserted inside `board` and outside each of those before it is touched.
+     */
+    fun kitInertBoardPoint(what: String): Offset {
+        val board = bounds(PlayTags.BOARD)
+        val boxes = listOf(PlayTags.SILHOUETTE, KitAppTag.RESTART, DevAidTags.DEV_BUTTON, PlayTags.FLIP_BADGE_BOARD, PlayTags.TIMER)
+            .filter { exists(it) }.map { it to bounds(it) }
+        val pieces = PieceId.entries.map { PlayTags.boardPiece(it) }.filter { exists(it) }.map { it to boardPolygonPx(it) }
+        fun clearance(q: Offset): Float {
+            var c = Float.MAX_VALUE
+            for ((_, r) in boxes) c = min(c, kitAppDistToRect(q, r))
+            for ((_, poly) in pieces) c = min(c, if (kitAppInside(q, poly)) -1f else kitAppDistToBoundary(q, poly))
+            return c
+        }
+        val step = dp(4f)
+        var best: Offset? = null
+        var bestClear = -1f
+        var y = board.top + step
+        while (y <= board.bottom - step) {
+            var x = board.left + step
+            while (x <= board.right - step) {
+                val q = Offset(x, y)
+                val c = clearance(q)
+                if (c > bestClear) {
+                    best = q
+                    bestClear = c
+                }
+                x += step
+            }
+            y += step
+        }
+        val at = best ?: throw AssertionError("kit: $what: `board` $board holds no grid point")
+        if (bestClear < dp(16f)) {
+            throw AssertionError("kit: $what: no point of `board` $board is 16 dp clear of ${boxes.map { it.first } + pieces.map { it.first }} (best ${bestClear / density()} dp at $at)")
+        }
+        if (!(at.x > board.left && at.x < board.right && at.y > board.top && at.y < board.bottom)) throw AssertionError("kit: $what: the point $at lies outside `board` $board")
+        for ((tag, r) in boxes) if (kitAppDistToRect(at, r) < 0f) throw AssertionError("kit: $what: the point $at lies inside `$tag` $r")
+        for ((tag, poly) in pieces) if (kitAppInside(at, poly)) throw AssertionError("kit: $what: the point $at lies inside `$tag`'s drawn shape")
+        return at
+    }
+
+    /**
+     * A touch through the window at an inert point ([kitInertBoardPoint]): `Instrumentation.sendPointerSync`, DOWN then UP at the
+     * same point, which `InputManager` delivers to the window, so it reaches `MainActivity.dispatchTouchEvent` and `:app`'s
+     * touch report (S-15Δ3; design §3 library fact 7 and reviews/WO-008-design-review.md F1: `performTouchInput` and
+     * `performClick` go to the `AndroidComposeView` and never reach it). Display coordinates are the point's window
+     * coordinates (the `play-screen` node's window bounds plus the point) plus the window's location on the screen; the window
+     * point is checked to lie inside `board`'s window bounds. Called from the test thread, never the main one. Afterwards the
+     * game is as it was (the open puzzle, its state, its board, the grid): the touch was inert, or this fails loudly.
+     */
+    fun kitTouchThroughWindow(what: String): Offset {
+        val at = kitInertBoardPoint(what)
+        val before = onController { listOf(puzzle.id, state, placed.toList(), overviewOpen) }
+        val inWindow = at + windowBounds(PlayTags.SCREEN).topLeft
+        val boardInWindow = windowBounds(PlayTags.BOARD)
+        if (!boardInWindow.contains(inWindow)) throw AssertionError("kit: $what: the window point $inWindow lies outside `board`'s window bounds $boardInWindow")
+        val a = activity(what)
+        val location = onMain { IntArray(2).also { a.window.decorView.getLocationOnScreen(it) } }
+        val x = inWindow.x + location[0]
+        val y = inWindow.y + location[1]
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val downTime = SystemClock.uptimeMillis()
+        val down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 0)
+        down.source = InputDevice.SOURCE_TOUCHSCREEN
+        try {
+            instrumentation.sendPointerSync(down)
+        } finally {
+            down.recycle()
+        }
+        val up = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, x, y, 0)
+        up.source = InputDevice.SOURCE_TOUCHSCREEN
+        try {
+            instrumentation.sendPointerSync(up)
+        } finally {
+            up.recycle()
+        }
+        waitIdle("$what: an idle after the window touch")
+        val after = onController { listOf(puzzle.id, state, placed.toList(), overviewOpen) }
+        if (after != before) throw AssertionError("kit: $what: the window touch at $at changed the game ($before → $after): the point was not inert")
+        return at
+    }
+
+    /** [a]'s lifecycle stage as androidx.test's monitor reads it (on the main thread, where the monitor must be read). */
+    fun kitStageOf(a: Activity): Stage = onMain { ActivityLifecycleMonitorRegistry.getInstance().getLifecycleStageOf(a) }
+
+    /** Waits until [a] is at [stage], read back from the lifecycle alone (no Compose call), failing loudly after 60 s. */
+    fun kitAwaitStage(a: Activity, stage: Stage, what: String) {
+        await("$what: MainActivity $stage (lifecycle read back)", KIT_APP_DEVICE_WAIT_MS) { kitStageOf(a) == stage }
+    }
+
+    /** The launched MainActivity is RESUMED now, read back before a clock move (the brief). */
+    fun kitAssertResumed(what: String) {
+        val stage = kitStageOf(activity(what))
+        if (stage != Stage.RESUMED) throw AssertionError("kit: $what: MainActivity is $stage, not RESUMED")
+    }
+
+    /** Home, as the player presses it (`input keyevent KEYCODE_HOME`); the caller reads the lifecycle back. */
+    fun kitPressHome() {
+        shell("input keyevent KEYCODE_HOME")
+    }
+
+    /**
+     * The app back in front, as the player returns to it: the task brought forward with its MainActivity (`am start` with
+     * NEW_TASK | REORDER_TO_FRONT, 0x10020000), then one steady resumed MainActivity ([awaitSteadyActivity]).
+     */
+    fun kitBringAppToFront(what: String) {
+        shell("am start -W -f 0x10020000 -n $KIT_APP_PACKAGE/$KIT_APP_PACKAGE.app.MainActivity")
+        awaitSteadyActivity("$what: MainActivity in front again")
+    }
+
+    /** The screen off, as its power key turns it off (`input keyevent KEYCODE_SLEEP`); the caller reads the lifecycle back. */
+    fun kitScreenOff() {
+        shell("input keyevent KEYCODE_SLEEP")
+    }
+
+    /** The screen on and the keyguard dismissed (`KEYCODE_WAKEUP`, the power service read back as awake, `wm dismiss-keyguard`). */
+    fun kitScreenOn(what: String) {
+        shell("input keyevent KEYCODE_WAKEUP")
+        await("$what: the screen awake (`dumpsys power` mWakefulness=Awake)", KIT_APP_DEVICE_WAIT_MS) { shell("dumpsys power").contains("mWakefulness=Awake") }
+        shell("wm dismiss-keyguard")
+    }
+
+    /**
+     * Registers the restore of the screen and the app (seam note 3, WO-008 brief: "the screen on and unlocked, the app in
+     * front"), in the app's phase, before the controller's restore runs (restores run newest first): the screen on and the
+     * keyguard dismissed, then the app brought to front unless a MainActivity is resumed.
+     */
+    fun kitRestoreScreenAndAppAfterTheTest() {
+        onRestore("the screen on and the app in front") {
+            kitScreenOn("the restore")
+            if (!live()) kitBringAppToFront("the restore")
+        }
+    }
+
     // ── Touch on `play-screen` (the play kit's pattern, copied: another module) ──
 
     fun touch(block: TouchInjectionScope.() -> Unit) {
@@ -1695,10 +1932,49 @@ internal class KitApp(private val rule: KitAppRule) {
     }
 
     /**
+     * The solved row's best time as S-48 forms the controller's `bestSeconds` (designs/WO-008-design.md §2 S-11Δ3/S-48:
+     * `bestTimeText` "returns `noTime` or `timeOf`"; `timeOf` "below 3600 s `m:ss` in hand-built ASCII"), formed here by the
+     * kit because `timeOf` is internal to `:play` (decisions.md 2026-10-20 "The play-through's closed world of texts admits the
+     * best time the solved row shows …"; WO-008 TASK-045). Minutes as they come, seconds as two ASCII digits.
+     *
+     * Null while the open puzzle has no best time: the row then shows `no_time` ("–"), a resource text the worlds already hold.
+     * One hour or more fails loudly (the same row: "A best time of one hour or more fails the leg loudly: a play-through on the
+     * device clock never reaches it"), and so does a negative one (WO-008 must-do 2: none is ever written).
+     */
+    fun kitBestTimeText(): String? {
+        val best = onController { bestSeconds } ?: return null
+        if (best < 0 || best >= 3600) {
+            throw AssertionError(
+                "kit: the controller's best time is $best s; the closed world admits the solved row's m:ss below one hour only " +
+                    "(decisions.md 2026-10-20 \"The play-through's closed world of texts admits the best time …\")",
+            )
+        }
+        return "${best / 60}:${(best % 60).toString().padStart(2, '0')}"
+    }
+
+    /**
+     * A world of texts that also holds, at each read, the solved row's best time as the controller holds it then
+     * ([kitBestTimeText]). A player's solve sets the best time during a play-through (REQ-030 statement), so it is read when a
+     * text is checked or the world is listed, never once at the start (decisions.md 2026-10-20 "The play-through's closed
+     * world of texts admits the best time …": "exactly as S-48 forms the controller's `bestSeconds`"). Every other text is
+     * [base], fixed.
+     */
+    private inner class KitWorldWithBest(private val base: Set<String>) : AbstractSet<String>() {
+        private fun now(): Set<String> = kitBestTimeText()?.let { base + it } ?: base
+
+        override val size: Int get() = now().size
+
+        override fun iterator(): Iterator<String> = now().iterator()
+
+        override fun contains(element: String): Boolean = element in base || element == kitBestTimeText()
+    }
+
+    /**
      * The play-through's closed world of texts (the TASK-030 brief: "the `values/` strings of `:app`, the `dev_aid_*` strings,
      * the bundle's titles, the counter format's output for this library, the best time's '–'", the last one being `values/`'s
      * own; a format pattern counts by its outputs only), plus the DEV overlay's labels, `PieceId` names (S-29: "data, as a
-     * puzzle title is").
+     * puzzle title is"), plus — from WO-008 on — the solved row's best time as S-48 forms the controller's `bestSeconds`, read
+     * live ([KitWorldWithBest]; decisions.md 2026-10-20 "The play-through's closed world of texts admits the best time …").
      */
     fun closedWorld(): Set<String> {
         val en = contextFor("en")
@@ -1707,10 +1983,14 @@ internal class KitApp(private val rule: KitAppRule) {
         out += counterTexts(en)
         library.puzzles.forEach { out += it.titles.values }
         PieceId.entries.forEach { out += it.name }
-        return out
+        return KitWorldWithBest(out)
     }
 
-    /** Every text the screens may show under S-36's rule for [language] ("fi" or "en"): its resources, its counter, its titles. */
+    /**
+     * Every text the screens may show under S-36's rule for [language] ("fi" or "en"): its resources, its counter, its titles,
+     * and the solved row's best time as S-48 forms it, read live (ASCII digits under every language: decisions.md 2026-10-20
+     * "One format for every time the game shows …"; the same admission as [closedWorld]).
+     */
     fun languageWorld(language: String): Set<String> {
         val ctx = contextFor(language)
         val out = LinkedHashSet<String>()
@@ -1718,7 +1998,7 @@ internal class KitApp(private val rule: KitAppRule) {
         out += counterTexts(ctx)
         library.puzzles.forEach { out += kitAppTitle(it, language) }
         PieceId.entries.forEach { out += it.name }
-        return out
+        return KitWorldWithBest(out)
     }
 
     /** The resource texts of [language] whose resolution in the other language differs: the comparisons that discriminate. */

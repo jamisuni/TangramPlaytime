@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# WO-003 TASK-015 · seam S-16 (tasks.md § WO-003 › Seams); WO-006 TASK-028 · seam S-37 (tasks.md § WO-006 › Seams)
-# · platform-notes/android.md § Device hygiene:
+# WO-003 TASK-015 · seam S-16 (tasks.md § WO-003 › Seams); WO-006 TASK-028 · seam S-37 (tasks.md § WO-006 › Seams);
+# WO-008 TASK-043 · seam S-37Δ (tasks.md § WO-008 › Seams) · platform-notes/android.md § Device hygiene:
 # reset the app's data and the device-level state the WO-006 kit and the floor channel change on the attached
 # device before a device step, and check it after. The kit restores everything itself (tasks.md § WO-006 seam
 # note 3); this script is the net under it, and its --check names any leftover.
@@ -33,6 +33,11 @@
 #                                                                                  setting and the AIRPLANE_MODE
 #                                                                                  broadcast as root)
 #   adbd-root                       adbd not running as root (`id -u` not 0)       reset: adb unroot (last)
+#   crash-window (S-37Δ)            no window holding the focus (every `mCurrentFocus` line of `dumpsys window`) has a
+#                                   title starting "Application Error" or "Application Not Responding" (the WO-006
+#                                   floor's line: `Application Error: com.android.launcher3`).
+#                                   reset: never dismissed; read last, after every other step, and when such a window
+#                                   still holds the focus the reset fails (exit 1), names it and says "reboot the image"
 #
 # Exit: 0 reset done / clean; 1 reset failed / NOT clean (the files and the items off their baseline are listed);
 # 2 no adb, no device, a bad argument, or state that cannot be read (a non-debuggable install, a setting or
@@ -199,7 +204,28 @@ read_adbd() {
 }
 restore_adbd() { switch_adbd unroot || true; }
 
-ITEMS="display-size display-density rotation show-ime-with-hard-keyboard app-locales device-locale airplane-mode adbd-root"
+# S-37Δ: a crash or not-responding dialog holding the focus (WO-006: the floor's launcher crash dialog kept finishing
+# activities from reaching DESTROYED while --check read clean). Read from every mCurrentFocus line (one per display).
+read_crash_window() {
+  local out lines line title hit=""
+  out="$(sh_ 'dumpsys window')"
+  lines="$(grep -E 'mCurrentFocus=' <<<"$out" | sed 's/^[[:space:]]*//')"
+  if [ -z "$lines" ]; then ST=unk; MSG="dumpsys window printed no mCurrentFocus line"; return; fi
+  while IFS= read -r line; do
+    # mCurrentFocus=Window{<hash> u<user> <title>}, or mCurrentFocus=null
+    title="$(sed -nE 's/^mCurrentFocus=Window\{[^ ]+ u[0-9]+ (.*)\}$/\1/p' <<<"$line")"
+    case "$title" in
+      "Application Error"*|"Application Not Responding"*) hit="$title"; MSG="'$title' holds the focus ($line)"; break ;;
+    esac
+  done <<<"$lines"
+  if [ -n "$hit" ]; then
+    ST=off; MSG="$MSG - the reset never dismisses it: reboot the image"
+  else
+    ST=ok; MSG="no crash or not-responding window holds the focus ($(tr '\n' ' ' <<<"$lines" | sed 's/ $//'))"
+  fi
+}
+
+ITEMS="display-size display-density rotation show-ime-with-hard-keyboard app-locales device-locale airplane-mode adbd-root crash-window"
 read_item() {
   case "$1" in
     display-size) read_display size ;;
@@ -210,6 +236,7 @@ read_item() {
     device-locale) read_device_locale ;;
     airplane-mode) read_airplane ;;
     adbd-root) read_adbd ;;
+    crash-window) read_crash_window ;;
   esac
 }
 restore_item() {
@@ -229,7 +256,9 @@ OFF=(); UNK=()
 verdict() {  # $1 = reset | check
   if [ "${#UNK[@]}" -gt 0 ]; then echo "$1: unknown - ${UNK[*]}${OFF[*]:+ (also off: ${OFF[*]})}" >&2; exit 2; fi
   if [ "${#OFF[@]}" -gt 0 ]; then
-    if [ "$1" = reset ]; then echo "reset: failed - ${OFF[*]}" >&2; else echo "check: NOT clean - ${OFF[*]}"; fi
+    local reboot=""
+    case " ${OFF[*]} " in *" crash-window "*) reboot=" - reboot the image" ;; esac
+    if [ "$1" = reset ]; then echo "reset: failed - ${OFF[*]}$reboot" >&2; else echo "check: NOT clean - ${OFF[*]}$reboot"; fi
     exit 1
   fi
   if [ "$1" = reset ]; then echo "reset: done"; else echo "check: clean"; fi
@@ -253,6 +282,8 @@ case "${1:-}" in
         skip) echo "  $it: skipped - $MSG" ;;
         unk) echo "  $it: unknown - $MSG"; UNK+=("$it") ;;
         off)
+          # S-37Δ: a crash or not-responding window is never dismissed; it fails the reset, named, with "reboot the image".
+          if [ "$it" = crash-window ]; then echo "  $it: NOT clean - $MSG"; OFF+=("$it"); continue; fi
           before="$MSG"
           restore_item "$it"
           read_item "$it"

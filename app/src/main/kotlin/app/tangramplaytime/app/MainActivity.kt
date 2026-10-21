@@ -17,6 +17,10 @@
 // WO-006 TASK-032 · S-36, one language rule (tasks.md § WO-006 › Seams): the base context is wrapped by `AppLanguage` in
 // `attachBaseContext`, and `PlayTexts.titleLanguage` is the same rule's value · REQ-047; G-10, O-06 · decisions.md 2026-10-17
 // "One language rule for strings and titles" (Q7), replacing the 2026-10-12 TASK-015 row's split.
+// WO-008 TASK-047 · S-11Δ3 (designs/WO-008-design.md §2): `PlayTexts.hoursMinutes` from `time_hours_minutes` (G-10).
+// WO-008 TASK-049 · S-15Δ3 (designs/WO-008-design.md §2): the window's touches (`dispatchTouchEvent`, before `super`) and the
+// activity's start and stop (`onStart`; `onStop`, after `goHome`) go to `AppGraph` · TYPE-005; REQ-029 · decisions.md
+// 2026-10-20 "TYPE-005 as code." · design §3 library facts 1 and 2.
 package app.tangramplaytime.app
 
 import android.content.Context
@@ -24,6 +28,7 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
+import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
@@ -100,6 +105,8 @@ class MainActivity : ComponentActivity() {
             counterFormat = getString(R.string.counter_format),
             allPuzzles = getString(R.string.all_puzzles),
             done = getString(R.string.done),
+            // WO-008 S-11Δ3: the one time format's "h" and "min" (REQ-029 rule 2; G-10).
+            hoursMinutes = getString(R.string.time_hours_minutes),
         )
         // S-35 step 3: the layout of the class (S-5's phone value unchanged, or the tablet value of Q2).
         val layout = when (layoutClass) {
@@ -122,10 +129,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * S-15Δ3: every touch of the window is the player's "last touch" (TYPE-005; decisions.md 2026-10-20 "TYPE-005 as code.":
+     * down, move or up), reported before the window's views handle it. Every real touch of the window passes here
+     * (`DecorView` → `Window.Callback`, design §3 library fact 2).
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        AppGraph.touched()
+        return super.dispatchTouchEvent(ev)
+    }
+
     override fun onStart() {
         super.onStart()
         // The setting can change while the app is in the background; onStart precedes every first frame.
         reducedMotion = Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
+        // S-15Δ3: the game is on screen from here to onStop (TYPE-005 "visible on screen"; design §3 library fact 1).
+        AppGraph.visible(true)
     }
 
     override fun onStop() {
@@ -134,6 +153,8 @@ class MainActivity : ComponentActivity() {
         // the controller there is no drag.
         val controller = AppGraph.controller.value
         if (controller != null && controller.dragged != null) controller.goHome()
+        // S-15Δ3, after goHome: the game leaves the screen, and the times are written with the piece back home.
+        AppGraph.visible(false)
         super.onStop()
     }
 }

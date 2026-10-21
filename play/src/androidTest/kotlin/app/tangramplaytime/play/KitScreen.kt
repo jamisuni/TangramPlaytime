@@ -25,6 +25,10 @@
 // mask, not the product or the data"): `silhouetteBands`, the silhouette's "3 px in" and "3 px out" pixel sets measured from
 // the exact outline (`kitOutline`, `kitBands`). `silhouetteMask` (each polygon widened 0.75 px) stays for the legs that do not
 // measure from the outline and for the self-check's old construction. No token lives in this file.
+//
+// Amended WO-008 (TASK-048; designs/WO-008-design.md §2 S-11Δ3, S-15Δ3 and "Kit doors", `play/` device): the `PlayTexts`
+// literal gains `hoursMinutes` (review F4); `KitDeviceClock` and `kitTimedControllerOver`, a controller with a time source next
+// to `kitControllerOver`, which is unchanged. No token lives in this file.
 package app.tangramplaytime.play
 
 import androidx.activity.ComponentActivity
@@ -53,6 +57,8 @@ import androidx.test.core.app.ActivityScenario
 import app.tangramplaytime.content.PuzzleLibraries
 import app.tangramplaytime.contracts.ArtLayer
 import app.tangramplaytime.contracts.ArtShape
+import app.tangramplaytime.contracts.Clock
+import app.tangramplaytime.contracts.IActiveTime
 import app.tangramplaytime.contracts.ILockEngine
 import app.tangramplaytime.contracts.IProgressStore
 import app.tangramplaytime.contracts.IPuzzleLibrary
@@ -67,6 +73,7 @@ import app.tangramplaytime.contracts.PuzzleProgress
 import app.tangramplaytime.contracts.PuzzleState
 import app.tangramplaytime.contracts.Settings
 import app.tangramplaytime.contracts.Turn
+import app.tangramplaytime.kernel.ActiveTime
 import app.tangramplaytime.kernel.LockEngine
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -74,6 +81,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import java.time.LocalDate
 import java.util.Collections
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -109,7 +117,8 @@ internal val kitPhoneLayout: PlayLayout = PlayLayout(
 
 /**
  * S-11 kit literal, grown by S-11Δ (designs/WO-004-design.md §2: "Kit literal: "Restart", "Retry", "Next", "Best time",
- * "–", "in progress", "solved", "%1$d / %2$d", "All puzzles", "Done""; design §3 "`KitScreen.kt`'s `PlayTexts` literal grows").
+ * "–", "in progress", "solved", "%1$d / %2$d", "All puzzles", "Done""; design §3 "`KitScreen.kt`'s `PlayTexts` literal grows")
+ * and by S-11Δ3 (designs/WO-008-design.md §2: `hoursMinutes` from `time_hours_minutes` = "%1$d h %2$d min"; WO-008 TASK-048).
  */
 internal val kitTexts: PlayTexts = PlayTexts(
     sizeSmall = "S",
@@ -126,6 +135,7 @@ internal val kitTexts: PlayTexts = PlayTexts(
     counterFormat = "%1\$d / %2\$d",
     allPuzzles = "All puzzles",
     done = "Done",
+    hoursMinutes = "%1\$d h %2\$d min",
 )
 
 /** S-1: a fresh controller over the real engine and the bundled puzzles — the fresh start. */
@@ -819,6 +829,63 @@ internal fun kitControllerOver(rule: ComposeContentTestRule, store: KitDeviceSto
     val persistence = runBlocking(Dispatchers.IO) { withTimeout(KIT_DEVICE_IO_TIMEOUT_MS) { Persistence.load(store, scope) } }
     val controller = rule.runOnUiThread { PlayController(kitLibrary, kitEngine, persistence, onEvent) }
     return KitPersisted(store, persistence, controller, failures)
+}
+
+// ── WO-008 (TASK-048): a controller with a time source ──────────────────────────────────────────────────
+
+/** Where the device kit's clock starts: any reading far from zero (Clock KDoc: "the zero point is unspecified"). */
+internal const val KIT_DEVICE_CLOCK_START_MS: Long = 50_000_000L
+
+/**
+ * The play device kit's `Clock` (ADR-006; G-14 "Tests set the clock"; designs/WO-008-design.md §2 "Kit doors", `play/` device:
+ * "The same doors; the kit calls `time.touched()` in place of `:app`'s hook"). Its reading moves only when a test moves it, and a
+ * test moves it on the main thread, where the controller and the kernel read it (platform-notes/android.md § Compose test kit:
+ * the clock is advanced "on the main thread, never `Thread.sleep`"; S-44 "One caller thread"). It is not the compose rule's
+ * `mainClock`, which paces the frames only.
+ */
+internal class KitDeviceClock(start: Long = KIT_DEVICE_CLOCK_START_MS, var date: LocalDate = LocalDate.of(2026, 10, 20)) : Clock {
+    @Volatile
+    var millis: Long = start
+        private set
+
+    override fun nowMillis(): Long = millis
+
+    override fun today(): LocalDate = date
+
+    /** Moves the reading [seconds] forward (call it on the main thread). */
+    fun forward(seconds: Int) {
+        millis += seconds * 1000L
+    }
+}
+
+/** A controller over `Persistence` with a time source ([kitTimedControllerOver]): the boot, the kit's [clock], the kernel's [time]. */
+internal class KitTimedPersisted(val persisted: KitPersisted, val clock: KitDeviceClock, val time: IActiveTime) {
+    val controller: PlayController get() = persisted.controller
+    val store: KitDeviceStore get() = persisted.store
+}
+
+/**
+ * [kitControllerOver] with a time source, in `AppGraph.start`'s order (designs/WO-008-design.md §2 S-15Δ3: it "builds
+ * ActiveTime(AppClock, persistence.playTimes) and the controller with it"): `Persistence.load` over [store] off the main thread
+ * (S-19Δ: "`load` also reads both" the play times and the settings, so a setting saved on [store] before this call is the one the
+ * controller reads, S-1Δ3 `timerShown`), then, on the main thread, the real `ActiveTime` (S-45) over [clock] and the play times
+ * `Persistence` read, and `PlayController(library, engine, persistence, time, onEvent)` (S-1Δ3). It calls no `setVisible`: the
+ * test makes the game visible itself, as `AppGraph.start` does last ("then calls setVisible(visibleNow)").
+ */
+internal fun kitTimedControllerOver(
+    rule: ComposeContentTestRule,
+    store: KitDeviceStore,
+    clock: KitDeviceClock = KitDeviceClock(),
+    onEvent: (PlayEvent) -> Unit = {},
+): KitTimedPersisted {
+    val failures = Collections.synchronizedList(ArrayList<Throwable>())
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, t -> failures += t })
+    val persistence = runBlocking(Dispatchers.IO) { withTimeout(KIT_DEVICE_IO_TIMEOUT_MS) { Persistence.load(store, scope) } }
+    val built = rule.runOnUiThread {
+        val time: IActiveTime = ActiveTime(clock, persistence.playTimes)
+        time to PlayController(kitLibrary, kitEngine, persistence, time, onEvent)
+    }
+    return KitTimedPersisted(KitPersisted(store, persistence, built.second, failures), clock, built.first)
 }
 
 /**

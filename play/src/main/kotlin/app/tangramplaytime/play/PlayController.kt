@@ -5,16 +5,24 @@
 // REQ-003, REQ-024, REQ-025, REQ-026, REQ-050; TYPE-006 · O-04 as read in decisions.md 2026-10-15 (the
 // TYPE-006 transitions stay here).
 // WO-004 TASK-021 · one internal read for the grid overview: the listed puzzles (`puzzles`).
+// WO-008 TASK-046 · seams S-1Δ3, S-2Δ3, S-20Δ (designs/WO-008-design.md §2) · REQ-005, REQ-030 (statement, rules 1, 2
+// and 4), TYPE-006 rule 4 · O-04 as read in decisions.md 2026-10-20 "O-04 read for WO-008 …" with its F2 amendment (the
+// puzzle time and the best time are kept here; TYPE-005 and the play times are `:kernel`'s, behind IActiveTime) ·
+// G-13 (every write through Persistence), G-14 (time only through IActiveTime's counts) · decisions.md 2026-10-20 "What
+// counts on each screen.", "An aid solve keeps the best time through one generic controller member." (as amended), "When
+// the times are written, and what a process death may lose.".
 package app.tangramplaytime.play
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import app.tangramplaytime.contracts.IActiveTime
 import app.tangramplaytime.contracts.ILockEngine
 import app.tangramplaytime.contracts.IPuzzleLibrary
 import app.tangramplaytime.contracts.LockResult
 import app.tangramplaytime.contracts.PieceId
 import app.tangramplaytime.contracts.Placement
+import app.tangramplaytime.contracts.PlayTimes
 import app.tangramplaytime.contracts.Point
 import app.tangramplaytime.contracts.PuzzleDefinition
 import app.tangramplaytime.contracts.PuzzleKind
@@ -69,42 +77,72 @@ data class Shake(val piece: PieceId, val serial: Int)
 data class Celebration(val puzzleId: String, val serial: Int)
 
 /**
- * The Play screen's state holder (S-1, S-2; S-1Δ, S-2Δ): one puzzle open, its TYPE-006 state, the
+ * S-20Δ's cadence: the play times, then the open puzzle, are written once this many play seconds have been counted since
+ * the last such write (decisions.md 2026-10-20 "When the times are written, and what a process death may lose.": "every 10
+ * counted play seconds"; at most 360 rewrites per hour of play, ADR-003). Not DI-1's 5 s (`design-inputs.md` §2 item 11).
+ */
+private const val SAVE_EVERY_PLAY_SECONDS = 10
+
+/**
+ * The Play screen's state holder (S-1, S-2; S-1Δ, S-2Δ; S-1Δ3, S-2Δ3): one puzzle open, its TYPE-006 state, the
  * locked pieces, the tray pieces with their turns and mirror, the dragged piece, the landing preview,
- * the pulse, shake and celebration the screen animates, and the moves between puzzles. Every lock,
- * preview, turn or mirror in place, load check and the solved check is [engine]'s answer (O-01, G-04);
- * the controller never derives a position.
+ * the pulse, shake and celebration the screen animates, the moves between puzzles, and the open puzzle's time
+ * and best time (REQ-030; O-04). Every lock, preview, turn or mirror in place, load check and the solved check
+ * is [engine]'s answer (O-01, G-04); the controller never derives a position.
  *
  * Reads are Compose snapshot state, readable from a JVM test without a composition. Actions run on the
- * main thread only; there is no time and no animation inside (the screen animates).
+ * main thread only, and so do [countTime] and [setVisible] (S-44 "One caller thread"). There is no clock and no
+ * animation inside: time arrives only as [time]'s whole counted seconds (G-14), and the screen animates.
  *
- * **What is kept per puzzle** (S-20): after each action, the open puzzle's
+ * **The fold** (S-2Δ3; decisions.md 2026-10-20 "Amends three 2026-10-20 rows … F2 option (a) …"): `n = time.count()`
+ * is added to [timeSeconds] when the open puzzle is In progress and the grid overview is closed — the predicate as it
+ * stands at the fold — and [playTimes] is read again. Every change of that predicate folds first ([open], [restart],
+ * [retry], a tray [startDrag], the solving [drop], [openOverview], [closeOverview]), and so does [setVisible] before it
+ * tells the kernel; the predicate therefore held for the whole interval since the previous fold, and the seconds go to
+ * the puzzle they were spent on. [countTime] folds, then writes on S-20Δ's cadence. The construction does not fold.
+ *
+ * **What is kept per puzzle** (S-20, S-20Δ): after each action, the open puzzle's
  * `PuzzleProgress(state, placed if In progress else [], time, best)` is saved when it differs from the
  * saved one — through [persistence] when there is one, else in this controller's memory. Tray turns and
  * the mirror are not kept (decisions.md 2026-10-11, F36). Every open, the start included, loads the saved
- * progress through the load check (S-21) and saves the last-opened id.
+ * progress through the load check (S-21) and saves the last-opened id; every open but the start first saves the
+ * leaving puzzle with its folded time.
  *
  * @param library the puzzles; construction opens the saved last-opened puzzle when the library lists it,
  *   else `library.puzzles.first()` (the fresh start).
  * @param engine the one lock rule.
  * @param persistence the road to the store (S-19), or null to keep progress in memory only.
+ * @param time the kernel's TYPE-005 accounting (S-44), or null: a controller without it counts nothing, so its
+ *   puzzle times only pass through as read (S-1Δ3; tasks.md § WO-008 seam note 1).
  * @param onEvent receives every [PlayEvent] synchronously, after the state changed (O-07).
  */
 class PlayController(
     private val library: IPuzzleLibrary,
     internal val engine: ILockEngine,
     private val persistence: Persistence?,
+    private val time: IActiveTime?,
     private val onEvent: (PlayEvent) -> Unit = {},
 ) {
     /**
-     * A controller that keeps progress in memory only (S-1Δ: the WO-003 construction, which passes no
-     * [Persistence]); it opens `library.puzzles.first()`.
+     * A controller over [persistence] that counts no time (S-1Δ3: the WO-004 construction, which passes no
+     * [IActiveTime]; every existing construction compiles unchanged).
+     */
+    constructor(
+        library: IPuzzleLibrary,
+        engine: ILockEngine,
+        persistence: Persistence?,
+        onEvent: (PlayEvent) -> Unit = {},
+    ) : this(library, engine, persistence, null, onEvent)
+
+    /**
+     * A controller that keeps progress in memory only and counts no time (S-1Δ: the WO-003 construction, which
+     * passes no [Persistence]); it opens `library.puzzles.first()`.
      */
     constructor(
         library: IPuzzleLibrary,
         engine: ILockEngine,
         onEvent: (PlayEvent) -> Unit = {},
-    ) : this(library, engine, null, onEvent)
+    ) : this(library, engine, null, null, onEvent)
 
     /** Each puzzle's progress when there is no [persistence] (S-1Δ "memory only"). */
     private val memory = HashMap<String, PuzzleProgress>()
@@ -112,8 +150,33 @@ class PlayController(
     private var shakeSerial = 0
     private var celebrationSerial = 0
 
-    /** The open puzzle's active seconds as read at its open; only Restart and Retry write 0 (S-20, O-04). */
-    private var timeSeconds = 0
+    /** True while [solveWithoutBest]'s drive runs: a solve then keeps the best time as it was (S-2Δ3; REQ-030 rule 4). */
+    private var withheld = false
+
+    /** Play seconds counted since the play times were last written (S-20Δ's cadence). */
+    private var unsavedPlaySeconds = 0
+
+    /**
+     * The open puzzle's active seconds (S-1Δ3; REQ-030; TYPE-005): read at its open, then each fold adds the seconds
+     * counted while it is In progress and the grid overview is closed; Restart and Retry write 0 (REQ-030 rule 2). For
+     * a Solved puzzle it is the time of its solve (REQ-005.A1; the PuzzleProgress KDoc).
+     */
+    var timeSeconds: Int by mutableStateOf(0)
+        private set
+
+    /**
+     * Today's and all-time play time (S-1Δ3; REQ-005.A2, REQ-029) as the kernel reports them, read again at every
+     * fold; [PlayTimes.NONE] for a controller that counts no time.
+     */
+    var playTimes: PlayTimes by mutableStateOf(time?.playTimes() ?: PlayTimes.NONE)
+        private set
+
+    /**
+     * Whether the running puzzle time is shown on the board (S-1Δ3; REQ-031): the stored setting as [persistence]
+     * read it, else false (the setting's default, REQ-031.A1).
+     */
+    val timerShown: Boolean
+        get() = persistence?.settings?.timerShown ?: false
 
     /** The drag the current [preview] was searched for, so a drop reuses that search (REQ-021 A1). */
     private var previewFor: Dragged? = null
@@ -199,7 +262,9 @@ class PlayController(
         }
 
     init {
-        // The start is an open (S-21 "On every open, the start included"; S-20 "Each open calls saveLastOpened").
+        // The start is an open (S-21 "On every open, the start included"; S-20 "Each open calls saveLastOpened"). It
+        // neither folds nor saves a leaving puzzle (S-2Δ3): there is none, and a leaving save here would write the
+        // property defaults over the saved puzzle (design §3). A resumed In-progress puzzle counts from the first fold.
         load(puzzle)
     }
 
@@ -212,8 +277,9 @@ class PlayController(
     // ── Opening ──────────────────────────────────────────────────────────────────────────────────
 
     /**
-     * Opens the listed puzzle [id]. A running drag ends as [goHome] first. The puzzle comes back as saved,
-     * through the load check (S-21): In progress with the board pieces that are still valid locks, New or
+     * Opens the listed puzzle [id]. The counted seconds are folded into the leaving puzzle first (S-2Δ3), a
+     * running drag ends as [goHome], and the leaving puzzle is saved with its time (S-20Δ). The puzzle comes back
+     * as saved, through the load check (S-21): In progress with the board pieces that are still valid locks, New or
      * Solved with an empty board (REQ-026.A1). Its tray turns and mirror reset to rest (decisions.md
      * 2026-10-11, F36); the celebration is cleared (S-3Δ); the last-opened id is saved (S-20).
      *
@@ -221,7 +287,9 @@ class PlayController(
      */
     fun open(id: String): Boolean {
         val next = library.byId(id) ?: return false
+        fold()
         goHome()
+        keep()
         load(next)
         return true
     }
@@ -254,13 +322,18 @@ class PlayController(
         next()
     }
 
-    /** Opens the grid overview (S-2Δ, REQ-050); no puzzle changes. */
+    /**
+     * Opens the grid overview (S-2Δ, REQ-050); no puzzle changes. It folds first (S-2Δ3): the puzzle time pauses while
+     * the grid shows the other puzzles (REQ-030 rule 1; decisions.md 2026-10-20 "What counts on each screen.").
+     */
     fun openOverview() {
+        fold()
         overviewOpen = true
     }
 
-    /** Closes the grid overview (S-2Δ); the open puzzle stays as it is (REQ-050 rule). */
+    /** Closes the grid overview (S-2Δ); the open puzzle stays as it is (REQ-050 rule). It folds first (S-2Δ3). */
     fun closeOverview() {
+        fold()
         overviewOpen = false
     }
 
@@ -277,28 +350,96 @@ class PlayController(
 
     /**
      * Restart (S-2Δ, REQ-025): an In-progress puzzle becomes New with an empty board, time 0 and its best
-     * time kept, every piece in the tray at its resting turn, unmirrored. A running drag ends as [goHome]
-     * first.
+     * time kept (REQ-030 rule 2), every piece in the tray at its resting turn, unmirrored. It folds first (S-2Δ3),
+     * and a running drag ends as [goHome].
      *
      * @return false, and nothing changes, when the puzzle is not In progress (Restart is shown only then).
      */
     fun restart(): Boolean {
         if (state != PuzzleState.IN_PROGRESS) return false
+        fold()
         goHome()
         startOver()
         return true
     }
 
     /**
-     * Retry (S-2Δ, REQ-026): a Solved puzzle becomes New with an empty board, time 0 and its best time kept,
-     * every piece in the tray at its resting turn, unmirrored; the celebration is cleared (S-3Δ).
+     * Retry (S-2Δ, REQ-026): a Solved puzzle becomes New with an empty board, time 0 and its best time kept
+     * (REQ-030 rule 2), every piece in the tray at its resting turn, unmirrored; the celebration is cleared (S-3Δ).
+     * It folds first (S-2Δ3).
      *
      * @return false, and nothing changes, when the puzzle is not Solved (Retry is shown only then).
      */
     fun retry(): Boolean {
         if (state != PuzzleState.SOLVED) return false
+        fold()
         startOver()
         return true
+    }
+
+    // ── Time (S-2Δ3, S-20Δ) ──────────────────────────────────────────────────────────────────────
+
+    /**
+     * One tick of `:app`'s ticker (S-2Δ3, S-15Δ3): the fold, then S-20Δ's cadence — once [SAVE_EVERY_PLAY_SECONDS]
+     * play seconds have been counted since the last such write, the play times are written through [persistence],
+     * then the open puzzle's S-20 save (decisions.md 2026-10-20 "When the times are written, and what a process death
+     * may lose."). Nothing happens for a controller that counts no time.
+     */
+    fun countTime() {
+        fold()
+        if (unsavedPlaySeconds >= SAVE_EVERY_PLAY_SECONDS) writeTimes()
+    }
+
+    /**
+     * The game became visible on screen ([shown] true) or left it (false) (S-2Δ3; TYPE-005 "visible on screen"): the
+     * fold, then the kernel is told. Leaving the screen writes the times at once: the play times, then the open
+     * puzzle's S-20 save (S-20Δ), so a death after leaving the screen loses none of them (decisions.md 2026-10-20 "When
+     * the times are written, and what a process death may lose.").
+     */
+    fun setVisible(shown: Boolean) {
+        fold()
+        time?.visible(shown)
+        if (!shown) writeTimes()
+    }
+
+    /**
+     * Runs [drive] with the best time withheld (S-2Δ3; REQ-030 rule 4, REQ-046 rule 4; decisions.md 2026-10-20 "An aid
+     * solve keeps the best time through one generic controller member." as amended): a solve inside it is the ordinary
+     * solve — Solved, the celebration, the save — but the best time stays as it was (none stays none, a saved one is
+     * kept). The flag is restored when [drive] returns or throws; its exception passes on.
+     */
+    internal fun solveWithoutBest(drive: () -> Unit) {
+        val before = withheld
+        withheld = true
+        try {
+            drive()
+        } finally {
+            withheld = before
+        }
+    }
+
+    /**
+     * The fold (S-2Δ3): the whole active seconds the kernel counted since the last count are added to [timeSeconds]
+     * when the open puzzle is In progress and the grid overview is closed (REQ-030 statement and rule 1; TYPE-006 rule
+     * 4; decisions.md 2026-10-20 "What counts on each screen."), and [playTimes] is read again. No write: the writes are
+     * [countTime]'s cadence, [setVisible]'s and each action's own S-20 save.
+     */
+    private fun fold() {
+        val t = time ?: return
+        val n = t.count()
+        if (state == PuzzleState.IN_PROGRESS && !overviewOpen) timeSeconds += n
+        playTimes = t.playTimes()
+        unsavedPlaySeconds += n
+    }
+
+    /**
+     * S-20Δ's write: the play times through [persistence] (when this controller counts time; one without a clock has
+     * none of its own to write), then the open puzzle's S-20 save.
+     */
+    private fun writeTimes() {
+        if (time != null) persistence?.savePlayTimes(playTimes)
+        unsavedPlaySeconds = 0
+        keep()
     }
 
     /**
@@ -377,7 +518,7 @@ class PlayController(
     /**
      * S-20, after each action: the open puzzle's progress in the save shape — its board only In progress
      * (a Solved puzzle's placements are never kept, REQ-026.A1) — is saved when it differs from the saved
-     * one. Times pass through as read (O-04; WO-008 counts them).
+     * one. The time rides every save as folded so far, and the best time as kept (S-20Δ; O-04).
      */
     private fun keep() {
         val now = PuzzleProgress(
@@ -455,8 +596,9 @@ class PlayController(
 
     /**
      * The player picks [piece] up at [centre] (puzzle units): it leaves the tray with its tray turn and
-     * mirror, or the board with its placement's turn and mirror. A start from the tray moves a New
-     * puzzle to In progress (TYPE-006). `PickedUp`.
+     * mirror, or the board with its placement's turn and mirror. A start from the tray folds first (S-2Δ3), then
+     * moves a New puzzle to In progress (TYPE-006), so the seconds spent while New are not the puzzle's (REQ-030.A3).
+     * `PickedUp`.
      *
      * @return false, and nothing changes, when [piece] is not the puzzle's, a drag is running, or the
      *   puzzle is solved.
@@ -468,6 +610,7 @@ class PlayController(
             placed = placed - current
             dragged = Dragged(piece, current.turn, current.mirrored, centre, fromTray = false, overBoard = true)
         } else {
+            fold()
             dragged = Dragged(piece, trayTurn(piece), trayMirrored(piece), centre, fromTray = true, overBoard = false)
             if (state == PuzzleState.NEW) state = PuzzleState.IN_PROGRESS
         }
@@ -512,9 +655,13 @@ class PlayController(
      * The player releases the piece. The lock is the [updatePreview] result for the current centre,
      * computed now if not yet, so a release locks where the preview was (REQ-021 A1).
      *
+     * The solving drop folds first, while the puzzle is still In progress, so the solve keeps its last seconds
+     * (S-2Δ3); its time is then the time of the solve, and the best time becomes the shorter of the two
+     * (REQ-030 statement, A2) — unless [solveWithoutBest] withholds it (REQ-030 rule 4).
+     *
      * @return the lock, appended to [placed] (`Locked`; then, when every piece is on the board, state
-     *   Solved, a new [celebration] and `Solved`), or null when the piece went back to its tray cell
-     *   (REQ-020; `WentHome`; a [pulse] in a mini puzzle, REQ-051). Null, and nothing happens, without a
+     *   Solved, the best time kept, a new [celebration] and `Solved`), or null when the piece went back to its
+     *   tray cell (REQ-020; `WentHome`; a [pulse] in a mini puzzle, REQ-051). Null, and nothing happens, without a
      *   drag.
      */
     fun drop(): Placement? {
@@ -528,10 +675,14 @@ class PlayController(
             keep()
             return null
         }
-        placed = placed + lock
+        val board = placed + lock
+        val solves = engine.isSolved(puzzle, board)
+        if (solves) fold()
+        placed = board
         onEvent(PlayEvent.Locked(d.piece))
-        if (engine.isSolved(puzzle, placed)) {
+        if (solves) {
             state = PuzzleState.SOLVED
+            if (!withheld) bestSeconds = minOf(bestSeconds ?: timeSeconds, timeSeconds)
             celebration = Celebration(puzzle.id, ++celebrationSerial)
             onEvent(PlayEvent.Solved(puzzle.id))
         }

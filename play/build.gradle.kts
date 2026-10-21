@@ -9,7 +9,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 31
         // The device kit (play/src/androidTest) runs under the AndroidX JUnit runner (tasks.md § WO-003 TASK-012).
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

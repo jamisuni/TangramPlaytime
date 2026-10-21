@@ -75,5 +75,6 @@ class ScreenSeamScaffoldTest {
         sizeSmall = "S", sizeMedium = "M", sizeLarge = "L", titleLanguage = language,
         restart = "Restart", retry = "Retry", next = "Next", bestTime = "Best time", noTime = "–",
         inProgress = "in progress", solved = "solved", counterFormat = "%1\$d / %2\$d", allPuzzles = "All puzzles", done = "Done",
+        hoursMinutes = "%1\$d h %2\$d min",
     )
 }

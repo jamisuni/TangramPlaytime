@@ -9,8 +9,9 @@ duty of the station it names; none of it is methodology.
 ## This project's channels (P2, 2026-10-11)
 
 - **Dev image:** AVD `Medium_Phone_API_37.0` (system image android-37.0, google_apis_playstore).
-- **Floor image:** AVD `Phone_API_26` (system image android-26, google_apis) — `minSdk 26`; booted headless 2026-10-11 as `emulator-5554` in 13.5 s (`emulator -avd Phone_API_26 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot`).
-- **Toolchain:** JDK `C:/Program Files/Android/Android Studio/jbr` (25), Gradle 9.8 wrapper, AGP 9.4.1, Kotlin 2.4.20, Compose BOM 2026.09.00; SDK `C:/Users/Jami/AppData/Local/Android/Sdk` (platform 37, build-tools 36.0.0).
+- **Floor image (from 2026-10-20):** AVD `Phone_API_31` (system image android-31, google_apis, x86_64; `Phone_API_26`'s screen, 1080 × 2400, 420 dpi) — `minSdk 31`, Android 12 (the owner's decision 2026-10-19; `decisions.md` 2026-10-19 "The platform floor moves to Android 12 (API 31) …"); floor channel proven 2026-10-20 (`.swdev/run-log/floor-API31.md`): booted headless with the same flags as below as `emulator-5554` in 41 s; `tools/device_reset.sh --check` is clean on it (app-locales skipped: API 33+). Its home app is `com.google.android.apps.nexuslauncher`. A crash dialog, titled `Application Error: <process>`, appears on the second crash of the same app within 60 s (`am crash <pkg>` twice), with no setting changed (WO-008 TASK-043, S-37Δ's control). The death harness leaves both APKs installed, so the next boot's uninstall reads "Success".
+- **Floor image through WO-010 (history):** AVD `Phone_API_26` (system image android-26, google_apis) — `minSdk 26`; booted headless 2026-10-11 as `emulator-5554` in 13.5 s (`emulator -avd Phone_API_26 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot`). Kept on the machine; no longer a channel.
+- **Toolchain:** JDK `C:/Program Files/Android/Android Studio/jbr` (25), Gradle 9.8 wrapper, AGP 9.4.1, Kotlin 2.4.20, Compose BOM 2026.09.00; SDK `C:/Users/Jami/AppData/Local/Android/Sdk` (platform 37, build-tools 36.0.0). SDK command-line tools 23.0 in `cmdline-tools/latest` (added 2026-10-20 for the android-31 image): `sdkmanager` now wraps the Android CLI, so install with `cmdline-tools/latest/bin/android.exe --no-metrics sdk install <path>` (`--no-metrics` turns its usage reporting off).
 - **Shell:** `export JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'` then `cmd.exe //c ".\gradlew.bat <tasks>"`; one emulator at a time, `adb devices` after every boot.
 
 ## Verification channels (name them at G3)
@@ -71,6 +72,49 @@ duty of the station it names; none of it is methodology.
 
 ## Device hygiene
 
+- *(Project lesson, WO-008.)* **On API 31 a `wm density` change resets a
+  locked rotation.** It rebuilds the 3-button navigation bar, and the new
+  bar re-locks a locked rotation at the display's rotation of that moment
+  (a lock to 90° sent within about 0.3 s of `wm density 270` fell back to
+  0; `wm size` alone rebuilds nothing). Construct at the display's own
+  rotation and turn afterwards, or freeze only once the density change
+  has settled (`decisions.md` 2026-10-21 "The kit fix is accepted …").
+
+*(2026-10-20: the floor is now `Phone_API_31`. The lines below that name API 26 are kept as history: they explain code and kit paths written for API 26, which stay until a task removes them with a reason. Re-measure such a rule on the new floor before relying on it.)*
+
+- **The API 26 rules, re-judged on `Phone_API_31`** (WO-008 TASK-043 (f),
+  2026-10-21; run log t043-f):
+  - *The launcher crashes on a display change with the home screen in
+    front:* **does not hold.** No `am_crash`, the launcher keeps its window.
+    After a stopped run the image is still rebooted (the device-time rule);
+    S-37Δ's `crash-window` item names a crash dialog if one appears.
+  - *A forced width is clamped to twice the initial width:* **holds**
+    (`wm size 2560x1600` reads back 2160x1600).
+  - *An override over a running activity is a configuration change:* **does
+    not hold.** An override over the running `MainActivity` recreates it
+    (`wm_relaunch_resume_activity`, destroy and create), and so does the
+    restore, as on the API 37 images. The kit still starts the activity
+    after the override.
+  - *The floor's limits:* no gesture bar **holds** (`navigation_mode` 0, the
+    gesture overlays installed but off); `svc wifi` **exists** on API 31
+    (no test uses it); the launcher is **not** relaunched by a display
+    change.
+  - *API 26 is not edge to edge:* **holds** for the play kit's full-window
+    host. It is 189 px (72 dp, both bars) shorter on the floor than on API
+    37, so a pixel-exact leg in a full-window host says nothing across
+    images. In a kit-sized host (1080 × 1919 px) the board is the same px
+    rect on both.
+  - *The Compose read that parked across a relaunch:* **holds as a guard.**
+    The 60 s bound fired once (TASK-043 hop 1, during the rotation re-lock
+    above). Keep the bound and the steady-activity wait.
+  - *The locale and airplane-mode routes:* the kit switches airplane mode
+    itself (`cmd connectivity airplane-mode`, `sdk >= 30`); `cmd locale` is
+    absent (API 33+). The root locale route (`vdc cryptfs`) is unmeasured:
+    the image is file-encrypted and `vdc` is not on the shell's PATH.
+    Re-measure before a WO needs device-locale lists on the floor.
+  - *`show_ime_with_hard_keyboard`'s default:* **holds:** 1 on the floor, 0
+    on the API 37 images. The reset restores each image's own default.
+
 - Before and after every device step: reset the device state with the
   project's reset script (`--check` after; a non-clean check voids the step:
   reset, re-run, record the leftover in the WO).
@@ -107,6 +151,14 @@ duty of the station it names; none of it is methodology.
 
 ## Compose test kit
 
+- *(Project lesson, WO-008.)* **`performTouchInput` never reaches
+  `Activity.dispatchTouchEvent`.** It dispatches on the
+  `AndroidComposeView`, so a kit line that needs the activity's touch hook
+  (the play-time touch) injects through the window:
+  `Instrumentation.sendPointerSync`, DOWN then UP, at an inert point read
+  on the screen in use (display coordinates = the node's window bounds +
+  the window's location on screen). `KitApp.kitTouchThroughWindow` is the
+  helper (design library fact 7; design review F1).
 - Import rules *(recurred three times)*: `assertExists` /
   `assertDoesNotExist` are **member** functions of
   `SemanticsNodeInteraction` (never imported); `assertIsDisplayed`,

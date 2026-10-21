@@ -6,6 +6,8 @@
 // stored, else m:ss) · seam note 4: each control is a tagged display container that merges its label, inert (the
 // router acts on it; platform-notes § Compose test kit) · G-17: every icon path in px · G-10 / O-06: every label
 // comes in through PlayTexts.
+// WO-008 TASK-047 · S-48 (designs/WO-008-design.md §2): the best time is written in the one time format (`timeOf`;
+// REQ-029 rule 2; REQ-030 rule 3; decisions.md 2026-10-20 "One format for every time the game shows …").
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Arrangement
@@ -130,7 +132,7 @@ internal fun SolvedRow(g: ScreenGeometry, texts: PlayTexts, bestSeconds: Int?) {
     Box(Modifier.slot(strip).testTag(PlayTags.SOLVED_ROW)) {
         SlotLayout(Modifier.fillMaxSize()) {
             RowButton(PlayTags.RETRY, thirds[0], texts.retry, primary = false)
-            BestTime(thirds[1], texts.bestTime, bestTimeText(bestSeconds, texts.noTime))
+            BestTime(thirds[1], texts.bestTime, bestTimeText(bestSeconds, texts))
             RowButton(PlayTags.SOLVED_NEXT, thirds[2], texts.next, primary = true)
         }
     }
@@ -208,18 +210,12 @@ private fun BestTime(slot: Slot, label: String, value: String) {
 }
 
 /**
- * The best time as minutes and two-digit seconds (m:ss), or [noTime] while none is stored — always until WO-008
- * computes times (decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn"; WO-004 checkpoint item
- * 3). Digits and the colon only: no word to translate.
+ * The solved row's best time (S-48; REQ-026, REQ-030 rule 3): [PlayTexts.noTime] while none is stored (decisions.md
+ * 2026-10-15 "The top bar, Restart and the solved row, as drawn"; WO-004 checkpoint item 3), else the one time format,
+ * [timeOf] — m:ss below one hour, [PlayTexts.hoursMinutes] from one hour (REQ-029 rule 2).
  */
-internal fun bestTimeText(seconds: Int?, noTime: String): String {
-    if (seconds == null) return noTime
-    return buildString {
-        append(seconds / 60)
-        append(':')
-        append((seconds % 60).toString().padStart(2, '0'))
-    }
-}
+internal fun bestTimeText(seconds: Int?, texts: PlayTexts): String =
+    if (seconds == null) texts.noTime else texts.timeOf(seconds)
 
 /** DI-1's ↻ centred on [centre] in a [boxPx] square, in px (G-17): the open arc and its arrowhead. */
 internal fun DrawScope.drawRestartIcon(centre: Offset, boxPx: Float, colour: Color) {

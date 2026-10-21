@@ -4,6 +4,7 @@
 // WO-004 TASK-020 · seam S-13Δ (designs/WO-004-design.md §2): the top bar, Restart, the solved row, the grid
 // overview and the loading paper. Every S-13Δ tag is declared here now, including the overview's, whose nodes
 // TASK-021 adds. A control's bounds are its touch area (S-13Δ).
+// WO-008 TASK-047 · seam S-13Δ3 (designs/WO-008-design.md §2): the timer on the board (REQ-031).
 package app.tangramplaytime.play
 
 import app.tangramplaytime.contracts.PieceId
@@ -63,6 +64,12 @@ object PlayTags {
 
     /** The Restart pill, shown only In progress (REQ-025); bounds = the pill. A merged display container. */
     const val RESTART: String = "restart"
+
+    /**
+     * The running puzzle time at the board's top-right (REQ-031; S-13Δ3, S-47), shown while the timer setting is on and
+     * the puzzle is not Solved; bounds = its measured slot. An inert merged node whose text is the time; never a control.
+     */
+    const val TIMER: String = "timer"
 
     /** The solved row that replaces the tray (REQ-026); bounds = the tray strip. */
     const val SOLVED_ROW: String = "solved-row"

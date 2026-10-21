@@ -31,6 +31,10 @@
 // gesture bar; `overlay`, `overlayContent` and `sheetContent` are the overlays' areas, and only `sheetContent` reads
 // the keyboard. S-33: the overview and the DEV sheet get their scrim area and their content area from it. With
 // `PlayInsets.NONE` and no keyboard every slot equals WO-005's (seam note 1). Every slot in px (G-17).
+// WO-008 TASK-047 · S-47 (designs/WO-008-design.md §2) · REQ-031; REQ-026 statement · decisions.md 2026-10-20 "The timer
+// on the board, as drawn": the timer (`BoardTimer`) after the Restart pill and before the pieces, while the stored
+// setting is on and the puzzle is not Solved. It is never a control (`ShownControls` is unchanged), and this screen
+// never reads the time itself (library fact 5).
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
@@ -118,7 +122,8 @@ internal class ShownCues(pulse: Pulse?, shake: Shake?, celebration: Celebration?
 
 /**
  * The Play screen (S-10): the top bar (‹, the counter with the title, the rating dots, "n / N" and the state word,
- * ›), the board with the flat silhouette, the Restart pill while In progress and the locked pieces, and the tray
+ * ›), the board with the flat silhouette, the Restart pill while In progress, the timer while its setting is on and the
+ * puzzle is not Solved (S-47), and the locked pieces, and the tray
  * with the puzzle's cells and miniatures — replaced by the solved row once a Solved puzzle's picture is fully
  * shown; the dragged piece and the landing preview while a drag runs; the grid overview below the bar while it is
  * open (S-22). It fills [modifier]'s size, lays every zone
@@ -197,6 +202,9 @@ fun PlayScreen(
                 // S-10Δ2: the aid's solution layer, right after the silhouette (under the pill and the pieces).
                 devAid?.SolutionLayer(controller, geometry)
                 restart?.let { RestartPill(it, texts.restart) }
+                // S-47: the timer, after the pill and before the pieces (under them and under the grid's scrim), while
+                // the setting is on and the puzzle is not Solved (REQ-031; REQ-026: the solved view shows no timer).
+                if (controller.timerShown && state != PuzzleState.SOLVED) BoardTimer(controller, geometry, texts)
                 if (solve.piecesShown) {
                     val tint = solve.popTint(reducedMotion)
                     for (placement in controller.placed) {

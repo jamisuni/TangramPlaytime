@@ -605,3 +605,93 @@ from starvation.
 - **Severity:** medium overall. Device time decided the WO's length (about
   9 h of station emulator time on 2026-10-20 for one product fix and 16
   kit corrections).
+
+## 2026-10-21 — WO-008 #PlayTime close: four corrected checks, a scope anchor the two scripts read differently, the first WO on the Android 12 floor
+
+- **Corrected checks 1, 2 and 4 (planned at P3, landed with the feature).**
+  Each pinned an earlier WO's interim fact as the oracle:
+  1. `ResumeKitTest` `kitExpect` expected "best null after a player's
+     solve" (WO-004, before any best time existed).
+  2. `KitApp` `closedWorld()` / `languageWorld()` admitted only "–" in the
+     solved row.
+  4. `ControlsScaffoldTest` expected "60:00" (WO-004's m:ss-only
+     rendering; D10 makes it "1 h 0 min").
+
+  **Miscalibration:** a placeholder of a feature not yet built, asserted
+  as if final. The design (S-48) and the plan named all three before
+  code, so each cost minutes.
+  **Proposal:** the test-author brief: a test that pins the visible
+  absence of a later WO's feature names that WO in a comment
+  (`// interim until WO-008 #PlayTime`). The later WO's planner then
+  greps for it instead of finding the pins by reading.
+- **Corrected check 3 (the floor move).** `KitApp`'s 800 × 1280 dp tablet
+  construction was calibrated on API 26. On API 31, a `wm density` change
+  rebuilds the 3-button navigation bar, and the rebuild re-locks a locked
+  rotation, so the 90° freeze sent the window the wrong way. Two legs went
+  red on `Phone_API_31` only. The kit's author fixed it: start landscape,
+  then turn (`platform-notes/android.md`). **Miscalibration:** a device
+  construction proven on one API level only.
+  **What worked:** a floor move runs every class alone on the new floor
+  first, the WO-010 proposal applied, so this showed in TASK-043 hop 1,
+  before any product code. It cost 1 h 46 min of kit fix and no
+  whole-set pass.
+- **trace-check and plan-check read the same Implements bullet
+  differently.** The bullet named its code homes with bare ids:
+  "`kernel/` (`#ActiveTime` row — REQ-029)" and four like it.
+  - trace-check's scope parser (`scope_ids`, `SCOPE_BARE`) reads a bare
+    `REQ-NNN` anywhere in the bullet as every acceptance of that REQ. So
+    REQ-029.A2, which G3 had moved to WO-007, became a tenth in-scope
+    ID, and `--wo WO-008` went RED at P6.
+  - plan-check read nine IDs: its warnings at 21:36 and 05:31 listed
+    REQ-029.A2 as *outside* the scope.
+  - The project already knew the trap: § Scope notes says "kept out of
+    the Implements bullet so trace-check's scope parser reads only the
+    IDs above". Prose in parentheses still slipped through.
+
+  Test & Verify found it, and the orchestrator dropped the five ids
+  (`decisions.md` 2026-10-21). **Proposals:**
+  1. One scope parser shared by plan-check and trace-check. Until then,
+     plan-check prints the scope trace-check would read and fails when the
+     two differ.
+  2. trace-check `--wo` runs at G3 (all red then, but its "WO scope: N
+     acceptance ID(s)" line is the check), and the G3 checklist compares
+     that N with plan-check's.
+  3. The WO template's Implements bullet says "IDs only; code homes and
+     prose go to Scope notes".
+
+  **Severity:** low-medium. Caught before G4; a scope wider than approved
+  reads as a coverage gap, and a narrower one would read GREEN on missing
+  coverage.
+- **wo-metrics' window, again** (2026-10-18, 2026-10-20). The window's
+  end date is now 2026-10-23: the checkpoint default date written in a
+  Log row, a day not yet come. Its start, the calendar day, holds WO-010's
+  close, so the launch, staffing, approver, test and LOC rows were
+  hand-corrected. **Proposal:** as before, window from the WO's
+  `Opened` Log row's timestamp to the last row's. Read the Log's Date
+  column only, never dates quoted in the notes. **Severity:** low.
+- **The Stop hook's "this session appears unlogged" during a station
+  wait** (2026-10-21 00:38). The orchestrator was waiting on a 102-minute
+  device station; `progress.md` was 74 minutes old by design, since
+  interim notices get no reply. **Proposal:** the hook counts a running
+  background agent as activity, or its text says "a one-line progress
+  bullet is enough while a station runs". **Severity:** low.
+- **D4 denied a read again:** a station's CRLF count loop that read
+  `git config` (2026-10-20 21:44). Same proposal as 2026-10-20 (the read
+  allow-list gains `git config --get`).
+- **What worked.**
+  - **The final whole sets were green at the first pass** (WO-010 lost
+    two whole-set passes). Every class ran alone on the floor and on dev as
+    it landed (TASK-046, 047, 049), so TASK-051's 2 h 50 min found
+    nothing. Inside the whole set each class ran within ±5 % of its time
+    alone, so running a class alone first adds no blind spot.
+  - **The design review re-derived the library.** F1 found that Compose's
+    `performTouchInput` never reaches `Activity.dispatchTouchEvent`, the
+    product's touch door, before any test was written. The kit injects
+    through the window.
+  - **The code reviewer mutated the fold order and `ActiveTime`.** Seven
+    plus four mutants; every one that changes behaviour went red.
+  - **Test & Verify reused the t051 baseline** on matching hashes in
+    about 4 minutes.
+- **Severity:** low overall. 9 IDs, 0 product defects, 4 corrected
+  checks. Device time was about 9 h 40 min of station wall-clock; the
+  kit fix took 1 h 46 min of it.

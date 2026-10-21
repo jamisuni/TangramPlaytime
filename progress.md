@@ -1701,3 +1701,213 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
     is the move to Android 12 as the oldest supported version, then
     the next work order.
   No emulator is running. Please commit the snapshot.
+
+## 2026-10-20 — The floor move to Android 12, then WO-008 #PlayTime opened (fresh orchestrator context)
+
+**Human input (verbatim, 20:07):**
+
+> WE ARE BETWEEN WORK ORDERS — the floor move to Android 12, then the next WO
+> (TangramPlaytime, SWDev v0.20, intake path C). Read AGENTS.md first (incl. the
+> "from P3 on" framework files), then governance.md, decisions.md (the row
+> 2026-10-19 "The platform floor moves to Android 12 …" and the 2026-10-20
+> rows), KICKOFF.md "State after WO-010" and "State after WO-006" (the WO-007
+> carries), architecture.md, build-map.md, capture-outbox/src-draft-android-12-floor.md
+> and chg-draft-req006-platform-floor.md, platform-notes/android.md, the last
+> progress.md entry. First the floor move: architecture.md v1.3 through the G2
+> route (minSdk 31; the floor channel Phone_API_31); the android-31 system image
+> installed and the Phone_API_31 AVD created with Phone_API_26's screen, booted,
+> the trivial test run (G3's floor proof); the platform-notes floor line. Then
+> open the next WO under row 8 (WO-007 #Settings by the kickoff order, or WO-008
+> #PlayTime first if #Settings needs its accounting), with minSdk 31 in every
+> module as its first task. Channels: Python, JVM (the two-run line), the floor
+> Phone_API_31 first, the dev and tablet images, V-01. Stations as subagents;
+> device steps as one background script per image; no replies to interim
+> notices. The four scripts are duties. End every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; from 20:07):**
+- Framework v0.20 = project, no drift. HEAD `5706854` (the WO-010
+  snapshot); the code is unchanged since WO-010's final run (same test,
+  product, bundle and tools hashes).
+- 20:10–20:14 the Android 12 image: the SDK had no command-line tools, so
+  Google's were added first (checksum checked against Google's index),
+  then the Android 12 emulator image, with the tool's usage reporting
+  switched off. A new emulator `Phone_API_31` has the Android 8 one's
+  screen (1080 × 2400, 420 dpi).
+- 20:14–20:16 the floor proof, as one background script: booted in 41 s,
+  reset clean, the launch tests green (1/0 and 2/0), reset clean, shut
+  down (`.swdev/run-log/floor-API31.md`).
+- 20:17 `architecture.md` v1.3 by the G2 route: the oldest Android is 12
+  (`minSdk 31`) and the floor emulator is `Phone_API_31`; baseline
+  re-frozen. The Android notes have the new floor line; the Android 8
+  lessons stay, marked as history. One decision row records it.
+- Next work order: **WO-008 (play time) before WO-007 (settings)**. The
+  settings screen shows the play times and pauses the puzzle clock, so
+  it is better built on real counting; its "settings shows today's and
+  all-time time" line moves to WO-007. Decision row written.
+- 20:16 WO-008 opened (`workorders/WO-008.md`), Full: the time counting
+  needs a new governed interface between the play screen and the kernel.
+  First task: `minSdk 31` in every module. 20:19 the design author
+  (Opus) is working on the design.
+- 20:24 the other test channels checked on the current code, all green:
+  the puzzle and requirement validators, the JVM tests (263/0), the
+  release check, the dev phone and the tablet (both launch tests). I
+  re-counted every result file.
+- 20:38 the design is back (`designs/WO-008-design.md`). In short: a new
+  time-keeping piece in the kernel counts active seconds; the app tells
+  it about every touch and whether the game is on screen; the play
+  screen tells it when a puzzle's own clock should run. Puzzle states
+  stay where they are. An aid solve never sets a best time; a clock
+  that jumps backwards counts nothing, so no bad time is ever saved.
+  Two questions for you later (the timer's look; one time format).
+  A fresh design reviewer is checking it now.
+- 20:53 the review is back: no blockers, five things to tighten. The
+  main ones: the planned device tests would pass even if nothing were
+  counted (test taps skip the place the app listens for touches), and
+  a puzzle resumed after a restart would not count its time until the
+  next piece moves. Also a test-file clean-up, a clock-jumps-back
+  corner, and a guard list I must extend. All accepted; the same
+  design author is fixing the design now.
+- 20:59 the fixed design is back and checks out. The simpler choice
+  won: the time-keeping piece only counts active seconds and the day's
+  and all-time totals; each puzzle's time and best time stay with the
+  play screen, which already knows which puzzle is open.
+- 21:00 the architecture gets the new time-keeping interface (v1.4),
+  the build map follows (v1.7), the guard now protects the new file,
+  and the baseline is re-frozen. 21:01 the planner (Opus) is turning
+  the design into tasks and briefs.
+- 21:31 the plan is back: nine tasks, one after another, Android 12
+  first; every test change is the test author's; about 7–8 h of
+  emulator time in all. My own plan check is green. I added the
+  process-death check to the channels and fixed a stale sentence;
+  the design author wrote the plan's small changes back into the
+  design (21:32). Two questions for you are written in the work order
+  (the timer's look; one time format), defaults stand 2026-10-23.
+  A fresh plan reviewer is checking the plan now.
+- 21:35 plan review: no blockers, four small fixes (two by the planner,
+  one by splitting the first task in two, one build-map status line by
+  me). 21:37 **plan approved (G3)** — my call under the governance
+  table; my own plan check green.
+- 21:37 building started: the first task moves the app to Android 12
+  and runs every test class on the new Android 12 emulator (then the
+  dev phone and the tablet in a second step). At the same time the test
+  author drafts the first time tests in its scratch folder; they land
+  once the first task is green.
+- 22:01 the first time tests are drafted (not yet in the code): five
+  minutes untouched adds at most 60 s; browsing away adds nothing to a
+  puzzle; a slower solve keeps the faster best; turning a tray piece
+  starts no time; plus the tricky cases (the clock jumping back, a
+  resumed puzzle, the aid solve). Two old test lines that assumed "no
+  best time ever" get corrected with them. The first task is still
+  running on the Android 12 emulator.
+- 23:23 the Android 12 switch is in and builds cleanly. On the Android
+  12 emulator 127 of 131 tests pass, 2 are the death test's deliberate
+  skips (they run only in the death pair, which passed), and 2 fail.
+  The 2 failures are both in the
+  test kit's simulated portrait tablet on a phone screen: on Android 12
+  the screen never turns to portrait. The game itself is not in either
+  failure. The new reset check for a crash window works: it caught a
+  provoked crash window and was clean after a reboot. The kit's author
+  now fixes the portrait-tablet setup; then the first task re-runs its
+  Android 12 tests and goes on to the dev phone and the tablet.
+- 2026-10-21 00:38 no new human input; the orchestrator changed nothing
+  since 23:23. The kit's author is still at work: it changed the test
+  kit's file at 23:48 and is running its proof on the Android 12
+  emulator. Its interim notices got no reply.
+- 01:12 the fake-tablet fix is in and green. The cause: on Android 12,
+  changing the screen density rebuilds the button bar at the bottom,
+  and the new bar quietly undoes a locked screen turn that was set a
+  moment earlier. The kit now starts the fake tablet sideways and turns
+  it upright afterwards, the same way the real tablet emulator already
+  did it. Both failing checks passed three times each on Android 12,
+  and once each on the dev phone and the tablet. The game's code was
+  never at fault. The first task now re-runs its whole-app tests on
+  Android 12 and then goes on to the dev phone and the tablet.
+- 03:44 the first task is done: every test passes on all three
+  emulators (Android 12, the dev phone, the tablet), and the
+  force-close check passes on Android 12 and the dev phone. Of the old
+  Android 8 rules, five still apply on Android 12 and four no longer
+  do. One routine (setting a different language at system
+  level) could not be tested and is marked to re-measure before
+  anything needs it. The Android notes are updated. Next, the first
+  timing tests go into the code.
+- 03:48 the first timing tests are in the code (they can't compile
+  yet: the timing code they test doesn't exist; that's planned). All
+  other tests still pass. Next: the core timing code (the 60-second
+  idle rule and the today / all-time totals) is being written now.
+- 03:56 the core timing code is in: five untouched minutes add at most
+  60 seconds, and all nine of its tests pass. The record of the game's
+  fixed interfaces is updated to include it. Two small choices were
+  logged (a new day with nothing counted yet keeps no date; today
+  reads 0 on a new day). Next: each puzzle's time and best time, and
+  saving them.
+- 04:19 each puzzle's time and best time work and are saved: all 290
+  computer-only tests pass, including every timing test so far, and
+  the release check passes. On the Android 12 emulator the solved
+  screen, resume, the testing aid and the full play-through all pass.
+  The testing aid's "solve now" never sets a best time. The task
+  also showed the tests really catch mistakes: with a deliberate bug
+  put in and taken out again, several of them failed. Next: the timer
+  on the board and the one time format (m:ss, then "1 h 5 min" past an
+  hour); its tests are being drafted at the same time.
+- 04:27 the timer's code is in and the app builds: a small stopwatch
+  and the time at the board's top-right, 14 dp in from the corner,
+  shown only when the setting is on and gone on a solved puzzle.
+  Times read m:ss up to an hour, then "1 h 5 min" (same in Finnish).
+  The best time on the solved row now shows your time instead of
+  "–". Its tests land next; then the timer is checked on the Android
+  12 emulator and the dev phone.
+- 04:31 the timer and time-format tests are in: all 295 computer-only
+  tests pass. The format tests prove the digits stay plain 0–9 even
+  under a phone language with other digits. One old test line expected
+  "60:00" for an hour; it now expects "1 h 0 min" (a corrected check).
+  The timer's own screen tests run next on the Android 12 emulator,
+  then the dev phone.
+- 04:53 the timer passes on the Android 12 emulator and the dev phone:
+  hidden on a fresh install, counting only active seconds, stopped
+  while the grid is open, gone when solved, and 14 dp in from the
+  board's corner (measured on a real screenshot: "⏱ 0:00" at the
+  top-right). The release check still passes. Next: the tests that
+  only the whole app can prove (real touches, leaving the app, the
+  screen going off, a force-close keeping the times), then the wiring
+  of the clock into the app.
+- 05:05 the whole-app timing tests are in. They use real finger
+  touches on an empty spot of the board, and they check three things:
+  five untouched minutes add exactly 60 s; leaving with Home or turning
+  the screen off adds nothing; and a force-close keeps 60 counted
+  seconds. They can't build until the app's clock exists, which is
+  planned. Now running: the task that wires the clock into the app,
+  then runs on all three emulators.
+- 05:32 the clock is wired into the app, and all the coding is done.
+  Every timing test passes on all three emulators: real touches
+  count, five idle minutes add exactly 60 s, Home or screen-off adds
+  nothing, and on Android 12 and the dev phone a force-close keeps
+  the counted time. The release check passes (no permissions, no
+  network). The plan check is green. Now running: a fresh code
+  review of the whole work order; after it, one final full run on all
+  three emulators.
+- 05:43 the code review found nothing to fix: no blockers, no
+  shoulds, five notes. It also broke the code on purpose in eleven
+  ways, and the tests caught every break that changes behaviour. One
+  note is for the next work order: when the settings screen adds the
+  timer switch, the board must refresh when it flips. A test-kit lesson
+  is filed in the Android notes. Now running: the final full run of
+  every test on all three emulators (about three hours).
+- 08:41 the final full run is green on every channel: 295 computer
+  tests, 100 play-screen tests on Android 12 and on the dev phone,
+  the whole app set on all three emulators (only the two guarded
+  force-close phases skip, as always), the force-close pair passes on
+  Android 12 and the dev phone, and the release check passes (no
+  permissions, no network). Nothing changed in the code during the
+  run; it took 2 h 50 min as planned. Now running: the independent
+  test check, then the traceability check and the close.
+- 08:53 **WO-008 closed.** The independent test check is green: every
+  requirement of this work order is tested by a test that can fail,
+  and nothing is wrong in the code or the tests. It found one wording
+  problem in the work order itself: a list of code folders named whole
+  requirements, so the traceability tool also counted a settings-screen
+  line that belongs to the next work order. I removed those names; the
+  traceability check is green, 9 of 9. Closing paperwork done: the
+  feature map marks play time, active time and the timer as built; four
+  test corrections and five lessons are filed in proposals.md; a
+  play-test list is in review-notes.md; KICKOFF.md has the hand-over
+  and the start text for WO-007 #Settings. Jami commits by hand.

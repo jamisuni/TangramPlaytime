@@ -430,7 +430,13 @@ class ResumeKitTest {
     // differs from the cached one, Persistence.save it." decisions.md 2026-10-15 "When progress is saved": "a
     // tray drag start (New → In progress), a lock, a go-home that changes the board, … the solve, Restart,
     // Retry"; "Tray turns and the mirror are not saved (F36)" (decisions.md line 29). Each step is read from
-    // the store after a flush and compared with the controller's own state and board. Pin, no token.
+    // the store after a flush and compared with the controller's own state and board. The best time: none
+    // until the player's solve, which sets it (designs/WO-008-design.md §2 S-2Δ3: after the solving drop,
+    // "bestSeconds = … minOf(bestSeconds ?: timeSeconds, timeSeconds)"; tasks.md § WO-008 seam note 2: on a
+    // controller without a clock that is "the puzzle's loaded time: 0 for one never counted"), kept by Retry
+    // and Restart (REQ-030 rule 2). Corrected in WO-008 TASK-045: the solve's and the later saves' best time was
+    // pinned as none, WO-004's interim (decisions.md 2026-10-15 "The top bar, Restart and the solved row, as
+    // drawn": "until WO-008 computes times"). Pin, no token.
     @Test
     fun everyChangeOfStateOrBoardIsSavedInTheShapeOfTheSaveRule() {
         val p = kitPuzzleOf(PuzzleKind.WARMUP)
@@ -442,7 +448,7 @@ class ResumeKitTest {
             session.flush(run)
             return run.store.kitProgressOf(p.id)
         }
-        fun kitExpect(state: PuzzleState, placed: List<Placement>) = PuzzleProgress(state, placed, 0, null)
+        fun kitExpect(state: PuzzleState, placed: List<Placement>, best: Int? = null) = PuzzleProgress(state, placed, 0, best)
 
         kitTurnInTray(c, plan[0].piece, plan[0].target.turn)
         assertEquals("a tray turn saves nothing new", PuzzleProgress.FRESH, kitSaved())
@@ -464,13 +470,13 @@ class ResumeKitTest {
 
         for (step in plan.drop(1)) kitPlace(c, step)
         assertEquals("fixture: solved", PuzzleState.SOLVED, c.state)
-        assertEquals("the solve: Solved, no placements", kitExpect(PuzzleState.SOLVED, emptyList()), kitSaved())
+        assertEquals("the solve: Solved, no placements, the best time the solve's 0 s", kitExpect(PuzzleState.SOLVED, emptyList(), best = 0), kitSaved())
         c.retry()
-        assertEquals("Retry", kitExpect(PuzzleState.NEW, emptyList()), kitSaved())
+        assertEquals("Retry, the best time kept", kitExpect(PuzzleState.NEW, emptyList(), best = 0), kitSaved())
         kitPlace(c, plan[0])
-        assertEquals("a lock after Retry", kitExpect(PuzzleState.IN_PROGRESS, c.placed.toList()), kitSaved())
+        assertEquals("a lock after Retry", kitExpect(PuzzleState.IN_PROGRESS, c.placed.toList(), best = 0), kitSaved())
         c.restart()
-        assertEquals("Restart", kitExpect(PuzzleState.NEW, emptyList()), kitSaved())
+        assertEquals("Restart, the best time kept", kitExpect(PuzzleState.NEW, emptyList(), best = 0), kitSaved())
     }
 
     // decisions.md 2026-10-15 "O-04 read for this WO" (the TYPE-006 transitions stay in PlayController; time

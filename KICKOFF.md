@@ -63,6 +63,69 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## State after WO-008 (2026-10-21, closed 08:53)
+
+- **The floor is Android 12 (API 31)** (the owner's decision 2026-10-19): `architecture.md` v1.3, `minSdk 31` in every module (TASK-043), the floor channel `Phone_API_31` (`.swdev/run-log/floor-API31.md`). The API 26 rules were re-judged on it: five still apply, four don't (`platform-notes/android.md` § Device hygiene). The reset now names a crash or not-responding window (S-37Δ).
+- **WO-008 #PlayTime is done** (`workorders/WO-008.md`, Full (b); G4 `decisions.md` 2026-10-21 "WO-008 closed at G4").
+  - **Active time is counted once, in `:kernel`:** `ActiveTime` behind the new governed `IActiveTime` (`architecture.md` v1.4, tier notify).
+    - A real touch of the window keeps the game active (`MainActivity.dispatchTouchEvent`), and 60 idle seconds stop the count.
+    - Nothing counts while the game is not visible (`onStart` … `onStop`).
+    - Today's and all-time play time persist. ADR-003 format 1 already held them, so no field was added.
+  - **`PlayController` credits the counted seconds to the open puzzle and keeps the best time.**
+    - An aid solve keeps the best time as it was.
+    - It saves every 10 counted seconds and on stop, so a force-close keeps the time.
+    - `AppClock` and `AppGraph`'s 250 ms ticker wire it in `:app`.
+  - **The timer on the board** is hidden by default, drawn as checkpoint item 1 (D9). Every time uses one format (item 2, D10: "1:23", "1 h 5 min").
+  - **Results:** 9/9 IDs green on the Python channel, JVM 295/0, the floor, dev and tablet images, the death pair and V-01.
+  - **Reviews:** design 0 B / 5 S, plan 0 B / 4 S, code 0 B / 0 S / 5 N. **4 corrected checks** (`proposals.md` 2026-10-21). 0 product defects.
+- **Device time from now on** (run log t051): the play set takes about 47 min on the floor and 55 min on dev; the app set about 20 min per image; the whole three-image run 2 h 50 min. Every class runs alone on the floor and on dev as it lands, and the whole sets run once on the final tree. WO-008's whole sets were green at the first pass.
+- **Next: WO-007 #Settings** (row 8, the kickoff order; WO-009 #Release is the last WO after it).
+- **Carry into WO-007:**
+  - **REQ-029.A2** (the settings screen shows today's and all-time play time) moved here from WO-008 (`decisions.md` 2026-10-20 row 8). `chg-draft-req005-available.md`'s screen half is here too.
+  - **Code review N1:** `PlayController.timerShown` reads `Persistence.settings`, which is loaded once at start-up. The timer switch must make that read snapshot state, and `Persistence` must replace its cached settings when it saves them. Otherwise the board won't change until a restart.
+  - **The WO-008 design's carries** (`designs/WO-008-design.md` "Carried to WO-007"):
+    - reset (REQ-034) also resets `ActiveTime`'s in-memory play times (a notify delta on `IActiveTime`);
+    - the settings screen adds its predicate term (the pause while it is open, REQ-032) and folds on open and close;
+    - the settings screen stays in the activity's window. A Compose `Dialog` or `Popup` is another window, whose touches `dispatchTouchEvent` never sees;
+    - `timeOf` becomes public.
+  - **From WO-006, still open:**
+    - the settings screen joins the "every screen" tests (the closed world of texts, the touch-size sweep, the no-money walk, the Finnish walk);
+    - REQ-009's free note goes on that screen;
+    - how sounds handle an aid solve's burst of events.
+  - **Code review N5 (optional):** an explicit `dataExtractionRules` file would silence a lint warning. Nothing changes in behaviour; the owner's call.
+- **Carry into WO-009** (unchanged from "State after WO-010" and "State after WO-006"):
+  - the convex-13 `NOTICE.md` line;
+  - the first-release puzzle selection;
+  - REQ-039.A2 / REQ-042.A1;
+  - REQ-001.A2;
+  - the `portrait` `uses-feature` line;
+  - the `localeFilters` / S-36 watch.
+- **A later kit pass:**
+  - the WO-010 items (the self-check's speed; REQ-039.A1's own mutation proof);
+  - new: the death pair's positive control fails before WO-008's time read-back (Test & Verify obs. 1; the JVM kit covers the line).
+- **Checkpoint items:** WO-008's items 1–2 (the timer's look; one format) **stand 2026-10-23** unless answered.
+- **Lock behind build:** 29 outbox drafts await a capture session; this WO wrote none.
+- **Owner steps:**
+  - Commit the WO-008 snapshot, which holds the floor move too (prompted on the G4 surface).
+  - Play the build: the best time on the solved card, idle and Home, best stays best, a force-close (`review-notes.md` 2026-10-21).
+  - Answer checkpoint items 1–2 by 2026-10-23 if a default is wrong.
+
+```text
+WE ARE BETWEEN WORK ORDERS — open WO-007 #Settings (TangramPlaytime, SWDev
+v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+files), then governance.md, decisions.md (the 2026-10-20 and 2026-10-21 rows),
+KICKOFF.md "State after WO-008" and "State after WO-006" (the WO-007 carries),
+architecture.md (v1.4: IActiveTime), build-map.md, designs/WO-008-design.md
+"Carried to WO-007", reviews/WO-008-code-review.md N1, platform-notes/android.md,
+the last progress.md entry. Open WO-007 under row 8 with REQ-029.A2 in its
+scope and the carries in its design; the Implements bullet holds IDs only.
+Channels: Python, JVM (the two-run line), the floor Phone_API_31 first, the
+dev and tablet images, V-01. Stations as subagents; every class alone on the
+floor and dev as it lands, the whole sets once on the final tree; device steps
+as one background script per image; no replies to interim notices. The four
+scripts are duties. End every turn with the one signal.
+```
+
 ## State after WO-010 (2026-10-20, closed 17:22)
 
 - **WO-010 content batch is done** (`workorders/WO-010.md`, Light; G4 `decisions.md` 2026-10-20 "WO-010 closed at G4").

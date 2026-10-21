@@ -67,3 +67,30 @@
 {"ts": "2026-10-20T13:51:33", "hook": "stop", "event": "progress-reminder", "age_min": 61}
 {"ts": "2026-10-20T15:24:38", "hook": "stop", "event": "progress-reminder", "age_min": 72}
 {"ts": "2026-10-20T16:43:22", "hook": "stop", "event": "progress-reminder", "age_min": 78}
+{"ts": "2026-10-20T20:14:51", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:14:52", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:14:54", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:14:56", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:14:59", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:15:03", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:59:50", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:59:51", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:59:54", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T20:59:57", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:00:00", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:00:03", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:00:04", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:00:09", "hook": "guard", "event": "allow-unlocked", "path": "architecture.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:00:15", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:00:18", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:00:21", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:35:27", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-20T21:35:28", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-21T00:38:24", "hook": "stop", "event": "progress-reminder", "age_min": 74}
+{"ts": "2026-10-21T03:51:37", "hook": "guard", "event": "contract-delta", "path": "contracts/src/main/kotlin/app/tangramplaytime/contracts/IActiveTime.kt", "pattern": "contracts/src/main/kotlin/app/tangramplaytime/contracts/IActiveTime.kt", "tool": "Write"}
+{"ts": "2026-10-21T03:51:40", "hook": "guard", "event": "contract-delta", "path": "contracts/src/main/kotlin/app/tangramplaytime/contracts/IProgressStore.kt", "pattern": "contracts/src/main/kotlin/app/tangramplaytime/contracts/IProgressStore.kt", "tool": "Edit"}
+{"ts": "2026-10-21T08:48:11", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-21T08:48:12", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-21T08:48:13", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-21T08:48:14", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
+{"ts": "2026-10-21T08:48:18", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}

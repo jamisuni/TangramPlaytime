@@ -8,6 +8,10 @@
 // phase 2 derives what it looks for the same way phase 1 chose it, from the bundled library and the engine.
 // The play kit's same-process legs of REQ-003 A2 and REQ-025 A1 are ResumeScreenKitTest's; this file carries the
 // process-death leg, tokened on `phase2`.
+// Amended WO-008 (TASK-050; tasks.md § WO-008, the TASK-050 row: "the death pair's times"): `phase1` also counts N s through
+// the window and the kit clock (KitApp `kitInstallClock`, `kitTouchThroughWindow`; S-46 `AppClock.override`, reset to null in
+// `finally`) before its flush, and `phase2` reads them back: REQ-005 A2 is an extra token there, beside the JVM kit's in
+// `play/` (PlayTimeKitTest). Each phase is still one finished test, and the guard is unchanged.
 package app.tangramplaytime.app
 
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -95,6 +99,32 @@ class ProcessDeathKitTest {
         }
         composeRule.waitForIdle()
         kitAssertShowsLeft(p, three, "phase 1, before the flush")
+        // WO-008 TASK-050, the death pair's times (the brief; design §3 "Recreation and death"; decisions.md 2026-10-20 "When the
+        // times are written, and what a process death may lose." (D8)): with the kit clock installed (S-46 `AppClock.override`,
+        // KitApp `kitInstallClock`: a fold on the main thread, so nothing real counts after it), the first touch of this process
+        // goes through the window at an inert point of the board (KitApp `kitTouchThroughWindow`; review F1), then the kit clock
+        // moves N s and the controller folds, on the main thread. Fixture first: nothing was counted before that touch (D3: "In a
+        // new process nothing counts before the first touch"), so the N s are the only seconds of this process. N = 60 is a
+        // multiple of S-20Δ's 10-second cadence (decisions.md 2026-10-21 "The save cadence counts play seconds since the last
+        // play-times write …": the tick writes the play times, then the open puzzle, once 10 are unsaved), so every counted
+        // second is queued before the flush below; and it is TYPE-005's idle limit, so after its one touch the player is idle
+        // when the override is reset to null in `finally` (S-45's backwards reading keeps the time since the last touch,
+        // decisions.md 2026-10-20, the F5 amendment), and no real second is counted between the reset and the force-stop.
+        val kit = KitApp(composeRule)
+        val clock = kit.kitInstallClock("phase 1")
+        try {
+            val before = composeRule.runOnUiThread { controller.countTime(); controller.timeSeconds to controller.playTimes.allTimeSeconds }
+            assertEquals("fixture: phase 1 counted nothing before the first touch (the puzzle's seconds, the all-time play time; D3)", 0 to 0, before)
+            kit.kitTouchThroughWindow("phase 1: the first touch of the process")
+            val after = composeRule.runOnUiThread {
+                clock.forward(KIT_DEATH_SECONDS)
+                controller.countTime()
+                controller.timeSeconds to controller.playTimes.allTimeSeconds
+            }
+            assertEquals("phase 1: a touch, then $KIT_DEATH_SECONDS s: the fixture puzzle's seconds and the all-time play time", KIT_DEATH_SECONDS to KIT_DEATH_SECONDS, after)
+        } finally {
+            composeRule.runOnUiThread { AppClock.override = null }
+        }
         // S-2Δ: "`flush()` delegates to Persistence" (S-19 `suspend fun flush()`); a Job it might return is joined too.
         runBlocking {
             withTimeout(30_000) {
@@ -104,7 +134,7 @@ class ProcessDeathKitTest {
         }
     }
 
-    @Test // REQ-003.A2 REQ-025.A1
+    @Test // REQ-003.A2 REQ-025.A1 REQ-005.A2
     fun phase2() {
         // REQ-025 A1: "Leave a puzzle with three pieces placed, come back: the same three pieces are in the same places."
         // REQ-003 A2: "Leaving and returning to a puzzle never loses its state." Rule (REQ-025): "The state survives closing
@@ -122,6 +152,16 @@ class ProcessDeathKitTest {
         val placed = composeRule.runOnUiThread { controller.placed.toList() }
         assertEquals("the controller's board: the pieces", three.map { it.piece }.sorted(), placed.map { it.piece }.sorted())
         for (pl in three) assertTrue("the controller's ${pl.piece}: expected $pl, is ${placed.single { it.piece == pl.piece }}", kitSame(pl, placed.single { it.piece == pl.piece }))
+        // WO-008 TASK-050 — REQ-005 A2: "The total active play time is available at any time", read as decisions.md 2026-10-20
+        // "REQ-005's two lines are verified as locked, at the seam …" (P1): "the all-time play time the controller reports (from
+        // IActiveTime.playTimes()) equals every second counted so far. It is read … after a process death." In this new process
+        // there is no override and no touch (D3: nothing counts before the first touch), so every second counted is phase 1's
+        // N: the all-time play time is N, and so is the fixture puzzle's own time (S-20Δ: `timeSeconds` rides the open puzzle's
+        // save; the PuzzleProgress KDoc: the active seconds of the current attempt). A process death that lost the times, or a
+        // write that never reached the file, reads 0 here.
+        val times = composeRule.runOnUiThread { controller.timeSeconds to controller.playTimes.allTimeSeconds }
+        assertEquals("the fixture puzzle's seconds across the death (S-1Δ3 timeSeconds)", KIT_DEATH_SECONDS, times.first)
+        assertEquals("the all-time play time across the death (S-1Δ3 playTimes)", KIT_DEATH_SECONDS, times.second)
     }
 
     // ── helpers of this file ───────────────────────────────────────────────────────────────────────────
@@ -172,6 +212,12 @@ class ProcessDeathKitTest {
     private companion object {
         /** Seam note 1: the instrumentation argument that selects a phase. */
         const val KIT_PHASE_ARGUMENT = "deathPhase"
+
+        /**
+         * WO-008 TASK-050: the seconds phase 1 counts after its one touch (N): a multiple of S-20Δ's 10-second cadence, and
+         * TYPE-005's 60 s idle limit, so the player is idle when phase 1 resets the kit clock (see `phase1`).
+         */
+        const val KIT_DEATH_SECONDS = 60
 
         const val KIT_TOL = 1e-6
 
