@@ -129,4 +129,16 @@ One row per `Tangrams/*.json`, sorted by puzzle id. Source figure id and Source 
 
 - **Pictures:** every puzzle picture (`art`) is made for this project. A picture not drawn yet carries the one-colour stub `{"base": "#D9DCE8", "shapes": []}` (WO-010, until its batch draws it).
 - **Fonts:** the system font only; no font is bundled (ADR-005).
-- **Sounds:** none yet (WO-007 adds the sounds and their rows).
+- **Sounds:** five sound effects, each made for this project by `tools/make_sounds.py`, GPL-3.0; one row per file in § Sounds below.
+
+## Sounds
+
+The five sound effects are made for this project by `tools/make_sounds.py` (Python standard library only, deterministic: a second run writes the same bytes), after the recipes of `decisions.md` 2026-10-21 "The five sounds and the tick." Each is a 16-bit mono WAV at 22 050 Hz in `app/src/main/res/raw/`, at most 1 s long. To change a sound, change its recipe in the tool and run it again (G-06). The lock's haptic tick is the platform's `CLOCK_TICK` and ships no file.
+
+| File | Sound | Recipe | Length | Source | Licence |
+|---|---|---|---|---|---|
+| `sfx_pick_up.wav` | pick-up | sine, 520 → 700 Hz | 70 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |
+| `sfx_turn.wav` | turn | square, 760 Hz | 40 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |
+| `sfx_lock.wav` | lock | triangle 1320 Hz + sine 1760 Hz | 60 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |
+| `sfx_home.wav` | return to the tray | sine, 300 → 180 Hz; the softest and lowest of the five | 160 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |
+| `sfx_solve.wav` | solve | four rising triangle notes, 523, 659, 784 and 1047 Hz, 110 ms apart | 570 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |

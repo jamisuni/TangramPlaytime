@@ -8,9 +8,14 @@
 // built with the controller; the window's touches and its visibility are forwarded; a 250 ms ticker folds the counted
 // seconds while the game is visible · TYPE-005; REQ-029, REQ-005, REQ-031 · decisions.md 2026-10-20 "TYPE-005 as code."
 // and "When the times are written, and what a process death may lose."
+// WO-007 TASK-061 · seam S-15Δ4, its feedback half (designs/WO-007-design.md §2): the one door (`Feedback`, S-50) over the
+// device's playback (`DeviceFeedback`, S-51) is built synchronously, before the load, and is the controller's `onEvent`;
+// `MainActivity` gives the playback its decor view · REQ-033; O-07 · decisions.md 2026-10-21 "REQ-033 A1's oracle is one
+// door …" (E8) as amended (E8a).
 package app.tangramplaytime.app
 
 import android.content.Context
+import android.view.View
 import app.tangramplaytime.content.PuzzleLibraries
 import app.tangramplaytime.contracts.IActiveTime
 import app.tangramplaytime.contracts.ILockEngine
@@ -46,9 +51,13 @@ import java.util.concurrent.atomic.AtomicBoolean
  * `countTime()`, then waits [TICK_MS], over and over; it stops when the game leaves the screen. Every member
  * runs on the main thread, as the kernel requires (`IActiveTime`: one caller thread).
  *
- * The kits' doors into the app (S-15Δ; designs/WO-004-design.md §3; S-46): `ProcessDeathKitTest`,
+ * Sounds, the tick and the click (S-15Δ4; O-07): [start] builds the one door, [feedback], before the load; the controller
+ * emits its events into it, and `MainActivity` provides it as `LocalSoundEffect` and gives the device's playback its decor
+ * view ([feedbackView], [feedbackViewGone]).
+ *
+ * The kits' doors into the app (S-15Δ; designs/WO-004-design.md §3; S-46; S-50): `ProcessDeathKitTest`,
  * `AppWiringKitTest` and `ActiveTimeAppKitTest` read [controller]; the `app/` time kits set
- * [AppClock.override].
+ * [AppClock.override]; the `app/` sound kit sets [feedback]'s `override`.
  */
 internal object AppGraph {
     /** The one lock rule (WO-001), stateless. */
@@ -65,10 +74,21 @@ internal object AppGraph {
     private val built = MutableStateFlow<PlayController?>(null)
 
     /**
-     * The Play screen's state holder, or null until [start]'s load has finished. Its events go nowhere in
-     * this WO: sounds and the haptic are WO-007's (O-07), which passes a listener here.
+     * The Play screen's state holder, or null until [start]'s load has finished. Its events go to
+     * [feedback] (S-15Δ4; O-07).
      */
     val controller: StateFlow<PlayController?> = built.asStateFlow()
+
+    /**
+     * The one door for every sound, tick and click (S-50; S-15Δ4: "`AppGraph.feedback` is internal"), built by the first
+     * [start], synchronously, before the load. Sound is on exactly while the controller exists and its settings say so: every
+     * use reads `controller.settings` (design §3 "N1"), and on the loading paper there is nothing to sound.
+     */
+    internal lateinit var feedback: Feedback
+        private set
+
+    /** The device's playback behind [feedback] (S-51), built with it. Main thread. */
+    private lateinit var device: DeviceFeedback
 
     /**
      * The kernel's TYPE-005 accounting the controller was built with (S-15Δ3), or null until [start]'s
@@ -101,16 +121,24 @@ internal object AppGraph {
      * S-15Δ3: the kernel's `ActiveTime` starts from the saved play times and reads [AppClock]; the
      * controller is told the visibility remembered so far before it is published, and the ticker starts if
      * the game is visible.
+     *
+     * S-15Δ4: [feedback] and its device playback are built here, on the caller's (main) thread, before the
+     * load starts, so they exist before `MainActivity` composes or starts; the controller's `onEvent` is the
+     * door's [Feedback.on].
      */
     fun start(context: Context) {
         if (!started.compareAndSet(false, true)) return
         val app = context.applicationContext
+        val playback = DeviceFeedback(app)
+        val door = Feedback({ built.value?.settings?.soundOn == true }, playback)
+        device = playback
+        feedback = door
         mainScope.launch {
             val (library, persistence) = withContext(Dispatchers.IO) {
                 PuzzleLibraries.bundled(engine) to Persistence.load(ProgressStores.onDevice(app), mainScope)
             }
             val activeTime = ActiveTime(AppClock, persistence.playTimes)
-            val playController = PlayController(library, engine, persistence, activeTime)
+            val playController = PlayController(library, engine, persistence, activeTime, door::on)
             time = activeTime
             playController.setVisible(visibleNow)
             built.value = playController
@@ -137,6 +165,22 @@ internal object AppGraph {
         if (shown) startedActivities++ else startedActivities--
         if (visibleNow != was) built.value?.setVisible(visibleNow)
         syncTicker()
+    }
+
+    /**
+     * A `MainActivity` started (S-51; S-15Δ4): from now on the tick and the click are made on its decor [view]. A new instance
+     * started over a running one takes the view over before the old one stops. Main thread.
+     */
+    fun feedbackView(view: View) {
+        device.view = view
+    }
+
+    /**
+     * A `MainActivity` stopped (S-51): its decor [view] makes no tick or click any more. Only the activity that set the view
+     * clears it, so an old instance stopping after a new one started leaves the new one's view in place. Main thread.
+     */
+    fun feedbackViewGone(view: View) {
+        if (device.view === view) device.view = null
     }
 
     /**

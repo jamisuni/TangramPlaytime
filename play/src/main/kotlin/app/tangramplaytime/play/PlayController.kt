@@ -11,6 +11,11 @@
 // G-13 (every write through Persistence), G-14 (time only through IActiveTime's counts) · decisions.md 2026-10-20 "What
 // counts on each screen.", "An aid solve keeps the best time through one generic controller member." (as amended), "When
 // the times are written, and what a process death may lose.".
+// WO-007 TASK-054 · seams S-1Δ4, S-2Δ4 (designs/WO-007-design.md §2) · REQ-032 (statement, rule 2, A1), REQ-031, REQ-033,
+// REQ-030 (rules 1 and 3), REQ-034; TYPE-005, TYPE-006 · G-13 (every write through Persistence's one FIFO) · decisions.md
+// 2026-10-21 "The settings screen sits in the activity's window, pauses the puzzle time …", "The two switches write
+// through `PlayController` and `Persistence` …", "Play time and best times on the settings screen.", "Reset all
+// progress, in order, and where the player is afterwards.".
 package app.tangramplaytime.play
 
 import androidx.compose.runtime.getValue
@@ -28,6 +33,7 @@ import app.tangramplaytime.contracts.PuzzleDefinition
 import app.tangramplaytime.contracts.PuzzleKind
 import app.tangramplaytime.contracts.PuzzleProgress
 import app.tangramplaytime.contracts.PuzzleState
+import app.tangramplaytime.contracts.Settings
 import app.tangramplaytime.contracts.Turn
 import kotlin.math.abs
 
@@ -77,6 +83,15 @@ data class Shake(val piece: PieceId, val serial: Int)
 data class Celebration(val puzzleId: String, val serial: Int)
 
 /**
+ * One row of the settings screen's best times (S-1Δ4; REQ-030 rule 3; decisions.md 2026-10-21 "Play time and best times
+ * on the settings screen."): a listed puzzle with a stored best time.
+ *
+ * @property puzzle the puzzle; the screen shows its title in the game's language.
+ * @property seconds its best time, in active seconds (TYPE-005).
+ */
+data class BestTime(val puzzle: PuzzleDefinition, val seconds: Int)
+
+/**
  * S-20Δ's cadence: the play times, then the open puzzle, are written once this many play seconds have been counted since
  * the last such write (decisions.md 2026-10-20 "When the times are written, and what a process death may lose.": "every 10
  * counted play seconds"; at most 360 rewrites per hour of play, ADR-003). Not DI-1's 5 s (`design-inputs.md` §2 item 11).
@@ -84,10 +99,11 @@ data class Celebration(val puzzleId: String, val serial: Int)
 private const val SAVE_EVERY_PLAY_SECONDS = 10
 
 /**
- * The Play screen's state holder (S-1, S-2; S-1Δ, S-2Δ; S-1Δ3, S-2Δ3): one puzzle open, its TYPE-006 state, the
- * locked pieces, the tray pieces with their turns and mirror, the dragged piece, the landing preview,
- * the pulse, shake and celebration the screen animates, the moves between puzzles, and the open puzzle's time
- * and best time (REQ-030; O-04). Every lock, preview, turn or mirror in place, load check and the solved check
+ * The Play screen's state holder (S-1, S-2; S-1Δ, S-2Δ; S-1Δ3, S-2Δ3; S-1Δ4, S-2Δ4): one puzzle open, its TYPE-006
+ * state, the locked pieces, the tray pieces with their turns and mirror, the dragged piece, the landing preview,
+ * the pulse, shake and celebration the screen animates, the moves between puzzles, the open puzzle's time
+ * and best time (REQ-030; O-04), and the settings screen's flag, the settings, the best times and Reset all progress
+ * (REQ-031, REQ-032, REQ-033, REQ-034). Every lock, preview, turn or mirror in place, load check and the solved check
  * is [engine]'s answer (O-01, G-04); the controller never derives a position.
  *
  * Reads are Compose snapshot state, readable from a JVM test without a composition. Actions run on the
@@ -95,11 +111,12 @@ private const val SAVE_EVERY_PLAY_SECONDS = 10
  * animation inside: time arrives only as [time]'s whole counted seconds (G-14), and the screen animates.
  *
  * **The fold** (S-2Δ3; decisions.md 2026-10-20 "Amends three 2026-10-20 rows … F2 option (a) …"): `n = time.count()`
- * is added to [timeSeconds] when the open puzzle is In progress and the grid overview is closed — the predicate as it
- * stands at the fold — and [playTimes] is read again. Every change of that predicate folds first ([open], [restart],
- * [retry], a tray [startDrag], the solving [drop], [openOverview], [closeOverview]), and so does [setVisible] before it
- * tells the kernel; the predicate therefore held for the whole interval since the previous fold, and the seconds go to
- * the puzzle they were spent on. [countTime] folds, then writes on S-20Δ's cadence. The construction does not fold.
+ * is added to [timeSeconds] when the open puzzle is In progress, the grid overview is closed and the settings screen is
+ * closed (S-2Δ4) — the predicate as it stands at the fold — and [playTimes] is read again. Every change of that
+ * predicate folds first ([open], [restart], [retry], a tray [startDrag], the solving [drop], [openOverview],
+ * [closeOverview], [openSettings], [closeSettings], [resetAll]), and so does [setVisible] before it tells the kernel; the
+ * predicate therefore held for the whole interval since the previous fold, and the seconds go to the puzzle they were
+ * spent on. [countTime] folds, then writes on S-20Δ's cadence. The construction does not fold.
  *
  * **What is kept per puzzle** (S-20, S-20Δ): after each action, the open puzzle's
  * `PuzzleProgress(state, placed if In progress else [], time, best)` is saved when it differs from the
@@ -172,11 +189,32 @@ class PlayController(
         private set
 
     /**
-     * Whether the running puzzle time is shown on the board (S-1Δ3; REQ-031): the stored setting as [persistence]
-     * read it, else false (the setting's default, REQ-031.A1).
+     * Whether the settings screen is open (S-1Δ4; REQ-032): false at the start, set by [openSettings] and [closeSettings].
+     * It lives here, so it survives a recreation but not a process death (decisions.md 2026-10-21 "The settings screen
+     * sits in the activity's window …").
      */
+    var settingsOpen: Boolean by mutableStateOf(false)
+        private set
+
+    /**
+     * The player's settings (S-1Δ4; REQ-031, REQ-033): this controller's own snapshot state, seeded once from
+     * [persistence]'s settings, else the defaults (timer off, sound on). [setTimerShown] and [setSoundOn] replace it, so
+     * every reader sees a switch at once (N1; decisions.md 2026-10-21 "The two switches write through `PlayController` …").
+     */
+    var settings: Settings by mutableStateOf(persistence?.settings ?: Settings())
+        private set
+
+    /** Whether the running puzzle time is shown on the board (S-1Δ4; REQ-031): [settings]' timer setting. */
     val timerShown: Boolean
-        get() = persistence?.settings?.timerShown ?: false
+        get() = settings.timerShown
+
+    /**
+     * The settings screen's best times (S-1Δ4; REQ-030 rule 3): one row per listed puzzle with a stored best time, in ‹ ›
+     * order; the open puzzle's is its [bestSeconds]. A puzzle never solved, or solved only by the developer aid (REQ-030
+     * rule 4), has none. Refreshed by [openSettings], and empty after [resetAll]; empty until the first [openSettings].
+     */
+    var bestTimes: List<BestTime> by mutableStateOf(emptyList())
+        private set
 
     /** The drag the current [preview] was searched for, so a drop reuses that search (REQ-021 A1). */
     private var previewFor: Dragged? = null
@@ -348,6 +386,78 @@ class PlayController(
         return id == puzzle.id || open(id)
     }
 
+    // ── The settings screen (S-2Δ4) ──────────────────────────────────────────────────────────────
+
+    /**
+     * The gear opens the settings screen over the open puzzle (S-2Δ4; REQ-032 statement): the fold first, then the flag,
+     * so the seconds before the opening are the puzzle's and those after it are play time only (REQ-032 rule 2; REQ-030
+     * rule 1; decisions.md 2026-10-20 "What counts on each screen."); then [bestTimes] is refreshed. Nothing on the board
+     * changes (REQ-032.A1): no placement, state, tray turn, open puzzle or puzzle time.
+     */
+    fun openSettings() {
+        fold()
+        settingsOpen = true
+        bestTimes = listedBestTimes()
+    }
+
+    /**
+     * Closes the settings screen (S-2Δ4; REQ-032 statement: back to the same puzzle state): the fold first, so the
+     * seconds spent on the screen stay play time only, then the flag. Nothing on the board changes (REQ-032.A1).
+     */
+    fun closeSettings() {
+        fold()
+        settingsOpen = false
+    }
+
+    /**
+     * The timer switch (S-2Δ4; REQ-031): [settings] is replaced at once, so the board's timer follows on this controller
+     * (N1), then the setting is saved through [persistence]'s one FIFO (G-13).
+     */
+    fun setTimerShown(shown: Boolean) {
+        settings = settings.copy(timerShown = shown)
+        persistence?.saveSettings(settings)
+    }
+
+    /**
+     * The sound switch (S-2Δ4; REQ-033): [settings] is replaced at once, so every reader of the sound setting follows
+     * (N1), then the setting is saved through [persistence]'s one FIFO (G-13).
+     */
+    fun setSoundOn(on: Boolean) {
+        settings = settings.copy(soundOn = on)
+        persistence?.saveSettings(settings)
+    }
+
+    /**
+     * The confirmed Reset all progress (S-2Δ4; REQ-034 statement and rule 2; decisions.md 2026-10-21 "Reset all progress,
+     * in order, and where the player is afterwards."), in this order, every step on the caller's (main) thread:
+     * 1. the fold, so the seconds before the reset are counted under the predicate that held;
+     * 2. the kernel's play times are erased ([IActiveTime.resetPlayTimes]);
+     * 3. [persistence] queues the store's reset behind every earlier write and empties its cache, keeping the settings and
+     *    the last-opened id ([Persistence.resetAll]); without one, this controller's memory is cleared;
+     * 4. the open puzzle is shown again as now saved: New, an empty board, every piece in the tray at rest, time 0, no
+     *    best time. Nothing is saved for it but the last-opened id;
+     * 5. [playTimes] is read again, the play seconds of S-20Δ's cadence start from 0, and [bestTimes] is empty.
+     *
+     * It never calls [open], whose leaving save would write the pre-reset board after the store's reset (design §3
+     * "Reset order"), and it emits no [PlayEvent]. The player stays on the open puzzle and [settingsOpen] is unchanged.
+     * The confirmation is the caller's (REQ-034 rule 1, A2).
+     */
+    fun resetAll() {
+        fold()
+        time?.resetPlayTimes()
+        if (persistence != null) persistence.resetAll() else memory.clear()
+        load(puzzle)
+        playTimes = time?.playTimes() ?: PlayTimes.NONE
+        unsavedPlaySeconds = 0
+        bestTimes = emptyList()
+    }
+
+    /** [bestTimes]' rows as now saved (S-1Δ4): the listed puzzles with a best time, in ‹ › order; the open one's [bestSeconds]. */
+    private fun listedBestTimes(): List<BestTime> = library.puzzles.mapNotNull { p ->
+        val best = if (p.id == puzzle.id) bestSeconds else savedOf(p.id).bestSeconds
+        best?.let { BestTime(p, it) }
+    }
+
     /**
      * Restart (S-2Δ, REQ-025): an In-progress puzzle becomes New with an empty board, time 0 and its best
      * time kept (REQ-030 rule 2), every piece in the tray at its resting turn, unmirrored. It folds first (S-2Δ3),
@@ -419,15 +529,16 @@ class PlayController(
     }
 
     /**
-     * The fold (S-2Δ3): the whole active seconds the kernel counted since the last count are added to [timeSeconds]
-     * when the open puzzle is In progress and the grid overview is closed (REQ-030 statement and rule 1; TYPE-006 rule
-     * 4; decisions.md 2026-10-20 "What counts on each screen."), and [playTimes] is read again. No write: the writes are
-     * [countTime]'s cadence, [setVisible]'s and each action's own S-20 save.
+     * The fold (S-2Δ3, S-2Δ4): the whole active seconds the kernel counted since the last count are added to
+     * [timeSeconds] when the open puzzle is In progress, the grid overview is closed and the settings screen is closed
+     * (REQ-030 statement and rule 1; REQ-032 rule 2; TYPE-006 rule 4; decisions.md 2026-10-20 "What counts on each
+     * screen."), and [playTimes] is read again. No write: the writes are [countTime]'s cadence, [setVisible]'s and each
+     * action's own S-20 save.
      */
     private fun fold() {
         val t = time ?: return
         val n = t.count()
-        if (state == PuzzleState.IN_PROGRESS && !overviewOpen) timeSeconds += n
+        if (state == PuzzleState.IN_PROGRESS && !overviewOpen && !settingsOpen) timeSeconds += n
         playTimes = t.playTimes()
         unsavedPlaySeconds += n
     }

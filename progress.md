@@ -1911,3 +1911,221 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   test corrections and five lessons are filed in proposals.md; a
   play-test list is in review-notes.md; KICKOFF.md has the hand-over
   and the start text for WO-007 #Settings. Jami commits by hand.
+
+## 2026-10-21 — WO-007 #Settings opened (fresh orchestrator context)
+
+**Human input (verbatim, 15:10):**
+
+> WE ARE BETWEEN WORK ORDERS — open WO-007 #Settings (TangramPlaytime, SWDev
+> v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+> files), then governance.md, decisions.md (the 2026-10-20 and 2026-10-21 rows),
+> KICKOFF.md "State after WO-008" and "State after WO-006" (the WO-007 carries),
+> architecture.md (v1.4: IActiveTime), build-map.md, designs/WO-008-design.md
+> "Carried to WO-007", reviews/WO-008-code-review.md N1, platform-notes/android.md,
+> the last progress.md entry. Open WO-007 under row 8 with REQ-029.A2 in its
+> scope and the carries in its design; the Implements bullet holds IDs only.
+> Channels: Python, JVM (the two-run line), the floor Phone_API_31 first, the
+> dev and tablet images, V-01. Stations as subagents; every class alone on the
+> floor and dev as it lands, the whole sets once on the final tree; device steps
+> as one background script per image; no replies to interim notices. The four
+> scripts are duties. End every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; from 15:10):**
+- Framework v0.20 = project, no drift. HEAD `aeba492` (the WO-008
+  snapshot); the code is unchanged since WO-008's final run (same test,
+  product, bundle and tools hashes).
+- 15:15 WO-007 opened (`workorders/WO-007.md`), Full: the reset must
+  also clear the in-memory play times, which changes the time-keeping
+  interface. 16 requirement lines in scope: the settings screen, the
+  sound switch and sounds, reset, the free note, today's and all-time
+  play time on the screen, and the privacy text (it belongs on this
+  screen too). The "no ads, big enough buttons, Finnish, airplane mode"
+  checks get the new screen added. The open-source licence line you
+  okayed on 2026-10-11 is built too, ahead of its paperwork. One
+  decision row records the scope.
+- 15:22 the design author (Opus) is working on the design; the
+  channel checks run in the background.
+- 15:24 every channel works on the current code: the puzzle and
+  requirement checks, the 295 computer tests, the release check, and
+  the Android 12 emulator, the dev phone and the tablet (each launched
+  the game and passed its two start-up tests). I re-counted the result
+  files.
+- 15:38 the design is back (`designs/WO-007-design.md`). In short: a
+  gear at the right end of the top bar opens the settings over the
+  puzzle, inside the game's own window; switches take effect at once;
+  the sounds are five short tones made by a project script, with a
+  light tick on each lock, all silent when sound is off; reset erases
+  everything except the settings and keeps you on the same puzzle,
+  now new. Four questions for you later (the gear and the screen's
+  look, which best times are listed, where you are after a reset, the
+  sounds); the how-to-play text goes to the proof-reading list. A
+  fresh design reviewer is checking it now.
+- 16:01 the review found one blocker and four things to tighten. The
+  blocker: Android plays its own click on every button tap, even with
+  the game's sound switched off — the design assumed it didn't. The
+  fix: the click follows the game's sound switch (silent when off, as
+  today when on). The others: the tests must know when the settings
+  screen is open, a few existing top-bar tests move with the gear, the
+  reset needs a test that re-reads the saved file, and the top bar's
+  "in progress" line must still fit on a narrow phone. All five went
+  back to the same design author.
+- 16:08 the fixed design is back: the phone's tap click now goes
+  through the game's own sound door, so the sound switch controls it
+  and the "no sound" test can see it. The narrow-phone top bar line
+  shrinks a little when it would not fit.
+- 16:10 the architecture record (v1.5) names the new "erase play
+  times" step that reset uses; the build map (v1.9) moves the play-time
+  tests' home to the app, where the settings screen is; the frozen
+  contract record is refreshed.
+- 16:12 the reviewer re-checked the click fix on the library code: it
+  holds. Design review closed. The planner (Opus) is turning the
+  design into tasks now.
+- 16:41 the plan is back: eleven tasks, one after another, the reset's
+  order (the riskiest part) right after the interface change; every
+  test change is the test author's, landing with or before the code it
+  checks; about 7.5 h of emulator time. My own plan check is green on
+  all 16 lines. I answered the planner's five questions (the main one:
+  the test-kit change re-runs every affected app test alone on the
+  Android 12 emulator and the dev phone, not only in the final run).
+- 16:43 four questions for you are in the work order (the gear and the
+  screen's look, which best times, where you are after a reset, the
+  sounds); defaults stand 2026-10-24. A fresh plan reviewer is checking
+  the plan now.
+- 16:48 plan review: no blockers, four small fixes (three by the
+  planner, one by running the biggest task in two hops). 16:51 **plan
+  approved (G3)** — my call under the governance table; my own plan
+  check green on all 16 lines.
+- 16:51 building started: the test author writes the first tests (the
+  reset's order, the switches, the pause while the screen is open);
+  they land before the code they check.
+- 17:17 the first tests are in (they wait for code that doesn't exist
+  yet, as planned). 17:23 the time-keeping core can erase play times
+  for a reset; its tests pass. The fixed interface record is updated.
+- 17:45 the riskiest part is done: the play screen's settings (the
+  switches take effect at once), the pause while the settings are
+  open, the best-times list, and reset in the right order, so nothing
+  old is saved back after a reset. All 311 computer tests pass; a bug
+  planted on purpose made the reset tests fail, then was removed. On
+  the Android 12 emulator and the dev phone the timer, resume and
+  play-time tests pass, and so does the force-close check.
+- 17:47 next: the gear in the top bar (› moves one step left, the
+  "in progress" line shrinks on narrow phones), with its tests drafted
+  at the same time.
+- 18:28 the gear is in and works: 315 computer tests pass, the release
+  check passes, and on the Android 12 emulator and the dev phone the
+  top bar, the testing aid and the phone layout tests pass. On a
+  narrow phone the English line shrinks to about 91 % and fits whole;
+  the Finnish one fits at full size. One new test (the narrow-phone
+  line) reads the wrong spot in the screen's structure, so it fails on
+  both emulators although the screen is right — it went back to the
+  test author to fix. One top-bar test missed once on Android 12 just
+  after the emulator started; alone, after a minute's wait, it passed
+  — from now on every emulator run waits a minute after starting.
+- 18:45 the narrow-phone test is fixed (it had two mistakes of its
+  own, both in the test, not the game) and passes on both emulators:
+  English shrinks to 91 % and fits, Finnish fits at full size. The
+  gear task is done.
+- 18:46 next, side by side: the five sounds made by a small script
+  (with their licence lines), and the settings screen's tests drafted.
+- 18:54 the five sounds exist (70 ms to 570 ms; the "back to the tray"
+  tone is the softest and lowest; the loudest is kept well below
+  distortion), each listed in ASSET-LICENCES.md. Running the script
+  twice gives byte-identical files.
+- 19:06 the settings screen's tests are in (8 requirement lines: the
+  screen, its texts, the play times, the timer switch, reset and
+  cancel), and the "every screen" tests (no ads or prices, button
+  sizes, Finnish, airplane mode) now include the new screen. 316
+  computer tests pass; the release check passes.
+- 19:10 now: the settings screen itself is being built; then its tests
+  run on the Android 12 emulator first (about an hour), then the dev
+  phone and the tablet.
+- 19:59 the settings screen is built. On the Android 12 emulator its
+  own tests pass (the screen, its texts, the play times, the timer
+  switch, reset and cancel), and so do the full play-through (no ads,
+  no prices, airplane mode), the Finnish check, both layouts and the
+  force-close check — 10 of 11 classes. The button-size sweep failed
+  in the test itself: it tries to scroll to the Done button, which
+  sits in the fixed title row and can't be scrolled to. Back to the
+  test author; then the dev phone and the tablet.
+- 20:17 the button-size test is fixed (it now checks Done where it
+  sits) and passes on the Android 12 emulator. No game code changed.
+  The dev phone and tablet runs have started.
+- 21:16 the settings screen task is done: every test passes on the
+  dev phone (all 11 classes and the force-close check) and on the
+  tablet (7 classes). I looked at three screenshots. The screen looks
+  as designed: a cream card over a dimmed game, the two switches, the
+  play times, Reset, how to play, the free note, privacy, the licence
+  line. Reset asks its question in place, with Erase and Cancel. One
+  thing for your play test: the how-to-play text is a light grey, so
+  check that it reads well. Next: the sound tests, then the sounds and
+  the vibration themselves.
+- 21:25 the sound tests are written. On a device: turn sound off with
+  the real switch, then play a puzzle by touch, and nothing may sound
+  or vibrate. Then sound on: each action makes its own sound once.
+  Plus four quick computer checks of the sound switch. The app's test
+  code stays red until the sound code exists, as planned. The sounds
+  and vibration are being built now, then tested on all three
+  emulators (about an hour and a half).
+- 22:16 the sounds and the vibration tick are built. Everything goes
+  through one switch: with Sound off there are no sounds, no ticks and
+  no button clicks. All tests pass on the three emulators (the
+  device part took 38 minutes, not the planned 85), plus the
+  force-close check and the release check. Two choices for your ear
+  test: the sounds play at the files' own level, and a sound asked for
+  in the first moment after a cold start, before the sounds have
+  loaded, is skipped. The plan check passes again. A fresh reviewer is
+  now reading all of the WO's code.
+- 22:30 the review found no blockers and five notes. One I'm fixing
+  before the final run: when you press Reset, the question's Erase
+  button appears right where Reset was, so a quick double tap on Reset
+  would erase everything without a real second confirmation. A test
+  for it comes first, then the fix. The others wait for your look at
+  the end: some text is a light grey (3.6:1 contrast; the white
+  "Done" on green is 2.4:1), a few TalkBack oddities, and the sounds
+  are your ear test.
+- 22:36 the new reset test fails on today's build, as expected, which
+  proves the problem: a second tap near Reset's corner erased a solved
+  puzzle and its play time, on a normal phone and on a short screen.
+  The settings-screen coder is now moving the buttons; then the reset,
+  settings and button-size tests run on the Android 12 emulator and
+  the dev phone (about 40 minutes).
+- 23:20 the reset fix is in and its test now passes on both, along
+  with the settings and button-size tests. Reset sits on the left;
+  after you press it, Cancel is on the left and Erase on the far
+  right, so a second tap where Reset was can never erase. Erase is now
+  a white button with red text, as in the prototype, instead of solid
+  red. The final run of everything, on all three emulators, has
+  started (about 3.5 hours), with two screenshots of the new reset
+  question for your look.
+- 2026-10-22 02:36 the final run finished green on all three emulators
+  (3 h 07 min): every test passed, the app still has no permissions
+  and no network code, and the keep-your-progress-after-the-system-
+  kills-the-app check passed on Android 12 and the dev phone. I
+  recounted every result myself and looked at the screenshots: the
+  reset question looks as fixed. One look note for the end: when the
+  question opens, the settings card grows upward a little and covers
+  more of the puzzle title behind it. The independent test check has
+  started; the closing paperwork follows it.
+- 2026-10-22 02:49 **WO-007 #Settings is closed.** The independent
+  test check found nothing wrong, and every one of its 16
+  requirement lines has a test that passed on every channel. It asked
+  one question: is "sound off means silence" proven at the speaker, or
+  only where the game asks for a sound? I kept it as proven, as decided
+  at the plan: every sound, tick and tap click goes through one door,
+  and the test watches that door. That the speaker really plays is your
+  ear test. The paperwork is done:
+  - the build map marks the settings Built;
+  - the lessons for the framework (nine test corrections, and a
+    data-loss bug the code reviewer called a nit) are filed;
+  - your play-test list is ready: settings, the timer switch, Reset,
+    and listening to the five sounds, plus contrast and TalkBack notes;
+  - the start text for WO-009 #Release is in KICKOFF.md.
+
+  Nothing is running. Please commit when you are ready. The four
+  look-and-feel choices stand on their defaults on 2026-10-24 unless
+  you say otherwise.
+- 2026-10-22 04:26 No new input from Jami. A late repeat notice came in
+  from the code reviewer. I checked it: the review file is still last
+  night's (22:24), handled before the close, and the 62 changed files
+  are unchanged. Nothing was done; WO-007 stays closed and waits for
+  your commit.

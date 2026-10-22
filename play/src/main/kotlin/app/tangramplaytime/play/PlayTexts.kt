@@ -8,6 +8,9 @@
 // WO-008 TASK-047 · seams S-11Δ3 and S-48 (designs/WO-008-design.md §2) · REQ-029 rule 2 (m:ss below one hour, h and
 // min from one hour) · decisions.md 2026-10-20 "One format for every time the game shows …" and 2026-10-19 "The counter
 // keeps ASCII digits under every device language" · G-10: "h" and "min" come in as `hoursMinutes`, with no default.
+// WO-007 TASK-056 · seam S-11Δ4 (designs/WO-007-design.md §2) · REQ-029 rule 2, REQ-047: `timeOf` and `titleOf` become
+// public, so `:app`'s settings screen shows its play times and best-time titles through the one format and the one title
+// rule. Nothing else changes.
 package app.tangramplaytime.play
 
 import app.tangramplaytime.contracts.PuzzleDefinition
@@ -57,9 +60,10 @@ data class PlayTexts(
 /**
  * The title the screen shows for [puzzle]: `titles[titleLanguage]`, else `titles["en"]` (REQ-012 and
  * REQ-047 rules; S-11). Every library puzzle has an `en` title (the `PuzzleDefinition` KDoc); the last
- * resorts never show for a listed puzzle.
+ * resorts never show for a listed puzzle. Public since WO-007 (S-11Δ4): the settings screen's best times name their
+ * puzzles with it.
  */
-internal fun PlayTexts.titleOf(puzzle: PuzzleDefinition): String =
+fun PlayTexts.titleOf(puzzle: PuzzleDefinition): String =
     puzzle.titles[titleLanguage] ?: puzzle.titles["en"] ?: puzzle.titles.values.firstOrNull() ?: puzzle.id
 
 /** The top bar's "n / N" for puzzle [number] of [count] (S-11Δ `counterFormat`; REQ-024 rule). */
@@ -76,9 +80,10 @@ private const val SECONDS_PER_HOUR = 3600
  *   its digits formatted under `Locale.ROOT`, so they stay ASCII under every device language (decisions.md 2026-10-19
  *   "The counter keeps ASCII digits under every device language").
  *
- * Internal until WO-007 (design review F4).
+ * Public since WO-007 (S-11Δ4; it was internal until then, WO-008 design review F4): the settings screen's play times and
+ * best times use it.
  */
-internal fun PlayTexts.timeOf(seconds: Int): String {
+fun PlayTexts.timeOf(seconds: Int): String {
     if (seconds < SECONDS_PER_HOUR) {
         return buildString {
             append(seconds / 60)

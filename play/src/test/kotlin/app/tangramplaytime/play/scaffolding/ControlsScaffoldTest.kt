@@ -2,6 +2,9 @@
 // device kit's TopBarKitTest, ResumeScreenKitTest and SolvedViewKitTest): the top bar's three full-height columns and
 // the gap below them, the hit order around the Restart pill (a piece's drawn shape → the pill → a piece's margin),
 // the solved row's thirds, and the best time's m:ss.
+// WO-007 TASK-056 (S-53; review F3, decisions.md 2026-10-21 "The moved-› pins in `play/` land in the same step as S-53 …"):
+// the bar is four full-height columns — ‹, the counter, ›, and the gear's 52 dp column at the right edge — so › ends at
+// the gear's left and the counter is narrower by the gear. A corrected check: its source was WO-004's three-column bar.
 package app.tangramplaytime.play.scaffolding
 
 import androidx.compose.ui.geometry.Offset
@@ -47,23 +50,27 @@ class ControlsScaffoldTest {
     private val density = 2.625f
 
     @Test
-    fun theTopBarIsThreeFullHeightColumnsAndTheGapBelowItIsNothing() {
+    fun theTopBarIsFourFullHeightColumnsAndTheGapBelowItIsNothing() {
         for (widthPx in listOf(1080, 945)) {
             val controller = PlayController(library, engine)
             val g = ScreenGeometry.of(widthPx, 2280, density, layout, controller.puzzle)
             controller.boardDpPerUnit = (g.mapping.pxPerUnit / density).toDouble()
             val column = (60f * density).roundToInt()
+            val gear = (52f * density).roundToInt()
             val bar = (66f * density).roundToInt()
             assertEquals(Slot(0, 0, column, bar), g.navPrev)
-            assertEquals(Slot(widthPx - column, 0, column, bar), g.navNext)
-            assertEquals(Slot(column, 0, widthPx - 2 * column, bar), g.counter)
+            assertEquals(Slot(widthPx - gear - column, 0, column, bar), g.navNext)
+            assertEquals(Slot(widthPx - gear, 0, gear, bar), g.gear)
+            assertEquals(Slot(column, 0, widthPx - 2 * column - gear, bar), g.counter)
             fun at(x: Float, y: Float) = HitTest.at(Offset(x, y), g, controller, 12f * density, ShownControls.NONE)
             assertEquals(Hit.OnControl(Control.PREV), at(0f, 0f))
             assertEquals(Hit.OnControl(Control.PREV), at(column - 1f, bar - 1f))
             assertEquals(Hit.OnControl(Control.COUNTER), at(column.toFloat(), 0f))
-            assertEquals(Hit.OnControl(Control.COUNTER), at(widthPx - column - 1f, bar - 1f))
-            assertEquals(Hit.OnControl(Control.NEXT), at(widthPx - column.toFloat(), 0f))
-            assertEquals(Hit.OnControl(Control.NEXT), at(widthPx - 1f, bar - 1f))
+            assertEquals(Hit.OnControl(Control.COUNTER), at(widthPx - gear - column - 1f, bar - 1f))
+            assertEquals(Hit.OnControl(Control.NEXT), at(widthPx - gear - column.toFloat(), 0f))
+            assertEquals(Hit.OnControl(Control.NEXT), at(widthPx - gear - 1f, bar - 1f))
+            assertEquals(Hit.OnControl(Control.GEAR), at(widthPx - gear.toFloat(), 0f))
+            assertEquals(Hit.OnControl(Control.GEAR), at(widthPx - 1f, bar - 1f))
             assertNull("the 4 dp gap between the bar and the board", at(widthPx / 2f, bar + 2f))
         }
     }

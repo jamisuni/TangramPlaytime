@@ -5,6 +5,12 @@
 // store double, where the line is not about the gesture. Tags are S-13Δ's strings (`KitTag`). Each tokened test asserts
 // its acceptance line's meaning; pins of a seam row, a rule or a decisions.md row carry no token. The hit-order-3 pin alone
 // hosts the screen at a 731 dp phone height over a kit-owned puzzle (its comment says why; kit finding, 2026-10-17).
+//
+// Amended WO-007 (TASK-055; designs/WO-007-design.md §2 S-53; decisions.md 2026-10-21 "The moved-› pins in `play/` land in
+// the same step as S-53, as declared outputs, each a corrected check."): the bar's columns are four (› ends at the gear's
+// left, a corrected check); the gear's legs — taps 2 px inside its edges open the settings, at the lift, with no long press;
+// a second finger on it during a drag and a tap on it with the grid open do nothing — and the gear on the loading paper's
+// list of absent tags. The settings are closed after each leg (S-2Δ4 `closeSettings`). No token is added.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.fillMaxSize
@@ -189,12 +195,15 @@ class TopBarKitTest {
 
     // ── Pins: the bar's columns and the hit order (S-22) ───────────────────────────────────────────────
 
-    @Test // pin: S-22 touch geometry "Top bar (66 dp). Three full-height columns, with no gaps: ‹ covers x from 0 to 60 dp …; › covers W − 60 to W; the counter is everything between … The 4 dp gap to the board hits nothing"; S-13Δ "A control's bounds are its touch area"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn" ("the whole counter zone opens the grid"); no token
-    fun theTopBarIsThreeFullHeightColumnsWithNoGapsAndTheGapToTheBoardHitsNothing() {
-        // Oracle: the three nodes' bounds are the S-22 columns over the whole bar height (S-5 `topBarDp`); then by taps 2 px
-        // inside each column's edges, at the bar's top and bottom: ‹ shows the previous puzzle, › the next, the counter
-        // opens the grid (S-1Δ `overviewOpen`; the overlay's own drawing is OverviewKitTest's), and a tap between the bar and
-        // the board changes nothing.
+    @Test // pin: S-22 touch geometry "Top bar (66 dp). … full-height columns, with no gaps: ‹ covers x from 0 to 60 dp …; the counter is everything between … The 4 dp gap to the board hits nothing", as S-53 (designs/WO-007-design.md §2) moves it: "`ScreenGeometry.gear` is a 52 dp column at the safe right edge, the bar's full height. `navNext` now ends at `gear.left`"; decisions.md 2026-10-21 "The gear and the settings screen, as drawn." ("a fourth top-bar column at the safe right edge, after ›"; "the counter keeps everything between ‹ and ›"); S-13Δ "A control's bounds are its touch area"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn" ("the whole counter zone opens the grid"); corrected WO-007 (TASK-055): three columns became four, a corrected check; no token
+    fun theTopBarIsFourFullHeightColumnsWithNoGapsAndTheGapToTheBoardHitsNothing() {
+        // Oracle: the four nodes' bounds are the columns over the whole bar height (S-5 `topBarDp`), with `PlayInsets.NONE`
+        // (the kit's phone literal), so the safe right edge is W: ‹ from 0 to 60 dp, › from W − 112 to W − 52 dp, the gear
+        // from W − 52 dp to W, the counter between ‹ and ›. Then by taps 2 px inside each column's edges: ‹ shows the previous
+        // puzzle, › the next, the counter opens the grid (S-1Δ `overviewOpen`; the overlay's own drawing is OverviewKitTest's),
+        // the gear opens the settings (S-53 "calls `openSettings()`"; S-1Δ4 `settingsOpen`; the screen itself is `:app`'s and
+        // the app kit's) and changes neither the puzzle nor the grid, and a tap between the bar and the board changes nothing.
+        // The settings are closed after each gear tap (S-2Δ4 `closeSettings`).
         val kit = KitScreen(rule)
         kit.show()
         val list = kitLibrary.puzzles
@@ -205,14 +214,18 @@ class TopBarKitTest {
         val prev = kit.bounds(KitTag.NAV_PREV)
         val next = kit.bounds(KitTag.NAV_NEXT)
         val counter = kit.bounds(KitTag.COUNTER)
+        val gear = kit.bounds(PlayTags.GEAR)
         val tol = 2.0
         kitAssertNear("‹ column left", 0.0, prev.left.toDouble(), tol)
         kitAssertNear("‹ column right (60 dp)", kit.dp(60f).toDouble(), prev.right.toDouble(), tol)
-        kitAssertNear("› column left (W − 60 dp)", (w - kit.dp(60f)).toDouble(), next.left.toDouble(), tol)
-        kitAssertNear("› column right (W)", w.toDouble(), next.right.toDouble(), tol)
+        kitAssertNear("› column left (W − 112 dp: 60 dp ending at the gear's left)", (w - kit.dp(112f)).toDouble(), next.left.toDouble(), tol)
+        kitAssertNear("› column right (W − 52 dp)", (w - kit.dp(52f)).toDouble(), next.right.toDouble(), tol)
+        kitAssertNear("› ends where the gear starts (S-53)", gear.left.toDouble(), next.right.toDouble(), tol)
+        kitAssertNear("gear column left (W − 52 dp)", (w - kit.dp(52f)).toDouble(), gear.left.toDouble(), tol)
+        kitAssertNear("gear column right (W, the safe right edge)", w.toDouble(), gear.right.toDouble(), tol)
         kitAssertNear("the counter starts where ‹ ends", prev.right.toDouble(), counter.left.toDouble(), tol)
         kitAssertNear("the counter ends where › starts", next.left.toDouble(), counter.right.toDouble(), tol)
-        for ((name, r) in listOf("‹" to prev, "›" to next, "counter" to counter)) {
+        for ((name, r) in listOf("‹" to prev, "›" to next, "counter" to counter, "gear" to gear)) {
             kitAssertNear("$name column top", 0.0, r.top.toDouble(), tol)
             kitAssertNear("$name column bottom (the bar's ${kitPhoneLayout.topBarDp} dp)", bar.toDouble(), r.bottom.toDouble(), tol)
         }
@@ -238,6 +251,23 @@ class TopBarKitTest {
             kit.onMain { kit.controller.closeOverview() }
             kit.frames(2)
         }
+        val gearMid = gear.center
+        for (at in listOf(
+            Offset(gear.left + 2f, gearMid.y),
+            Offset(gear.right - 2f, gearMid.y),
+            Offset(gearMid.x, gear.top + 2f),
+            Offset(gearMid.x, gear.bottom - 2f),
+        )) {
+            kit.open(home.id)
+            assertFalse("set-up: the settings are closed before the tap at $at", kit.onMain { kit.controller.settingsOpen })
+            kit.tap(at)
+            kit.frames()
+            assertTrue("a tap at $at, 2 px inside an edge of the gear column, opens the settings (S-53; S-1Δ4 settingsOpen)", kit.onMain { kit.controller.settingsOpen })
+            assertEquals("a tap in the gear column keeps the puzzle", home.id, kit.shownId())
+            assertFalse("a tap in the gear column opens no grid", kit.onMain { kit.controller.overviewOpen })
+            kit.onMain { kit.controller.closeSettings() }
+            kit.frames(2)
+        }
         // The gap between the bar and the board hits nothing.
         val board = kit.bounds(PlayTags.BOARD)
         kit.open(home.id)
@@ -246,22 +276,67 @@ class TopBarKitTest {
             kit.frames()
             assertEquals("a tap in the gap between the bar and the board keeps the puzzle", home.id, kit.shownId())
             assertFalse("a tap in the gap opens no grid", kit.onMain { kit.controller.overviewOpen })
+            assertFalse("a tap in the gap opens no settings", kit.onMain { kit.controller.settingsOpen })
         } else {
             android.util.Log.i("KitScreen", "the bar (bottom ${counter.bottom}) and the board (top ${board.top}) leave no 2 px gap to tap")
         }
     }
 
-    @Test // pin: S-22 hit order 1 "A drag is running: the touch is a twist finger, so ‹ and › never act mid-drag"; no token
-    fun neitherArrowNorTheCounterActsWhileADragRuns() {
-        // Oracle: with a piece dragged over the board, a second finger tapping ‹, › and the counter, and held on › for 700 ms,
-        // changes neither the puzzle nor the grid, and the drag goes on.
+    @Test // pin: S-53 "Hit: `Control.GEAR` acts at lift within the slop, with no long press, and calls `openSettings()`"; S-22 "Taps and the long press" ("A tap is a lift within the 12 dp slop, acted on at the lift whatever its duration; moving the slop distance or more cancels it. On › only, a finger held within the slop at 500 ms runs `nextUnsolved()`"); no token
+    fun theGearOpensTheSettingsAtTheLiftWithNoLongPressAndAHoldThatMovesIsCancelled() {
+        // Oracle, by touch on the gear's centre, with the settings closed before each leg (S-2Δ4 `closeSettings`):
+        //  - a finger down opens nothing before the lift; held still for 700 ms (past ›'s 500 ms long press) it still opens
+        //    nothing and the puzzle is unchanged; the lift then opens the settings (a tap whatever its duration);
+        //  - a finger that moves 20 dp (past the 12 dp slop) before the lift opens nothing, and nothing else acts;
+        //  - positive control: a still tap opens the settings.
+        val kit = KitScreen(rule)
+        kit.show()
+        val home = kitLibrary.puzzles[1]
+        kit.open(home.id)
+        val at = kit.bounds(PlayTags.GEAR).center
+        assertFalse("set-up: the settings are closed", kit.onMain { kit.controller.settingsOpen })
+
+        kit.touch { down(at) }
+        kit.frames()
+        assertFalse("a finger down on the gear opens nothing before the lift", kit.onMain { kit.controller.settingsOpen })
+        kit.advance(700)
+        assertFalse("held still on the gear for 700 ms, it still opens nothing: no long press", kit.onMain { kit.controller.settingsOpen })
+        assertEquals("…and the puzzle is unchanged (no long press runs nextUnsolved)", home.id, kit.shownId())
+        kit.lift()
+        kit.frames()
+        assertTrue("the lift within the slop after the hold opens the settings (acted on at the lift whatever its duration)", kit.onMain { kit.controller.settingsOpen })
+        assertEquals("…on the same puzzle", home.id, kit.shownId())
+        kit.onMain { kit.controller.closeSettings() }
+        kit.frames(2)
+
+        kit.touch { down(at) }
+        kit.frames()
+        kit.touch { moveTo(Offset(at.x - kit.dp(20f), at.y + kit.dp(4f))) }
+        kit.frames()
+        kit.advance(300)
+        kit.lift()
+        kit.frames()
+        assertFalse("a touch on the gear that moved 20 dp (past the 12 dp slop) opens no settings", kit.onMain { kit.controller.settingsOpen })
+        assertEquals("…changes no puzzle", home.id, kit.shownId())
+        assertFalse("…and opens no grid", kit.onMain { kit.controller.overviewOpen })
+
+        kit.press(PlayTags.GEAR)
+        assertTrue("positive control: a still tap on the gear opens the settings", kit.onMain { kit.controller.settingsOpen })
+        kit.onMain { kit.controller.closeSettings() }
+        kit.frames(2)
+    }
+
+    @Test // pin: S-22 hit order 1 "A drag is running: the touch is a twist finger, so ‹ and › never act mid-drag"; S-53 (WO-007) "[The gear] is inert under hit orders 0 and 1"; decisions.md 2026-10-21 "The gear and the settings screen, as drawn." ("It is inert while a drag runs …"); reviews/WO-007-design-review.md Re-derived row 9 ("The gear never acts while another finger is down"); the gear joins the list (TASK-055); no token
+    fun noTopBarColumnActsWhileADragRuns() {
+        // Oracle: with a piece dragged over the board, a second finger tapping ‹, ›, the counter and the gear, and held on ›
+        // for 700 ms, changes neither the puzzle, the grid nor the settings, and the drag goes on.
         val kit = KitScreen(rule)
         kit.show()
         val p = kitFirst(PuzzleKind.FULL)
         kit.open(p.id)
         var finger = kit.pickUpFromTray(PieceId.ST1)
         finger = kit.moveFinger(finger, kit.bounds(PlayTags.BOARD).center, 4)
-        for (tag in listOf(KitTag.NAV_NEXT, KitTag.NAV_PREV, KitTag.COUNTER)) {
+        for (tag in listOf(KitTag.NAV_NEXT, KitTag.NAV_PREV, KitTag.COUNTER, PlayTags.GEAR)) {
             val at = kit.bounds(tag).center
             kit.touch { down(1, at) }
             kit.frames()
@@ -269,6 +344,7 @@ class TopBarKitTest {
             kit.frames(2)
             assertEquals("a second finger on `$tag` during a drag keeps the puzzle", p.id, kit.shownId())
             assertFalse("a second finger on `$tag` during a drag opens no grid", kit.onMain { kit.controller.overviewOpen })
+            assertFalse("a second finger on `$tag` during a drag opens no settings", kit.onMain { kit.controller.settingsOpen })
             assertTrue("the drag goes on after a second finger on `$tag`", kit.exists(PlayTags.dragPiece(PieceId.ST1)))
         }
         kit.touch { down(1, kit.bounds(KitTag.NAV_NEXT).center) }
@@ -279,6 +355,28 @@ class TopBarKitTest {
         assertEquals("a second finger held on › for 700 ms during a drag keeps the puzzle", p.id, kit.shownId())
         kit.release()
         kit.advance(300)
+    }
+
+    @Test // pin: S-53 "[The gear] is inert under hit orders 0 and 1"; S-22 hit order 0 ("The overview is open: the router neither consumes nor acts, on the top bar too"; "The bar stays drawn and inert: a touch on ‹, › or the counter does nothing while the overview is open"); decisions.md 2026-10-21 "The gear and the settings screen, as drawn." ("It is inert while … the grid … is open"); no token
+    fun theGearDoesNothingWhileTheGridIsOpen() {
+        // Oracle: the grid opened by a tap on the counter; a tap on the gear opens no settings, keeps the puzzle and leaves the
+        // grid open (the bar is inert and is not the scrim). Positive control: the grid closed, the same tap opens the settings.
+        val kit = KitScreen(rule)
+        kit.show()
+        val home = kitLibrary.puzzles[1]
+        kit.open(home.id)
+        kit.press(KitTag.COUNTER)
+        assertTrue("set-up: a tap on the counter opened the grid", kit.onMain { kit.controller.overviewOpen })
+        kit.press(PlayTags.GEAR)
+        assertFalse("a tap on the gear with the grid open opens no settings", kit.onMain { kit.controller.settingsOpen })
+        assertTrue("…and leaves the grid open", kit.onMain { kit.controller.overviewOpen })
+        assertEquals("…on the same puzzle", home.id, kit.shownId())
+        kit.onMain { kit.controller.closeOverview() }
+        kit.frames(2)
+        kit.press(PlayTags.GEAR)
+        assertTrue("positive control: with the grid closed, a tap on the gear opens the settings", kit.onMain { kit.controller.settingsOpen })
+        kit.onMain { kit.controller.closeSettings() }
+        kit.frames(2)
     }
 
     @Test // pin: S-22 hit order 3 "The badge disc → a piece's drawn shape → the Restart pill → the rest of the badge area → a cell or a margin"; decisions.md 2026-10-15 "The top bar, Restart and the solved row, as drawn" ("In the touch order a piece's drawn shape beats it and it beats a piece's margin"); no token
@@ -398,14 +496,14 @@ class TopBarKitTest {
 
     // ── Pin: the loading paper ─────────────────────────────────────────────────────────────────────────
 
-    @Test // pin: S-23 "PlayLoading(modifier): plain paper, no top bar (no puzzle is current yet), tag play-loading"; decisions.md 2026-10-15 "REQ-024 A2 and the launch window" (its title's dotted ID written without the dot: it is not this test's token) and "Startup, and what survives" ("blank paper (play-loading: no spinner, no text)"); no token
+    @Test // pin: S-23 "PlayLoading(modifier): plain paper, no top bar (no puzzle is current yet), tag play-loading" (the gear, S-53, is a top-bar column, so it is absent too: TASK-055); decisions.md 2026-10-15 "REQ-024 A2 and the launch window" (its title's dotted ID written without the dot: it is not this test's token) and "Startup, and what survives" ("blank paper (play-loading: no spinner, no text)"); no token
     fun theLoadingPaperDrawsNoTopBarAndNoText() {
         rule.setContent { PlayLoading(Modifier.fillMaxSize()) }
         rule.waitForIdle()
         val kit = KitScreen(rule)
         assertTrue("a `play-loading` node", kit.exists(KitTag.PLAY_LOADING))
         rule.onNodeWithTagUnmerged(KitTag.PLAY_LOADING).assertIsDisplayed()
-        for (tag in listOf(PlayTags.SCREEN, PlayTags.TITLE, KitTag.NAV_PREV, KitTag.NAV_NEXT, KitTag.COUNTER, KitTag.RATING, KitTag.STATE_WORD)) {
+        for (tag in listOf(PlayTags.SCREEN, PlayTags.TITLE, KitTag.NAV_PREV, KitTag.NAV_NEXT, PlayTags.GEAR, KitTag.COUNTER, KitTag.RATING, KitTag.STATE_WORD)) {
             assertFalse("no `$tag` on the loading paper", kit.exists(tag))
         }
         assertEquals("no text on the loading paper", emptyList<String>(), kit.tagsAndTexts().second)

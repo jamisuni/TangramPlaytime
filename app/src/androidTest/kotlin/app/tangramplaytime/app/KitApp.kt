@@ -53,6 +53,21 @@
 //   the main thread and reset to null by a registered restore; touches for the time lines go through the window
 //   (`Instrumentation.sendPointerSync`), never `performTouchInput`; Home, the screen off and the lifecycle read back. No token
 //   lives in this file.
+// - Amended WO-007 (TASK-058, kit stage 3; designs/WO-007-design.md §2 "Kit doors (Q11)" as amended by decisions.md
+//   2026-10-21 "Amends … (its kit rule): the `app/` kit's doors know the settings layer." (E4a); tasks.md § WO-007 seam notes 4
+//   and 5): the doors know the settings screen — a window touch on the open screen lands on `settings-title`, read on the screen
+//   in use, and the touch's before/after check adds `settingsOpen`; `start` fails loudly while the settings are open, reads
+//   them, and registers `onRestore("the settings")`, which puts both switches back through `setTimerShown` / `setSoundOn`;
+//   `restoreController` calls `closeSettings()`. The worlds admit the screen's times, read at each check (decisions.md
+//   2026-10-21 "The closed world of texts admits the settings screen's times …", E10). S-49's tags are `KitAppTag` literals
+//   (seam note 4: never through `SettingsTags`, which does not exist before TASK-059); the kit clock's date can be moved (the
+//   REQ-029 A2 oracle of E4a counts on one date and then the next). No token lives in this file.
+// - Amended WO-007 (TASK-060, kit stage 4; designs/WO-007-design.md §2 S-50 and "Kit doors (Q11)", `app/` device: "the doors are
+//   `AppGraph.controller`, `AppClock.override` and `AppGraph.feedback.override` (a recorder, set back to null by `onRestore`)";
+//   decisions.md 2026-10-21 "REQ-033 A1's oracle is one door …" (E8; the title's ID written here without its dot) and its
+//   amendment (E8a)): the feedback door — a recorder
+//   (`KitFeedbackRecorder`) installed as `AppGraph.feedback.override` on the main thread, null again through `onRestore`. No
+//   source scan, no caller inventory, no allow-list (E8). No token lives in this file.
 package app.tangramplaytime.app
 
 import android.app.Activity
@@ -84,6 +99,7 @@ import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -202,6 +218,56 @@ internal object KitAppTag {
     const val OVERVIEW_CELL_PREFIX = "overview-cell-"
 
     fun overviewCell(id: String): String = OVERVIEW_CELL_PREFIX + id
+
+    // WO-007 (TASK-058): the gear (designs/WO-007-design.md §2 S-53: "`PlayTags.GEAR = "gear"`") and S-49's tag row, written as
+    // literals (tasks.md § WO-007 seam note 4: "The tags go in `KitAppTag`, as every play tag does … never through
+    // `SettingsTags`").
+
+    /** S-53: the gear, the top bar's 52 dp column at the safe right edge; a router control, no click action. */
+    const val GEAR = "gear"
+
+    /** S-49 tags, controls: the scrim ("covers the whole window; its `clickable` calls `closeSettings()`"). */
+    const val SETTINGS = "settings"
+
+    /** S-49 tags, controls: Done in the fixed header. */
+    const val SETTINGS_DONE = "settings-done"
+
+    /** S-49 tags, controls: the two whole-row switches ("whole-row `toggleable`, Role.Switch, ≥ 56 dp"). */
+    const val SETTINGS_TIMER = "settings-timer"
+    const val SETTINGS_SOUND = "settings-sound"
+
+    /** S-49 tags, controls: Reset all progress, and the inline confirmation's Erase and Cancel ("only Erase calls `resetAll()`"). */
+    const val SETTINGS_RESET = "settings-reset"
+    const val RESET_ERASE = "reset-erase"
+    const val RESET_CANCEL = "reset-cancel"
+
+    /** S-49 tags, inert merged nodes: the header title ("the kit's window-touch point, F2") and the sheet. */
+    const val SETTINGS_TITLE = "settings-title"
+    const val SETTINGS_SHEET = "settings-sheet"
+
+    /** S-49 tags, inert merged nodes: the play times ("[label, value]"), the best times ("[heading] + "–" if none"; rows [title, time]). */
+    const val PLAY_TIME_TODAY = "play-time-today"
+    const val PLAY_TIME_ALL = "play-time-all"
+    const val BEST_TIMES = "best-times"
+    const val BEST_TIME_ROW_PREFIX = "best-time-"
+
+    /** S-49 tags, inert merged nodes: the question, the how-to-play text, the free note, the privacy text, the licence line. */
+    const val RESET_QUESTION = "reset-question"
+    const val HOW_TO_PLAY = "how-to-play"
+    const val FREE_NOTE = "free-note"
+    const val PRIVACY_TEXT = "privacy-text"
+    const val LICENCE_LINE = "licence-line"
+
+    /** S-49 tags: `best-time-<id>`, one row per puzzle with a stored best (E5). */
+    fun bestTimeRow(id: String): String = BEST_TIME_ROW_PREFIX + id
+
+    /** S-49's controls (its tag row's "Controls:"), the confirmation's two among them. */
+    val SETTINGS_CONTROLS: List<String> = listOf(SETTINGS, SETTINGS_DONE, SETTINGS_TIMER, SETTINGS_SOUND, SETTINGS_RESET, RESET_ERASE, RESET_CANCEL)
+
+    /** REQ-032 rule 1's order of the body, with the licence line below the privacy text (workorders/WO-007.md scope note; E1). */
+    val SETTINGS_BODY_ORDER: List<String> = listOf(
+        SETTINGS_TIMER, SETTINGS_SOUND, PLAY_TIME_TODAY, PLAY_TIME_ALL, BEST_TIMES, SETTINGS_RESET, HOW_TO_PLAY, FREE_NOTE, PRIVACY_TEXT, LICENCE_LINE,
+    )
 }
 
 /** The one lock rule: the real `LockEngine` on the app's classpath, as `ProcessDeathKitTest` uses it. */
@@ -393,10 +459,17 @@ internal fun kitAppDistToRect(o: Offset, r: Rect): Float {
  * device: "a kit clock that starts at `elapsedRealtime()`"; the brief: "and `LocalDate.now()`"). Its reading moves only when
  * the kit moves it, on the main thread (KitApp `kitMoveClock`; G-14 "Tests set the clock"; ADR-006).
  */
-internal class KitAppClock(start: Long, val date: LocalDate) : Clock {
+internal class KitAppClock(start: Long, date: LocalDate) : Clock {
     @Volatile
     var millis: Long = start
         private set
+
+    /**
+     * The local date the clock reports (Clock `today()`). WO-007: the kit moves it on the main thread to count on one date
+     * and then the next (E4a's REQ-029 A2 oracle; REQ-029 rule 1: "Today's time restarts at local midnight").
+     */
+    @Volatile
+    var date: LocalDate = date
 
     override fun nowMillis(): Long = millis
 
@@ -433,6 +506,33 @@ internal fun kitAppIsPlatformAndroidXOrOwn(c: Class<*>): Boolean =
 /** The `int` fields of a resource class: its resources by name. */
 internal fun kitAppResourceIds(rClass: Class<*>): Map<String, Int> =
     rClass.fields.filter { Modifier.isStatic(it.modifiers) && it.type == Int::class.javaPrimitiveType }.associate { it.name to it.getInt(null) }
+
+/**
+ * The recorder at the feedback door (S-50: `FeedbackOut { play(Sound); tick(); click() }`; "Both paths go to `override ?:
+ * device`"; E8a: the door carries the five sounds, the tick and the click): every call it receives, in order, as "sound X",
+ * "tick" or "click". `Feedback` calls it on the main thread; the kit reads it from the test thread, so it is synchronized.
+ */
+internal class KitFeedbackRecorder : FeedbackOut {
+    private val calls = ArrayList<String>()
+
+    override fun play(sound: Sound) {
+        synchronized(calls) { calls += "sound ${sound.name}" }
+    }
+
+    override fun tick() {
+        synchronized(calls) { calls += "tick" }
+    }
+
+    override fun click() {
+        synchronized(calls) { calls += "click" }
+    }
+
+    /** Every call recorded since the last [take], which are then cleared. */
+    fun take(): List<String> = synchronized(calls) { calls.toList().also { calls.clear() } }
+
+    /** Every call recorded since the last [take], left in place. */
+    fun peek(): List<String> = synchronized(calls) { calls.toList() }
+}
 
 // ── The kit ───────────────────────────────────────────────────────────────────────────────────────────
 
@@ -1311,6 +1411,22 @@ internal class KitApp(private val rule: KitAppRule) {
     fun start(what: String) {
         awaitScreen(what)
         if (exists(DevAidTags.SHEET)) throw AssertionError("kit: precondition ($what): the DEV sheet is open at the start; a class before this one left it open")
+        // E4a: "`KitApp.start` fails loudly while `settingsOpen` holds. It reads `controller.settings`, and registers
+        // `onRestore("the settings")`, which puts both values back through `setTimerShown` / `setSoundOn` inside `restoreRule()`'s
+        // ordered restores."
+        if (onController { settingsOpen }) throw AssertionError("kit: precondition ($what): the settings screen is open at the start; a class before this one left it open")
+        val found = onController { settings }
+        onRestore("the settings") {
+            val c = AppGraph.controller.value
+            if (c != null) {
+                onMain {
+                    if (c.settings.timerShown != found.timerShown) c.setTimerShown(found.timerShown)
+                    if (c.settings.soundOn != found.soundOn) c.setSoundOn(found.soundOn)
+                }
+                if (onMain { c.settings } != found) throw AssertionError("kit: the settings were not put back: ${onMain { c.settings }}, found $found")
+                flush(c)
+            }
+        }
         val ids = library.puzzles.map { it.id }
         val snap = onController {
             KitSnapshot(
@@ -1331,6 +1447,9 @@ internal class KitApp(private val rule: KitAppRule) {
         onMain {
             if (c.dragged != null) c.goHome()
             if (c.overviewOpen) c.closeOverview()
+            // E4a: "`restoreController`: calls `closeSettings()`" (seam note 5: a class that fails with the screen open would
+            // leave every touch of the next class on its scrim).
+            if (c.settingsOpen) c.closeSettings()
         }
         val problems = ArrayList<String>()
         for ((id, then) in snap.states) {
@@ -1604,11 +1723,15 @@ internal class KitApp(private val rule: KitAppRule) {
      * game is as it was (the open puzzle, its state, its board, the grid): the touch was inert, or this fails loudly.
      */
     fun kitTouchThroughWindow(what: String): Offset {
-        val at = kitInertBoardPoint(what)
-        val before = onController { listOf(puzzle.id, state, placed.toList(), overviewOpen) }
+        // E4a: "Window touches on the open screen: `kitTouchThroughWindow` uses the header title `settings-title`, a merged inert
+        // node read on the screen in use. Elsewhere it uses the board's inert point. Its before/after check adds `settingsOpen`."
+        val open = onController { settingsOpen }
+        val at = if (open) kitInertSettingsPoint(what) else kitInertBoardPoint(what)
+        val before = onController { listOf(puzzle.id, state, placed.toList(), overviewOpen, settingsOpen) }
         val inWindow = at + windowBounds(PlayTags.SCREEN).topLeft
-        val boardInWindow = windowBounds(PlayTags.BOARD)
-        if (!boardInWindow.contains(inWindow)) throw AssertionError("kit: $what: the window point $inWindow lies outside `board`'s window bounds $boardInWindow")
+        val regionTag = if (open) KitAppTag.SETTINGS_TITLE else PlayTags.BOARD
+        val regionInWindow = windowBounds(regionTag)
+        if (!regionInWindow.contains(inWindow)) throw AssertionError("kit: $what: the window point $inWindow lies outside `$regionTag`'s window bounds $regionInWindow")
         val a = activity(what)
         val location = onMain { IntArray(2).also { a.window.decorView.getLocationOnScreen(it) } }
         val x = inWindow.x + location[0]
@@ -1630,8 +1753,25 @@ internal class KitApp(private val rule: KitAppRule) {
             up.recycle()
         }
         waitIdle("$what: an idle after the window touch")
-        val after = onController { listOf(puzzle.id, state, placed.toList(), overviewOpen) }
+        val after = onController { listOf(puzzle.id, state, placed.toList(), overviewOpen, settingsOpen) }
         if (after != before) throw AssertionError("kit: $what: the window touch at $at changed the game ($before → $after): the point was not inert")
+        return at
+    }
+
+    /**
+     * The settings screen's inert point, in `play-screen` px: the centre of `settings-title` (S-49 tags: "`settings-title` (the
+     * header title: the kit's window-touch point, F2)"; E4a), read on the screen in use, asserted inside `settings-sheet` and
+     * outside every control of S-49's tag row before it is touched.
+     */
+    fun kitInertSettingsPoint(what: String): Offset {
+        val title = bounds(KitAppTag.SETTINGS_TITLE)
+        val sheet = bounds(KitAppTag.SETTINGS_SHEET)
+        val at = title.center
+        if (!sheet.contains(at)) throw AssertionError("kit: $what: the centre $at of `settings-title` $title lies outside `settings-sheet` $sheet")
+        for (tag in KitAppTag.SETTINGS_CONTROLS.filter { it != KitAppTag.SETTINGS && exists(it) }) {
+            val r = bounds(tag)
+            if (r.contains(at)) throw AssertionError("kit: $what: the centre $at of `settings-title` lies inside the control `$tag` $r")
+        }
         return at
     }
 
@@ -1959,14 +2099,36 @@ internal class KitApp(private val rule: KitAppRule) {
      * world of texts admits the best time …": "exactly as S-48 forms the controller's `bestSeconds`"). Every other text is
      * [base], fixed.
      */
-    private inner class KitWorldWithBest(private val base: Set<String>) : AbstractSet<String>() {
-        private fun now(): Set<String> = kitBestTimeText()?.let { base + it } ?: base
+    private inner class KitWorldWithBest(private val base: Set<String>, private val ctx: Context) : AbstractSet<String>() {
+        private fun live(): Set<String> = (listOfNotNull(kitBestTimeText()) + kitScreenTimeTexts(ctx)).toSet()
+
+        private fun now(): Set<String> = base + live()
 
         override val size: Int get() = now().size
 
         override fun iterator(): Iterator<String> = now().iterator()
 
-        override fun contains(element: String): Boolean = element in base || element == kitBestTimeText()
+        override fun contains(element: String): Boolean = element in base || element in live()
+    }
+
+    /**
+     * The settings screen's times as S-48 forms the controller's values, read now (decisions.md 2026-10-21 "The closed world of
+     * texts admits the settings screen's times …" (E10): "today's and all-time play time and every `bestTimes` entry, exactly
+     * as S-48 forms the controller's values"): `PlayController.playTimes` (today, all-time) and every `bestTimes` entry's seconds,
+     * each through [kitTimeText] with [ctx]'s `time_hours_minutes`.
+     */
+    fun kitScreenTimeTexts(ctx: Context): List<String> =
+        onController { listOf(playTimes.todaySeconds, playTimes.allTimeSeconds) + bestTimes.map { it.seconds } }.map { kitTimeText(it, ctx) }
+
+    /**
+     * One time as S-48 forms it (decisions.md 2026-10-20 "One format for every time the game shows …" (C2): "m:ss below one
+     * hour, "h h m min" from one hour"; ASCII digits under `Locale.ROOT`; "h" and "min" from `time_hours_minutes`; E10: "from one
+     * hour, which is now reachable"). A negative time fails loudly (WO-008 must-do 2: none is ever written).
+     */
+    fun kitTimeText(seconds: Int, ctx: Context): String {
+        if (seconds < 0) throw AssertionError("kit: a time of $seconds s; no negative time is ever shown (WO-008 must-do 2)")
+        if (seconds < 3600) return "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}"
+        return String.format(Locale.ROOT, ctx.getString(R.string.time_hours_minutes), seconds / 3600, (seconds % 3600) / 60)
     }
 
     /**
@@ -1974,7 +2136,8 @@ internal class KitApp(private val rule: KitAppRule) {
      * the bundle's titles, the counter format's output for this library, the best time's '–'", the last one being `values/`'s
      * own; a format pattern counts by its outputs only), plus the DEV overlay's labels, `PieceId` names (S-29: "data, as a
      * puzzle title is"), plus — from WO-008 on — the solved row's best time as S-48 forms the controller's `bestSeconds`, read
-     * live ([KitWorldWithBest]; decisions.md 2026-10-20 "The play-through's closed world of texts admits the best time …").
+     * live ([KitWorldWithBest]; decisions.md 2026-10-20 "The play-through's closed world of texts admits the best time …"), and —
+     * from WO-007 on — the settings screen's times, read live too ([kitScreenTimeTexts]; E10).
      */
     fun closedWorld(): Set<String> {
         val en = contextFor("en")
@@ -1983,7 +2146,7 @@ internal class KitApp(private val rule: KitAppRule) {
         out += counterTexts(en)
         library.puzzles.forEach { out += it.titles.values }
         PieceId.entries.forEach { out += it.name }
-        return KitWorldWithBest(out)
+        return KitWorldWithBest(out, en)
     }
 
     /**
@@ -1998,7 +2161,7 @@ internal class KitApp(private val rule: KitAppRule) {
         out += counterTexts(ctx)
         library.puzzles.forEach { out += kitAppTitle(it, language) }
         PieceId.entries.forEach { out += it.name }
-        return KitWorldWithBest(out)
+        return KitWorldWithBest(out, ctx)
     }
 
     /** The resource texts of [language] whose resolution in the other language differs: the comparisons that discriminate. */
@@ -2041,6 +2204,92 @@ internal class KitApp(private val rule: KitAppRule) {
             if (pkg != KIT_APP_PACKAGE) problems += "the active window belongs to $pkg"
             problems.joinToString("; ")
         }
+    }
+
+    // ── WO-007 (TASK-058): the settings screen ──
+
+    /**
+     * Opens the settings by touch: a still tap at the centre of the gear (S-53: "`Control.GEAR` acts at lift within the slop
+     * … and calls `openSettings()`"; S-13Δ: a control's bounds are its touch area), then `settings-sheet` shown and
+     * `settingsOpen` read back (S-1Δ4).
+     */
+    fun openSettingsByTouch(what: String) {
+        if (onController { settingsOpen }) throw AssertionError("kit: $what: the settings are already open before the gear is pressed")
+        pressCentre(KitAppTag.GEAR)
+        awaitExists(KitAppTag.SETTINGS_SHEET, "$what: the gear opens the settings screen")
+        if (!onController { settingsOpen }) throw AssertionError("kit: $what: `settings-sheet` is shown but settingsOpen is false (S-1Δ4)")
+        waitIdle("$what: an idle once the settings are open")
+    }
+
+    /** Closes the settings by a tap on Done (S-49 "Header (fixed): the title and Done"), then the sheet gone and `settingsOpen` false. */
+    fun closeSettingsByDone(what: String) {
+        pressCentre(KitAppTag.SETTINGS_DONE)
+        awaitGone(KitAppTag.SETTINGS_SHEET, "$what: Done closes the settings screen")
+        if (onController { settingsOpen }) throw AssertionError("kit: $what: the sheet is gone but settingsOpen is still true (S-1Δ4)")
+    }
+
+    /**
+     * Scrolls [tag]'s node into its scrolling parent's view (`performScrollTo`), with the compose clock auto-advancing for the
+     * call (design §2 "Sheet scrolls run with auto-advance on"; `platform-notes/android.md` § Compose test kit, WO-010: under a
+     * paused clock `performScrollTo` never returns), then restores the clock's mode.
+     */
+    fun scrollIntoView(tag: String, what: String) {
+        val was = rule.mainClock.autoAdvance
+        rule.mainClock.autoAdvance = true
+        try {
+            bounded("$what: scrolling `$tag` into view") { rule.onNodeWithTag(tag, useUnmergedTree = true).performScrollTo() }
+        } finally {
+            rule.mainClock.autoAdvance = was
+        }
+        waitIdle("$what: an idle after scrolling `$tag` into view")
+    }
+
+    /** [tag]'s node is wholly in view: its shown bounds are its whole layout box, within 1 px ("shows" read on the screen). */
+    fun wholeInView(tag: String): Boolean {
+        val n = node(tag)
+        val shown = boundsOf(n)
+        val whole = unclippedBoundsOf(n)
+        return abs(shown.left - whole.left) <= 1f && abs(shown.top - whole.top) <= 1f && abs(shown.right - whole.right) <= 1f && abs(shown.bottom - whole.bottom) <= 1f
+    }
+
+    /** The texts of a merged, inert node, each its own `Text` entry (S-49 tags: "each one is a resource, a title or a time"). */
+    fun mergedTexts(tag: String): List<String> = bounded("reading the texts of `$tag`") {
+        rule.onNodeWithTag(tag).fetchSemanticsNode("kit: merged node `$tag`").config.getOrNull(SemanticsProperties.Text)?.map { it.text } ?: emptyList()
+    }
+
+    /**
+     * A resetting class's precondition (tasks.md § WO-007 seam note 5: "a class that resets leaves every puzzle New"; the brief:
+     * "A resetting class needs every puzzle New at its start, fails loudly otherwise"): every listed puzzle is New now.
+     */
+    fun requireEveryPuzzleNew(what: String) {
+        val ids = library.puzzles.map { it.id }
+        val notNew = onController { ids.map { it to stateOf(it) }.filter { it.second != PuzzleState.NEW } }
+        if (notNew.isNotEmpty()) throw AssertionError("kit: precondition ($what): a resetting class needs every puzzle New at its start; not New: $notNew")
+    }
+
+    /**
+     * Recreates the activity in use (`ActivityScenario.recreate()`: the real lifecycle, as a rotation or a configuration change
+     * does), then waits for the new MainActivity, read without Compose first ([awaitRecreated]; the header), showing `play-screen`.
+     */
+    fun recreateActivity(what: String) {
+        val old = activity(what)
+        scenario.recreate()
+        awaitRecreated(old, what)
+    }
+
+    // ── WO-007 (TASK-060): the feedback door ──
+
+    /**
+     * Installs a [KitFeedbackRecorder] as `AppGraph.feedback.override` on the main thread (S-50: "`@Volatile internal var
+     * override: FeedbackOut?` (the kits' door)"; S-15Δ4: "`AppGraph.feedback` is internal"; E8: "The kit sets
+     * `AppGraph.feedback.override` to a recorder (the `AppClock.override` pattern, ADR-006)"), with its reset to null registered
+     * first, in the app's phase, so it runs whatever the test does (design §2 "Kit doors": "set back to null by `onRestore`").
+     */
+    fun kitUseFeedbackRecorder(what: String): KitFeedbackRecorder {
+        onRestore("the feedback door") { onMain { AppGraph.feedback.override = null } }
+        val recorder = KitFeedbackRecorder()
+        onMain { AppGraph.feedback.override = recorder }
+        return recorder
     }
 
     // ── Paused time (the cue pins) ──

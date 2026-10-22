@@ -28,6 +28,11 @@
 // the screen's `DevAidHook` (null without one). Hit order 0 also holds while the aid's sheet is open, so the sheet's
 // own `clickable`s and its field act and nothing under it does; the DEV button is a control like the others (it acts
 // at the lift within the slop, never drags, has no long press), and acting on it is `onButton()`.
+// WO-007 TASK-056 · S-53 (designs/WO-007-design.md §2; tasks.md § WO-007 seam note 2) · REQ-032 statement: the gear is a
+// router control like ‹ and ›, with no `clickable` and no semantics click action. It acts at the lift within the slop,
+// whatever its duration, with no long press, and acting on it is `openSettings()`. It is inert under hit orders 0 and 1:
+// a touch that starts while the grid or the DEV sheet is open is the overlay's, and a finger that lands on it during a
+// drag is a twist finger, as on every other control.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -74,8 +79,8 @@ private enum class ControlEnd {
  *    lands on — ‹, › and the counter included; lifting it keeps the turn reached. Every drag starts and ends
  *    inside the one gesture that owns every pointer until its primary finger lifts, so a new gesture never meets
  *    a running drag.
- * 2. Otherwise a new touch belongs to the first hit of [HitTest] (a top-bar column or a third of the solved row;
- *    then the badges, the drawn pieces, the Restart pill, the rest of the badge areas, the tray cells and the
+ * 2. Otherwise a new touch belongs to the first hit of [HitTest] (a top-bar column, the gear's among them, or a third
+ *    of the solved row; then the badges, the drawn pieces, the Restart pill, the rest of the badge areas, the tray cells and the
  *    pieces' margins → nothing).
  * 3. A touch on a control never drags: it acts at the lift within the slop (S-8), whatever its duration; moved
  *    the slop or more it does nothing; on ›, held 500 ms within the slop, it runs `nextUnsolved()` at once and its
@@ -205,14 +210,15 @@ internal class PointerRouter(
     }
 
     /**
-     * A control acted on at its lift (S-2Δ): ‹ `previous`, › and Next `next`, the counter `openOverview`, Restart, Retry;
-     * the best time is inert; the DEV button is the aid's `onButton()` (S-22Δ2).
+     * A control acted on at its lift (S-2Δ): ‹ `previous`, › and Next `next`, the counter `openOverview`, the gear
+     * `openSettings` (S-53), Restart, Retry; the best time is inert; the DEV button is the aid's `onButton()` (S-22Δ2).
      */
     private fun act(control: Control) {
         when (control) {
             Control.PREV -> controller.previous()
             Control.NEXT -> controller.next()
             Control.COUNTER -> controller.openOverview()
+            Control.GEAR -> controller.openSettings()
             Control.RESTART -> controller.restart()
             Control.RETRY -> controller.retry()
             Control.BEST_TIME -> Unit

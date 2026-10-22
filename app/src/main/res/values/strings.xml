@@ -20,4 +20,27 @@
     <string name="done">Done</string>
     <!-- WO-008 (S-11Δ3): a time of one hour or more (REQ-029 rule 2): %1$d the whole hours, %2$d the minutes left over. -->
     <string name="time_hours_minutes">%1$d h %2$d min</string>
+    <!-- WO-007 (S-49): the settings screen (REQ-032, REQ-031, REQ-033, REQ-029, REQ-030, REQ-034). -->
+    <string name="settings_title">Settings</string>
+    <string name="setting_timer">Timer on screen</string>
+    <string name="setting_sound">Sound</string>
+    <string name="setting_on">On</string>
+    <string name="setting_off">Off</string>
+    <string name="play_time_title">Play time</string>
+    <string name="play_time_today">Today</string>
+    <string name="play_time_all">All time</string>
+    <string name="best_times_title">Best times</string>
+    <string name="reset_all">Reset all progress</string>
+    <string name="reset_question">Erase every puzzle and all times? Your settings stay.</string>
+    <string name="reset_erase">Erase</string>
+    <string name="reset_cancel">Cancel</string>
+    <string name="how_to_title">How to play</string>
+    <!-- REQ-032 rule 1 (pending chg-draft-req032-how-to-play-text.md: at most 60 words): the design's 59-word draft. -->
+    <string name="how_to_text">Drag a piece from the tray onto the shape. Tap a piece to turn it; while dragging, twist it with a second finger. The badge beside the parallelogram flips it. A dropped piece snaps into place or goes back to the tray. Fill the shape to see its picture. Press the number at the top to see all puzzles.</string>
+    <!-- REQ-009 statement, verbatim (the Contract wording, G-10). -->
+    <string name="free_note">Enjoy, it\'s absolutely free. No ads, no purchases, no network. Your play time stays on this device.</string>
+    <!-- REQ-049 rule 1, verbatim. -->
+    <string name="privacy_text">Privacy: this game collects no data. It has no network access, no accounts and no analytics. Your puzzle progress and play times are stored only on this device and are deleted when the game is uninstalled.</string>
+    <!-- S-49 strings row (pending chg-draft-licence-notice-and-assets.md): plain text, not a link (REQ-010). -->
+    <string name="licence_line">Open source, GPL-3.0 — source code: github.com/jamisuni/TangramPlaytime</string>
 </resources>

@@ -448,15 +448,17 @@ class DevAidScreenKitTest {
         kitAssertPasscodeNotShown(kit, "the overlay on")
     }
 
-    @Test // pin: S-22Δ2 hit order 0 "The overview or the aid's sheet is open: the router neither consumes nor acts, on the top bar too"; touch geometry "The sheet. … The scrim (PlayPalette.scrim) and the sheet start below the top bar. The bar stays drawn and inert"; S-10Δ2 "SheetLayer comes last, over Slot(0, bar bottom, W, H − bar bottom)"; tag table `dev-aid-sheet` bounds "the screen below the top bar"; REQ-024 A2 (the name and the number always shown; `isDisplayed` cannot see occlusion — designs/WO-004-design.md §3); decisions.md 2026-10-17 "The DEV button, the overlay and the sheet, as placed" ("below the top bar like the overview — the bar drawn and inert, the router standing aside"); no token
+    @Test // pin: S-22Δ2 hit order 0 "The overview or the aid's sheet is open: the router neither consumes nor acts, on the top bar too"; touch geometry "The sheet. … The scrim (PlayPalette.scrim) and the sheet start below the top bar. The bar stays drawn and inert"; S-10Δ2 "SheetLayer comes last, over Slot(0, bar bottom, W, H − bar bottom)"; tag table `dev-aid-sheet` bounds "the screen below the top bar"; REQ-024 A2 (the name and the number always shown; `isDisplayed` cannot see occlusion — designs/WO-004-design.md §3); decisions.md 2026-10-17 "The DEV button, the overlay and the sheet, as placed" ("below the top bar like the overview — the bar drawn and inert, the router standing aside"); WO-007 (TASK-055): S-53 "It is inert under hit orders 0 and 1" and decisions.md 2026-10-21 "The gear and the settings screen, as drawn." ("It is inert while a drag runs or the grid or the DEV sheet is open"), so the gear joins the bar's nodes; no token
     fun withTheSheetOpenTheBarIsDrawnAboveItAndNothingUnderItActs() {
         // Oracle, on a full puzzle (New), once with the prompt open and once with the menu open:
-        //  - `dev-aid-sheet` is the screen below the top bar within 2 px, and no bar node (title, counter, ‹, ›) overlaps it;
+        //  - `dev-aid-sheet` is the screen below the top bar within 2 px, and no bar node (title, counter, ‹, ›, the gear)
+        //    overlaps it;
         //  - with the menu open, the title's and the "n / N" text's pixels are what they were with the sheet closed. With the
         //    prompt open the field has focus and the soft keyboard may show, whose handling is WO-006's (decisions.md
         //    2026-10-17 "Solve this puzzle now is an ordinary solve", Carries: WO-006 "handles the soft keyboard under the
         //    passcode prompt"; "The passcode prompt's open readings" (4)), so the pixels are not compared there;
-        //  - taps on ‹, › and the counter change no puzzle, open no grid and leave the sheet open (the bar is not the scrim);
+        //  - taps on ‹, ›, the counter and the gear change no puzzle, open no grid and no settings, and leave the sheet open
+        //    (the bar is not the scrim);
         //  - a tap on a tray piece under the sheet does not turn it, and a 20 dp drag from it drags nothing and leaves the
         //    puzzle New (a tap there may land on the scrim and close the sheet, which then is opened again).
         val aid = kitNewAid()
@@ -1056,7 +1058,7 @@ class DevAidScreenKitTest {
         val barBottom = kit.bounds(KitTag.COUNTER).bottom
         val sheet = kit.bounds(DevAidTags.SHEET)
         kitAssertBoxNear("$what: `dev-aid-sheet` is the screen below the top bar (S-10Δ2 Slot(0, bar bottom, W, H − bar bottom))", Rect(0f, barBottom, screen.width, screen.height), sheet, 2f)
-        for (tag in listOf(PlayTags.TITLE, KitTag.COUNTER, KitTag.NAV_PREV, KitTag.NAV_NEXT)) {
+        for (tag in listOf(PlayTags.TITLE, KitTag.COUNTER, KitTag.NAV_PREV, KitTag.NAV_NEXT, PlayTags.GEAR)) {
             val r = kit.bounds(tag)
             assertFalse("$what: `$tag` $r overlaps `dev-aid-sheet` $sheet (the scrim and the sheet start below the top bar)", r.overlaps(sheet))
         }
@@ -1071,10 +1073,11 @@ class DevAidScreenKitTest {
             }
             assertEquals("$what: $name's pixels that differ from the sheet closed (drawn over?); first $first", 0, changed)
         }
-        for (tag in listOf(KitTag.NAV_PREV, KitTag.NAV_NEXT, KitTag.COUNTER)) {
+        for (tag in listOf(KitTag.NAV_PREV, KitTag.NAV_NEXT, KitTag.COUNTER, PlayTags.GEAR)) {
             kit.press(tag)
             assertEquals("$what: a tap on `$tag` changes no puzzle", p.id, kit.shownId())
             assertFalse("$what: a tap on `$tag` opens no grid", kit.onMain { kit.controller.overviewOpen })
+            assertFalse("$what: a tap on `$tag` opens no settings (S-53: inert under hit order 0)", kit.onMain { kit.controller.settingsOpen })
             assertTrue("$what: a tap on `$tag` leaves the sheet open (the bar is inert and is not the scrim)", kit.exists(open))
         }
         val piece = PieceId.ST1

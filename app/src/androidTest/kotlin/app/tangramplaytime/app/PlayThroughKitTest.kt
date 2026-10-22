@@ -17,6 +17,11 @@
 // - The installed app (REQ-010 A2) on every image; its release-APK leg is TASK-027's `ReleasePromiseKitTest`.
 // - The app's controller is one per process and shared by every class of the run: each test leaves it, and the device, as
 //   it found them (seam note 3; `KitApp.restoreRule()`).
+// - Amended WO-007 (TASK-058; designs/WO-007-design.md §2 "Tokens (Q10)", re-covered: "`PlayThroughKitTest` (REQ-001 A1,
+//   REQ-008, REQ-010 A1): the gear, the whole sheet scrolled under the closed world, both switches flipped and back, Reset then
+//   Cancel, then Done" — the design's words, its IDs written here without the dot; decisions.md 2026-10-21 "Scope of WO-007 …" (E1): a new
+//   screen changes those lines' truth): each leg walks the settings screen after its last Retry (`walkTheSettings`). The
+//   closed world admits the screen's times (E10, KitApp `closedWorld`). This file's tokens are unchanged.
 package app.tangramplaytime.app
 
 import android.content.pm.PackageInfo
@@ -158,11 +163,59 @@ class PlayThroughKitTest {
         assertTrue("$leg: after Retry nothing is on the board", PieceId.entries.none { kit.exists(PlayTags.boardPiece(it)) })
         kit.assertPromise("$leg: ${full.id} after Retry", allowed)
 
+        walkTheSettings(leg, allowed)
+
         assertTrue("$leg: a drag from the tray was used (REQ-014)", moves.drag)
         assertTrue("$leg: a tap turn in the tray was used (REQ-016)", moves.tapTurn)
         assertTrue("$leg: a two-finger twist was used (REQ-017)", moves.twist)
         assertTrue("$leg: the flip badge was used (REQ-018)", moves.badge)
         if (airplane) assertTrue("$leg: airplane mode is still on after the last step (`settings get global airplane_mode_on`)", kit.airplaneModeOn())
+    }
+
+    /**
+     * The settings screen, walked by touch under the closed world (design §2 "Tokens (Q10)", re-covered; REQ-001 A1: "A full
+     * play-through of every screen shows no ad, no price and no request for money"; REQ-008 A1 and A2; REQ-010 A1, airplane mode
+     * still on): the gear opens it; the whole body is scrolled, item by item in REQ-032 rule 1's order, the promise checked at
+     * each; the timer switch is turned on and straight back off, and the sound switch off, checked, and back on, each by touch
+     * and read back from the controller; Reset asks its question, which is checked, and Cancel answers it; Done closes the
+     * screen. The promise is not checked while the timer is on: the board's timer then shows the puzzle's time, a text the
+     * closed world does not admit (E10 admits the settings screen's times; C3 the solved row's best time).
+     */
+    private fun walkTheSettings(leg: String, allowed: Set<String>) {
+        kit.openSettingsByTouch("$leg: the gear")
+        kit.assertPromise("$leg: the settings screen", allowed)
+        for (tag in KitAppTag.SETTINGS_BODY_ORDER) {
+            kit.scrollIntoView(tag, "$leg: the settings screen")
+            kit.assertPromise("$leg: the settings screen, `$tag` in view", allowed)
+        }
+
+        kit.scrollIntoView(KitAppTag.SETTINGS_TIMER, "$leg: the timer switch")
+        val timer = kit.onController { timerShown }
+        kit.pressCentre(KitAppTag.SETTINGS_TIMER)
+        kit.await("$leg: the timer switch flipped (E4: at once)") { kit.onController { timerShown } != timer }
+        kit.pressCentre(KitAppTag.SETTINGS_TIMER)
+        kit.await("$leg: the timer switch back") { kit.onController { timerShown } == timer }
+        kit.assertPromise("$leg: the timer switch flipped and back", allowed)
+
+        kit.scrollIntoView(KitAppTag.SETTINGS_SOUND, "$leg: the sound switch")
+        val sound = kit.onController { settings.soundOn }
+        kit.pressCentre(KitAppTag.SETTINGS_SOUND)
+        kit.await("$leg: the sound switch flipped (E4: at once)") { kit.onController { settings.soundOn } != sound }
+        kit.assertPromise("$leg: the sound switch flipped", allowed)
+        kit.pressCentre(KitAppTag.SETTINGS_SOUND)
+        kit.await("$leg: the sound switch back") { kit.onController { settings.soundOn } == sound }
+        kit.assertPromise("$leg: the sound switch back", allowed)
+
+        kit.scrollIntoView(KitAppTag.SETTINGS_RESET, "$leg: Reset")
+        kit.pressCentre(KitAppTag.SETTINGS_RESET)
+        kit.awaitExists(KitAppTag.RESET_QUESTION, "$leg: Reset asks its question")
+        kit.assertPromise("$leg: the reset question", allowed)
+        kit.pressCentre(KitAppTag.RESET_CANCEL)
+        kit.awaitGone(KitAppTag.RESET_QUESTION, "$leg: Cancel answers it")
+        kit.assertPromise("$leg: after Cancel", allowed)
+
+        kit.closeSettingsByDone("$leg: Done")
+        kit.assertPromise("$leg: the settings closed", allowed)
     }
 
     /** Seam note 5's three cases (as measured on the floor); true when airplane mode is on and under test for this play-through. */

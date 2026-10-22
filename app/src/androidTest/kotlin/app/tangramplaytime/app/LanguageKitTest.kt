@@ -21,6 +21,10 @@
 //   app locales, as it found them (seam note 3; `KitApp.restoreRule()`: the locales are restored through the shell alone,
 //   bounded and waiting on nothing of the app, before the activity is closed, decisions.md 2026-10-18 "Worker wins three
 //   contests", part 3).
+// - Amended WO-007 (TASK-058; design §2 "Tokens (Q10)", re-covered: "`LanguageKitTest`: the `fi` resources (still
+//   unverified)"; REQ-047 A1 names "the settings screen"): the settings screen joins the screens — opened by the gear, at the
+//   top, scrolled to its end, and with the reset question — each held to the language's texts (the screen's times admitted as
+//   E10 says, KitApp `languageWorld`). This file's tokens are unchanged.
 package app.tangramplaytime.app
 
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -124,7 +128,8 @@ class LanguageKitTest {
 
     /**
      * Every screen that exists, each checked against [language]'s texts: the Play screen New (a full puzzle, the DEV pill on
-     * it), In progress (one piece placed through S-2), the solved view (solved through S-2), the grid overview, and the DEV
+     * it), In progress (one piece placed through S-2), the solved view (solved through S-2), the grid overview, the settings
+     * screen (WO-007: at its top, at its end, and with the reset question), and the DEV
      * sheet (the prompt, or the menu where this process's aid is already unlocked: either holds only `dev_aid_` texts). The fixture puzzle is the first New full puzzle whose
      * `title.fi` and `title.en` differ, where one exists (so the title comparison discriminates too).
      */
@@ -167,6 +172,20 @@ class LanguageKitTest {
         screen("the grid overview", titled = false)
         kit.onController { closeOverview() }
         kit.awaitGone(KitAppTag.OVERVIEW, "$leg: the grid closed")
+
+        // WO-007: the settings screen (REQ-047 A1 names it), opened by the gear; the title is under its scrim, so it is held to
+        // the world like every other text and compared on the three Play-screen states above.
+        kit.openSettingsByTouch("$leg: the settings screen")
+        screen("the settings screen", titled = false)
+        kit.scrollIntoView(KitAppTag.LICENCE_LINE, "$leg: the settings screen's end")
+        screen("the settings screen, scrolled to its end", titled = false)
+        kit.scrollIntoView(KitAppTag.SETTINGS_RESET, "$leg: Reset")
+        kit.pressCentre(KitAppTag.SETTINGS_RESET)
+        kit.awaitExists(KitAppTag.RESET_QUESTION, "$leg: the reset question")
+        screen("the reset question", titled = false)
+        kit.pressCentre(KitAppTag.RESET_CANCEL)
+        kit.awaitGone(KitAppTag.RESET_QUESTION, "$leg: Cancel")
+        kit.closeSettingsByDone("$leg: Done")
 
         assertTrue("$leg: the debug app shows `dev-button` on the unsolved ${p.id}", kit.exists(DevAidTags.DEV_BUTTON))
         kit.closeDevSheetAfterTheTest()

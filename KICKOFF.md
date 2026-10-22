@@ -63,6 +63,71 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## State after WO-007 (2026-10-22, closed 02:49)
+
+- **WO-007 #Settings is done** (`workorders/WO-007.md`, Full (b); G4 `decisions.md` 2026-10-22 "WO-007 closed at G4").
+  - **The gear** is the top bar's last column; › moves one column left, and on a narrow phone the line under the number shrinks to fit (never below 75 %).
+  - **The settings screen** is a card over a veil in the activity's own window. It has a fixed header ("Settings", Done) and one scrolling body in REQ-032's order:
+    - the timer and sound switches;
+    - today's and all-time play time, live;
+    - the best times of the solved puzzles;
+    - Reset all progress, which asks in place: Cancel at the start, Erase at the far end, never under Reset;
+    - how to play;
+    - the free note, the privacy text and the licence line.
+  - **The puzzle time pauses** while the screen is open.
+  - **The timer switch** takes effect at once (WO-008's N1 closed).
+  - **Erase** wipes every puzzle and all times, `ActiveTime`'s memory included (`IActiveTime.resetPlayTimes`, `architecture.md` v1.5). The settings stay, and the player stays on the open puzzle.
+  - **Sound:** five tones from `tools/make_sounds.py` and a haptic tick on each lock. `Feedback` is the one door for every sound, tick and tap click, so the one switch silences them all.
+  - **Results:** 16/16 IDs green on the Python channel, JVM 320/0, the floor, dev and tablet images, the death pair and V-01. REQ-047.A1 stays unverified on its draft.
+  - **Reviews:** design 1 B / 4 S, plan 0 B / 4 S, code 0 B / 0 S / 5 N (N4 raised and fixed). **9 corrected checks** (`proposals.md` 2026-10-22). 1 product defect, found by review and fixed.
+- **Device time from now on** (run log t062): the play set takes about 48 min on the floor and 59 min on dev, the app set about 23 min per image (`TouchTargetKitTest` alone about 13 min), and the whole three-image run 3 h 07 min. The whole sets were green at the first pass again.
+- **Next: WO-009 #Release** (row 8, the kickoff order; the last WO of the build map).
+- **Carry into WO-009:**
+  - **From "State after WO-010" and "State after WO-006"**, unchanged:
+    - the convex-13 `NOTICE.md` line;
+    - the first-release puzzle selection;
+    - REQ-039.A2 / REQ-042.A1;
+    - REQ-001.A2;
+    - the `portrait` `uses-feature` line;
+    - the `localeFilters` / S-36 watch.
+  - `#Release` (`build-map.md`) covers the store listing, data safety, rating, the icon (DI-9) and the release verifier. The build map also sends REQ-002.A2 (`#Solving`) to WO-009. Owner-evidence rows stay the owner's to sign.
+  - **The licence line** is built and pinned untokened (`SettingsKitTest.kt:350`) until `chg-draft-licence-notice-and-assets.md` is ingested.
+  - **Code review N3**, for any WO that adds a window: a `Popup`, `Dialog` or `DropdownMenu` would click with sound off, and nothing would go red. A JVM pin is the smallest guard, if the owner wants one.
+  - **Outside REQ-033.A1:** a D-pad focus move plays the system's own sound.
+- **Owner's calls, any time** (`review-notes.md` 2026-10-22):
+  - N1, contrast: a darker grey and a dark Done label;
+  - N2, TalkBack;
+  - an `owner-evidence.md` row for REQ-033 once its device-check draft is ingested (`decisions.md` 2026-10-22).
+- **A later kit pass:**
+  - the WO-010 items;
+  - the death pair's positive control (WO-008);
+  - new: `TouchTargetKitTest`'s 13 min per image.
+- **Checkpoint items:**
+  - WO-007's items 1–4 (the gear and the screen's look, the best-times list, where you are after Reset, the sounds) **stand 2026-10-24** unless answered;
+  - WO-008's items 1–2 stand 2026-10-23.
+- **Lock behind build:** 29 outbox drafts await a capture session; this WO wrote none.
+- **Owner steps:**
+  - Commit the WO-007 snapshot (prompted on the G4 surface).
+  - Play the build: settings, the timer switch, Reset, and the sound ear test (`review-notes.md` 2026-10-22).
+  - Answer checkpoint items by their dates if a default is wrong.
+
+```text
+WE ARE BETWEEN WORK ORDERS — open WO-009 #Release (TangramPlaytime, SWDev
+v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+files), then governance.md, decisions.md (the 2026-10-21 and 2026-10-22 rows),
+KICKOFF.md "State after WO-007" (the WO-009 carries, with those of "State
+after WO-010" and "State after WO-006"), architecture.md (v1.5), build-map.md
+(v1.10: #Release, #Promise A2, #Solving and #PuzzleArt A2), owner-evidence.md,
+platform-notes/android.md, the last progress.md entry. Open WO-009 under row 8;
+the Implements bullet holds IDs only; owner-evidence lines and anything
+touching signing, accounts or money are the owner's (hard-stop 1, F-floors).
+Channels: Python, JVM (the two-run line), the floor Phone_API_31 first, the
+dev and tablet images, V-01. Stations as subagents; every class alone on the
+floor and dev as it lands, the whole sets once on the final tree; device steps
+as one background script per image; no replies to interim notices. The four
+scripts are duties. End every turn with the one signal.
+```
+
 ## State after WO-008 (2026-10-21, closed 08:53)
 
 - **The floor is Android 12 (API 31)** (the owner's decision 2026-10-19): `architecture.md` v1.3, `minSdk 31` in every module (TASK-043), the floor channel `Phone_API_31` (`.swdev/run-log/floor-API31.md`). The API 26 rules were re-judged on it: five still apply, four don't (`platform-notes/android.md` § Device hygiene). The reset now names a crash or not-responding window (S-37Δ).

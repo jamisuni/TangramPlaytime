@@ -11,6 +11,12 @@
 //   areas and of the scrim, and 1 dp inside the middle of each edge of the rounded foundation clickables, the grid's cells and
 //   the Done pill (decisions.md 2026-10-17 "The device kit's open readings — amends the Q5 row's probe", ruling 3). `dev-*` nodes are exempt (REQ-037 rule 3); board pieces are not
 //   swept (REQ-015 fixes their area; Q5 row).
+// - Amended WO-007 (TASK-058; design §2 "Tokens (Q10)", re-covered: "`TouchTargetKitTest`: the gear and S-49's controls"): the
+//   gear (S-53, a router control like ‹ and ›: no click action, so the completeness check does not see it; tasks.md § WO-007
+//   seam note 2) is listed and probed on the Play screen New, In progress and on the solved view; the settings screen is a
+//   new screen of the sweep, with and without its reset question (S-49's tag row: the scrim, Done, the two switches, Reset,
+//   Erase, Cancel). Erase resets, so this class needs every puzzle New at its start and leaves them New (the brief; seam note
+//   5). This file's tokens are unchanged.
 // - The app's controller is one per process and shared by every class of the run: each probe undoes its act, and the test
 //   leaves the controller and the device as it found them (seam note 3; `KitApp.restoreRule()`).
 package app.tangramplaytime.app
@@ -57,6 +63,7 @@ class TouchTargetKitTest {
         // area is 60 dp"; rule 2: a tray piece's touch area is its whole cell; rule 3: the #DevTools controls are exempt.
         // The phone layout class at 360 × 780 dp; every screen swept as `sweepEveryScreen` says.
         kit.start("REQ-037 A1, phone")
+        kit.requireEveryPuzzleNew("REQ-037 A1, phone: Erase is probed (a resetting class)")
         kit.usePhone(KIT_PHONE_360, "the 360 × 780 dp phone")
         sweepEveryScreen("the 360 × 780 dp phone")
     }
@@ -65,6 +72,7 @@ class TouchTargetKitTest {
     fun onA1280By800DpTabletNoPlayerControlInAnyScreenHasATouchAreaBelowItsMinimum() {
         // REQ-037 A1 (see the phone test): the tablet layout class at 1280 × 800 dp, landscape.
         kit.start("REQ-037 A1, tablet landscape")
+        kit.requireEveryPuzzleNew("REQ-037 A1, tablet landscape: Erase is probed (a resetting class)")
         kit.useTablet(portrait = false, what = "the 1280 × 800 dp tablet")
         sweepEveryScreen("the 1280 × 800 dp tablet")
     }
@@ -73,6 +81,7 @@ class TouchTargetKitTest {
     fun onAn800By1280DpTabletNoPlayerControlInAnyScreenHasATouchAreaBelowItsMinimum() {
         // REQ-037 A1 (see the phone test): the tablet layout class at 800 × 1280 dp, portrait by a frozen rotation.
         kit.start("REQ-037 A1, tablet portrait")
+        kit.requireEveryPuzzleNew("REQ-037 A1, tablet portrait: Erase is probed (a resetting class)")
         kit.useTablet(portrait = true, what = "the 800 × 1280 dp tablet")
         sweepEveryScreen("the 800 × 1280 dp tablet")
     }
@@ -103,6 +112,9 @@ class TouchTargetKitTest {
         sweepOverview("$leg, the grid overview", p)
         kit.onController { if (overviewOpen) closeOverview() }
         kit.idle()
+
+        if (kit.shownId() != p.id) kit.openByController(p.id, "$leg: back to ${p.id}")
+        sweepSettings("$leg, the settings screen", p)
     }
 
     /**
@@ -117,6 +129,7 @@ class TouchTargetKitTest {
         listed[KitAppTag.NAV_PREV] = NAV_MIN_DP
         listed[KitAppTag.NAV_NEXT] = NAV_MIN_DP
         listed[KitAppTag.COUNTER] = CONTROL_MIN_DP
+        listed[KitAppTag.GEAR] = CONTROL_MIN_DP
         for (piece in p.pieces) listed[PlayTags.trayCell(piece)] = CONTROL_MIN_DP
         if (PieceId.PG in inTray) listed[PlayTags.FLIP_BADGE_TRAY] = BADGE_MIN_DP
         if (placed.isNotEmpty()) listed[KitAppTag.RESTART] = CONTROL_MIN_DP
@@ -128,6 +141,7 @@ class TouchTargetKitTest {
         probeBrowse(where, id, KitAppTag.NAV_PREV, before(id), prepare = {})
         probeBrowse(where, id, KitAppTag.NAV_NEXT, after(id), prepare = {})
         probeCounter(where, prepare = {})
+        probeGear(where, prepare = {})
         for (piece in p.pieces.filter { it in inTray }) probeTrayCell(where, piece)
         if (PieceId.PG in inTray) probeTrayBadge(where)
         if (placed.isNotEmpty()) probeRestart(where, placed)
@@ -140,6 +154,7 @@ class TouchTargetKitTest {
             KitAppTag.NAV_PREV to NAV_MIN_DP,
             KitAppTag.NAV_NEXT to NAV_MIN_DP,
             KitAppTag.COUNTER to CONTROL_MIN_DP,
+            KitAppTag.GEAR to CONTROL_MIN_DP,
             KitAppTag.RETRY to CONTROL_MIN_DP,
             KitAppTag.SOLVED_NEXT to CONTROL_MIN_DP,
         )
@@ -150,6 +165,7 @@ class TouchTargetKitTest {
         probeBrowse(where, id, KitAppTag.NAV_PREV, before(id), prepare = solvedRow)
         probeBrowse(where, id, KitAppTag.NAV_NEXT, after(id), prepare = solvedRow)
         probeCounter(where, prepare = solvedRow)
+        probeGear(where, prepare = solvedRow)
         // decisions.md 2026-10-15 "Browsing readings no REQ fixes": "The solved row's Next = › (the next puzzle in order)".
         probeBrowse(where, id, KitAppTag.SOLVED_NEXT, after(id), prepare = solvedRow)
         probe(
@@ -285,6 +301,131 @@ class TouchTargetKitTest {
                 kit.awaitGone(KitAppTag.OVERVIEW, "$where: the grid closed again")
             },
         )
+    }
+
+    /**
+     * The gear: the settings open (REQ-032 statement: "WHEN the player presses the gear in the top bar, the game SHALL open the
+     * settings screen"; S-53: it "acts at lift within the slop … and calls `openSettings()`"), read back from the controller
+     * (S-1Δ4 `settingsOpen`). Its area is the router's 52 dp column (S-53), probed at its corners as ‹ and › are.
+     */
+    private fun probeGear(where: String, prepare: () -> Unit) {
+        probe(
+            where, KitAppTag.GEAR, prepare = prepare,
+            expect = { { if (kit.onController { settingsOpen }) null else "settingsOpen is false after the tap" } },
+            restore = {
+                kit.onController { if (settingsOpen) closeSettings() }
+                kit.awaitGone(KitAppTag.SETTINGS_SHEET, "$where: the settings closed again")
+            },
+        )
+    }
+
+    /**
+     * The settings screen (S-49's tag row, "Controls: `settings` (the scrim), `settings-done`, `settings-timer` and
+     * `settings-sound` (whole-row `toggleable`, Role.Switch, ≥ 56 dp), `settings-reset`, `reset-erase`, `reset-cancel`"), over
+     * [p] New (so the Play screen under the scrim has no foundation control of its own): each control's size (REQ-037: 48 dp),
+     * the completeness check with the question closed and open, and the probe of each control, the control scrolled wholly into
+     * view first (auto-advance on, KitApp `scrollIntoView`). Done and the scrim close the screen; each switch flips its setting
+     * (E4: at once, read from the controller) and is put back; Reset asks its question and Cancel answers it; Erase resets —
+     * its probe first puts [p] In progress, so the reset can show (S-2Δ4: every puzzle New).
+     */
+    private fun sweepSettings(where: String, p: PuzzleDefinition) {
+        val open = {
+            if (!kit.onController { settingsOpen }) kit.onController { openSettings() }
+            kit.awaitExists(KitAppTag.SETTINGS_SHEET, "$where: the settings open")
+        }
+        val inView = { tag: String ->
+            kit.scrollIntoView(tag, where)
+            assertTrue("$where: `$tag` scrolled wholly into view before its probe", kit.wholeInView(tag))
+        }
+        val closed = { if (kit.exists(KitAppTag.SETTINGS_SHEET) || kit.onController { settingsOpen }) "the settings screen is still shown" else null }
+        val question = {
+            open()
+            inView(KitAppTag.SETTINGS_RESET)
+            kit.pressCentre(KitAppTag.SETTINGS_RESET)
+            kit.awaitExists(KitAppTag.RESET_QUESTION, "$where: Reset asks its question")
+        }
+        open()
+        val listed = linkedMapOf(
+            KitAppTag.SETTINGS to CONTROL_MIN_DP,
+            KitAppTag.SETTINGS_DONE to CONTROL_MIN_DP,
+            KitAppTag.SETTINGS_TIMER to CONTROL_MIN_DP,
+            KitAppTag.SETTINGS_SOUND to CONTROL_MIN_DP,
+            KitAppTag.SETTINGS_RESET to CONTROL_MIN_DP,
+        )
+        for ((tag, min) in listed) {
+            // S-49: "Header (fixed): the title and Done. Body (scrolls): timer, sound, …, reset, …" — only the body's controls
+            // have a scrolling parent; the scrim covers the window and Done stays in the fixed header (corrected check, TASK-059
+            // hop 1 on the floor: scrolling Done failed "no parent layout with a Scroll SemanticsAction").
+            if (tag in KitAppTag.SETTINGS_BODY_ORDER) kit.scrollIntoView(tag, where)
+            assertMinimum(where, tag, min)
+        }
+        assertEveryClickableListed(where, listed.keys)
+
+        probe(where, KitAppTag.SETTINGS_DONE, points = KitProbePoints.EDGE_MIDDLES, prepare = open, expect = { closed }, restore = open)
+        for ((tag, flipped) in listOf<Pair<String, () -> Boolean>>(
+            KitAppTag.SETTINGS_TIMER to { kit.onController { settings.timerShown } },
+            KitAppTag.SETTINGS_SOUND to { kit.onController { settings.soundOn } },
+        )) {
+            var was = false
+            probe(
+                where, tag, points = KitProbePoints.EDGE_MIDDLES,
+                prepare = { open(); inView(tag) },
+                expect = {
+                    was = flipped()
+                    ({ if (flipped() != was) null else "its setting stayed $was" })
+                },
+                restore = {
+                    kit.onController { if (tag == KitAppTag.SETTINGS_TIMER) setTimerShown(was) else setSoundOn(was) }
+                    kit.idle()
+                },
+            )
+        }
+        probe(
+            where, KitAppTag.SETTINGS_RESET, points = KitProbePoints.EDGE_MIDDLES,
+            prepare = { open(); inView(KitAppTag.SETTINGS_RESET) },
+            expect = { { if (kit.exists(KitAppTag.RESET_QUESTION)) null else "no `reset-question` after the tap" } },
+            restore = {
+                kit.pressCentre(KitAppTag.RESET_CANCEL)
+                kit.awaitGone(KitAppTag.RESET_QUESTION, "$where: Cancel after the Reset probe")
+            },
+        )
+        probe(
+            where, KitAppTag.SETTINGS, prepare = open,
+            owner = { at -> if (kit.exists(KitAppTag.SETTINGS_SHEET) && kit.bounds(KitAppTag.SETTINGS_SHEET).contains(at)) "inside `settings-sheet`, on the sheet" else null },
+            expect = { closed },
+            restore = open,
+        )
+
+        question()
+        val withQuestion = linkedMapOf(KitAppTag.RESET_ERASE to CONTROL_MIN_DP, KitAppTag.RESET_CANCEL to CONTROL_MIN_DP)
+        for ((tag, min) in withQuestion) {
+            kit.scrollIntoView(tag, where)
+            assertMinimum("$where, the reset question", tag, min)
+        }
+        assertEveryClickableListed("$where, the reset question", listed.keys + withQuestion.keys)
+        probe(
+            where, KitAppTag.RESET_CANCEL, points = KitProbePoints.EDGE_MIDDLES,
+            prepare = { if (!kit.exists(KitAppTag.RESET_QUESTION)) question(); inView(KitAppTag.RESET_CANCEL) },
+            expect = { { if (!kit.exists(KitAppTag.RESET_QUESTION)) null else "`reset-question` is still shown" } },
+            restore = {},
+        )
+        val firstLock = kitAppLockOrder(p)?.first() ?: throw AssertionError("kit: $where: no lock order for ${p.id}")
+        probe(
+            where, KitAppTag.RESET_ERASE, points = KitProbePoints.EDGE_MIDDLES,
+            prepare = {
+                if (kit.onController { stateOf(p.id) } == PuzzleState.NEW) {
+                    kit.onController { if (settingsOpen) closeSettings() }
+                    kit.awaitGone(KitAppTag.SETTINGS_SHEET, "$where: the settings closed to set up the Erase probe")
+                    kit.placeByController(firstLock, "$where: ${p.id} In progress before the Erase probe")
+                }
+                if (!kit.exists(KitAppTag.RESET_QUESTION)) question()
+                inView(KitAppTag.RESET_ERASE)
+            },
+            expect = { { if (kit.onController { stateOf(p.id) } == PuzzleState.NEW && !kit.exists(KitAppTag.RESET_QUESTION)) null else "${p.id} is ${kit.onController { stateOf(p.id) }} after the tap (S-2Δ4: every puzzle New)" } },
+            restore = {},
+        )
+        kit.onController { if (settingsOpen) closeSettings() }
+        kit.awaitGone(KitAppTag.SETTINGS_SHEET, "$where: the settings closed at the end of the sweep")
     }
 
     /**

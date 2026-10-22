@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // GOVERNED INTERFACE — SWDev Contract (see architecture.md §4)
 // Tier: notify. Changes ONLY by common agreement, recorded like a REQ change.
-// Serves: REQ-005 (A2), REQ-029; supplies the seconds REQ-030 credits; TYPE-005
+// Serves: REQ-005 (A2), REQ-029, REQ-034; supplies the seconds REQ-030 credits; TYPE-005
 // ─────────────────────────────────────────────────────────────────────────────
 package app.tangramplaytime.contracts
 
@@ -49,4 +49,11 @@ interface IActiveTime {
      * than the stored one, today reads 0 until a second counts on it.
      */
     fun playTimes(): PlayTimes
+
+    /**
+     * Erases today's and the all-time play time (REQ-034 statement). Afterwards `playTimes` reads
+     * `PlayTimes.NONE` until a second counts; an uncounted part of a second is dropped. Visibility
+     * and the last touch (TYPE-005) are kept. The confirmation is the caller's (REQ-034 rule 1, A2).
+     */
+    fun resetPlayTimes()
 }

@@ -2,6 +2,8 @@
 // "Backwards readings (F5)", "One thread" · REQ-029 (A1), REQ-005 (A2: the play times' source), the seconds REQ-030
 // credits; TYPE-005; guardrails G-12, G-14; decisions.md 2026-10-20 "TYPE-005 as code.", "Today's play time follows
 // the date `Clock.today()` reports.", "No time the store's reader rejects is ever written …" and its F5 amendment.
+// WO-007 TASK-053 · designs/WO-007-design.md §2 row S-45Δ (`resetPlayTimes`) · REQ-034 (the play times' erasure);
+// decisions.md 2026-10-21 "Reset all progress, in order, and where the player is afterwards." step (2).
 package app.tangramplaytime.kernel
 
 import app.tangramplaytime.contracts.Clock
@@ -10,7 +12,8 @@ import app.tangramplaytime.contracts.PlayTimes
 import java.time.LocalDate
 
 /**
- * TYPE-005 accounting and the play times (REQ-029, REQ-005.A2) behind [IActiveTime] (O-04).
+ * TYPE-005 accounting and the play times (REQ-029, REQ-005.A2), and their erasure by Reset all
+ * progress (REQ-034), behind [IActiveTime] (O-04).
  *
  * A moment is active when the game is visible and the last touch was at most [IDLE_LIMIT_MS] ago
  * (TYPE-005). Every member first accrues the interval since the previous reading of [clock]
@@ -89,6 +92,19 @@ class ActiveTime(private val clock: Clock, saved: PlayTimes) : IActiveTime {
             null -> stored.copy(todaySeconds = 0)
             else -> PlayTimes(0, today, stored.allTimeSeconds)
         }
+    }
+
+    /**
+     * S-45Δ `resetPlayTimes` (REQ-034 statement; decisions.md 2026-10-21 "Reset all progress, in
+     * order, …" step (2)): first accrues, so the interval up to now is settled the usual way (a
+     * backwards reading shifts the last touch, F5) and [last] becomes the reading; then the
+     * remainder not yet counted is dropped and the play times are [PlayTimes.NONE]. [shown] and
+     * [lastTouch] are kept, so the TYPE-005 rule runs on as before the erasure.
+     */
+    override fun resetPlayTimes() {
+        accrue()
+        pendingMs = 0L
+        times = PlayTimes.NONE
     }
 
     /**

@@ -3,6 +3,10 @@
 // within ±1–2 px; this file holds WO-005's `ScreenGeometry.of` frozen (commit a797553, `PlayScreen.kt`) and asserts the
 // new one equal to it **exactly**, slot by slot, for every bundled puzzle on a spread of screen sizes and densities, with
 // the phone literal and the tablet literal — so the eleven play device classes keep their meaning. No token.
+// WO-007 TASK-056 (S-53; review F3, decisions.md 2026-10-21 "The moved-› pins in `play/` land in the same step as S-53 …"):
+// the frozen reference gains S-53's one change to the bar — the gear's 52 dp column at the right edge, › ending at its
+// left, the counter narrower by the gear — and the gear's slot is compared too. A corrected check: its source was
+// WO-005's three-column bar. Every other slot is still WO-005's exactly.
 package app.tangramplaytime.play.scaffolding
 
 import app.tangramplaytime.content.PuzzleLibraries
@@ -25,20 +29,25 @@ import kotlin.math.roundToInt
 
 class SafeAreaScaffoldTest {
 
-    /** WO-005's slots, as its `ScreenGeometry.of` placed them (frozen below). */
+    /** WO-005's slots, as its `ScreenGeometry.of` placed them (frozen below), with S-53's gear (WO-007). */
     private class Wo005(
-        val topBar: Slot, val navPrev: Slot, val navNext: Slot, val counter: Slot, val board: Slot, val mapping: BoardMapping,
+        val topBar: Slot, val navPrev: Slot, val navNext: Slot, val counter: Slot, val gear: Slot, val board: Slot, val mapping: BoardMapping,
         val tray: Slot, val trayPxPerUnit: Float, val cells: Map<PieceId, Slot>, val solvedThirds: List<Slot>, val sheetArea: Slot,
     )
 
-    /** WO-005's `ScreenGeometry.of`, verbatim but for the private constants written as their values (4, 8, 0.82, 0.80, 60). */
+    /**
+     * WO-005's `ScreenGeometry.of`, verbatim but for the private constants written as their values (4, 8, 0.82, 0.80, 60,
+     * and S-53's 52), and for S-53's bar: the gear's column at the right edge, › ending at its left, the counter between.
+     */
     private fun wo005(widthPx: Int, heightPx: Int, density: Float, layout: PlayLayout, puzzle: PuzzleDefinition): Wo005 {
         val topBarPx = (layout.topBarDp * density).roundToInt()
         val topBar = Slot(0, 0, widthPx, topBarPx)
         val column = (60f * density).roundToInt().coerceAtMost(widthPx / 2)
+        val gearWidth = (52f * density).roundToInt().coerceIn(0, widthPx - 2 * column)
+        val gear = Slot(widthPx - gearWidth, 0, gearWidth, topBarPx)
         val navPrev = Slot(0, 0, column, topBarPx)
-        val navNext = Slot(widthPx - column, 0, column, topBarPx)
-        val counter = Slot(column, 0, (widthPx - 2 * column).coerceAtLeast(0), topBarPx)
+        val navNext = Slot(widthPx - gearWidth - column, 0, column, topBarPx)
+        val counter = Slot(column, 0, (widthPx - 2 * column - gearWidth).coerceAtLeast(0), topBarPx)
         val trayGeometry = TrayMetrics.layout(widthPx / density, heightPx / density, layout, puzzle.pieces)
         val trayTop = (heightPx - trayGeometry.heightDp * density).roundToInt().coerceIn(0, heightPx)
         val tray = Slot(0, trayTop, widthPx, heightPx - trayTop)
@@ -65,7 +74,7 @@ class SafeAreaScaffoldTest {
         // WO-005's PlayScreen: the overview and the sheet over Slot(0, bar bottom, W, H − bar bottom).
         val barBottom = topBar.top + topBar.height
         val sheetArea = Slot(0, barBottom, widthPx, (heightPx - barBottom).coerceAtLeast(0))
-        return Wo005(topBar, navPrev, navNext, counter, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, thirds, sheetArea)
+        return Wo005(topBar, navPrev, navNext, counter, gear, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, thirds, sheetArea)
     }
 
     private val phone = PlayLayout(
@@ -100,6 +109,7 @@ class SafeAreaScaffoldTest {
                         assertEquals("$tag: navPrev", old.navPrev, g.navPrev)
                         assertEquals("$tag: navNext", old.navNext, g.navNext)
                         assertEquals("$tag: counter", old.counter, g.counter)
+                        assertEquals("$tag: gear", old.gear, g.gear)
                         assertEquals("$tag: board", old.board, g.board)
                         assertEquals("$tag: mapping", old.mapping, g.mapping)
                         assertEquals("$tag: tray", old.tray, g.tray)

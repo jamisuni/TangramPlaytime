@@ -5,6 +5,8 @@
 // overview and the loading paper. Every S-13Δ tag is declared here now, including the overview's, whose nodes
 // TASK-021 adds. A control's bounds are its touch area (S-13Δ).
 // WO-008 TASK-047 · seam S-13Δ3 (designs/WO-008-design.md §2): the timer on the board (REQ-031).
+// WO-007 TASK-056 · seam S-53 (designs/WO-007-design.md §2): the gear, the top bar's fourth column (REQ-032, REQ-037);
+// › now ends at the gear's left.
 package app.tangramplaytime.play
 
 import app.tangramplaytime.contracts.PieceId
@@ -50,8 +52,14 @@ object PlayTags {
     /** ‹ (REQ-024): the top bar's left column, from the screen edge to 60 dp, full height (S-22). */
     const val NAV_PREV: String = "nav-prev"
 
-    /** › (REQ-024, REQ-050 long press): the top bar's right column, the last 60 dp, full height (S-22). */
+    /** › (REQ-024, REQ-050 long press): the top bar's 60 dp column ending at the gear's left, full height (S-22, S-53). */
     const val NAV_NEXT: String = "nav-next"
+
+    /**
+     * The gear (REQ-032; S-53): the top bar's 52 dp column at the safe right edge, full height; bounds = that column, its
+     * touch area. A router control: no `clickable` and no semantics click action; a press opens the settings at the lift.
+     */
+    const val GEAR: String = "gear"
 
     /** The counter zone between ‹ and ›, full height; a press opens the grid (REQ-050). It does not merge its descendants (seam note 4). */
     const val COUNTER: String = "counter"

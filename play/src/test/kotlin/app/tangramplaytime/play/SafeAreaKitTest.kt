@@ -30,6 +30,12 @@
 // - Every assertion cites its S-row sentence; geometry the seams do not fix (the board mapping's fit, the strip's
 //   width, the badges, which are not `ScreenGeometry` fields) is not asserted. Internal members are called directly.
 //   Nothing is skipped. Helper names carry a `kit` / `Kit` / `KIT_` prefix and are members of this class.
+// - Corrected WO-007 (TASK-055; three corrected checks, decisions.md 2026-10-21 "The moved-› pins in `play/` land in the same
+//   step as S-53, as declared outputs, each a corrected check."): S-53 (designs/WO-007-design.md §2) adds the gear, "a 52 dp
+//   column at the safe right edge, the bar's full height", and "`navNext` now ends at `gear.left`". So `kitControls` lists
+//   the gear; the fixture's right-side discriminator reads the NONE layout's rightmost column, now the gear; and the column
+//   pins put › at the gear's left and the gear at the safe right edge. The counter still spans ‹ to › (decisions.md
+//   2026-10-21 "The gear and the settings screen, as drawn.": "the counter keeps everything between ‹ and ›").
 package app.tangramplaytime.play
 
 import app.tangramplaytime.contracts.PieceId
@@ -70,6 +76,9 @@ class SafeAreaKitTest {
 
         /** ‹ and › are columns 60 dp wide (S-32, from S-22). */
         const val KIT_NAV_COLUMN_DP = 60f
+
+        /** The gear is "a 52 dp column at the safe right edge, the bar's full height" (S-53, WO-007). */
+        const val KIT_GEAR_COLUMN_DP = 52f
 
         /** The board starts at "the bar's bottom + 4 dp" and ends at "the tray's top − 8 dp" (S-32). */
         const val KIT_BOARD_TOP_GAP_DP = 4f
@@ -171,9 +180,12 @@ class SafeAreaKitTest {
     private fun kitRight(s: Slot): Int = s.left + s.width
     private fun kitBottom(s: Slot): Int = s.top + s.height
 
-    /** The player controls and the bar and board slots of [g], by name: ‹, ›, the counter, each cell, each third (S-32). */
+    /**
+     * The player controls and the bar and board slots of [g], by name: ‹, ›, the gear, the counter, each cell, each third
+     * (S-32; the gear is S-53's, WO-007: a corrected check).
+     */
     private fun kitControls(g: ScreenGeometry): List<Pair<String, Slot>> =
-        listOf("topBar" to g.topBar, "navPrev" to g.navPrev, "navNext" to g.navNext, "counter" to g.counter, "board" to g.board) +
+        listOf("topBar" to g.topBar, "navPrev" to g.navPrev, "navNext" to g.navNext, "gear" to g.gear, "counter" to g.counter, "board" to g.board) +
             g.cells.map { (id, s) -> "cell $id" to s } +
             g.solvedThirds.mapIndexed { i, s -> "third $i" to s }
 
@@ -189,7 +201,9 @@ class SafeAreaKitTest {
      * The brief's "fixtures discriminate": with [c]'s insets, the WO-005 geometry (the same screen with
      * `PlayInsets.NONE` and no keyboard, which is WO-005's by seam note 1) fails the inside-the-safe-area pins —
      * its bar starts above the safe top, its lowest tray cell ends below the safe bottom, and with a side inset its ‹
-     * or › column reaches past that side. Otherwise the fixture cannot tell inside from not: a fixture defect.
+     * column or its rightmost column reaches past that side. The rightmost column is the gear since WO-007 (S-53: "a 52 dp
+     * column at the safe right edge"; › now ends at its left, so › no longer reaches the right edge: a corrected check).
+     * Otherwise the fixture cannot tell inside from not: a fixture defect.
      */
     private fun kitAssertFixtureDiscriminates(c: KitCase) {
         val old = c.geometry(insets = PlayInsets.NONE, keyboardDp = 0f)
@@ -199,16 +213,17 @@ class SafeAreaKitTest {
         val lowest = old.cells.values.maxOf { kitBottom(it) }
         if (lowest <= safe.bottom + KIT_EDGE_TOL_PX) defects += "the NONE cells end at $lowest px, not below the safe bottom ${safe.bottom}"
         if (c.insets.leftDp > 0f && old.navPrev.left >= safe.left - KIT_EDGE_TOL_PX) defects += "the NONE ‹ column starts at ${old.navPrev.left} px, not left of the safe left ${safe.left}"
-        if (c.insets.rightDp > 0f && kitRight(old.navNext) <= safe.right + KIT_EDGE_TOL_PX) defects += "the NONE › column ends at ${kitRight(old.navNext)} px, not right of the safe right ${safe.right}"
+        if (c.insets.rightDp > 0f && kitRight(old.gear) <= safe.right + KIT_EDGE_TOL_PX) defects += "the NONE gear column ends at ${kitRight(old.gear)} px, not right of the safe right ${safe.right}"
         if (defects.isNotEmpty()) throw AssertionError("fixture defect (${c.tag}, insets ${c.insets}): ${defects.joinToString("; ")}")
     }
 
     // ── Pins ─────────────────────────────────────────────────────────────────────────────────────
 
     // S-32: "The safe area is the composable minus `layout.insets`" (`safe: Slot`), and "Top bar: `topBarDp` tall from
-    // the safe top"; "Every cell, both badges and the solved row's thirds lie inside the safe area"; ‹ and › are
-    // columns "from the safe left edge" / "ending at the safe right edge" and the counter is "everything between", so
-    // every player control of the bar lies inside it too; the board lies "`sideMarginDp` inside the safe left and right
+    // the safe top"; "Every cell, both badges and the solved row's thirds lie inside the safe area"; ‹ is the column
+    // "from the safe left edge", the gear "a 52 dp column at the safe right edge" with › ending at its left (S-53, WO-007;
+    // a corrected check), and the counter is "everything between" ‹ and ›, so every player control of the bar lies inside
+    // it too; the board lies "`sideMarginDp` inside the safe left and right
     // edges" between the bar and the tray. On the phone, both tablet orientations and both puzzles, each with its
     // non-zero insets — insets the WO-005 geometry fails (asserted first). The badges are not `ScreenGeometry` fields
     // (the badge area sits inside the PG cell, decisions.md 2026-10-12 "Inside the parallelogram's tray cell the
@@ -255,6 +270,9 @@ class SafeAreaKitTest {
     // - "Top bar: `topBarDp` tall from the safe top, across the safe width."
     // - "‹ is the column from the safe left edge, 60 dp wide; › the column ending at the safe right edge; both the bar's
     //   full height (S-22's columns, moved inside the insets). The counter is everything between."
+    //   S-53 (WO-007; a corrected check): "`ScreenGeometry.gear` is a 52 dp column at the safe right edge, the bar's full
+    //   height. `navNext` now ends at `gear.left`" — so › is 60 dp ending at the gear's left, the gear ends at the safe right
+    //   edge, and the counter still spans ‹ to › (decisions.md 2026-10-21 "The gear and the settings screen, as drawn.").
     // - "Tray: `TrayMetrics.layout(the safe width, the composable's full height, layout, pieces)` (S-6 unchanged;
     //   REQ-013's 'screen height' is the whole screen), cells offset by the safe left. The tray's top is the safe
     //   bottom − the tray height." S-6: cells are tray-local dp and hold exactly `pieces`; `trayPxPerUnit` is "the
@@ -285,10 +303,14 @@ class SafeAreaKitTest {
                 ch.near("$tag: ‹ width", g.navPrev.width, KIT_NAV_COLUMN_DP * d, KIT_SUM_TOL_PX)
                 ch.same("$tag: ‹ top", g.navPrev.top, g.topBar.top)
                 ch.same("$tag: ‹ height", g.navPrev.height, g.topBar.height)
-                ch.near("$tag: › right", kitRight(g.navNext), e.right, KIT_EDGE_TOL_PX)
+                ch.same("$tag: › ends at the gear's left (S-53)", kitRight(g.navNext), g.gear.left)
                 ch.near("$tag: › width", g.navNext.width, KIT_NAV_COLUMN_DP * d, KIT_SUM_TOL_PX)
                 ch.same("$tag: › top", g.navNext.top, g.topBar.top)
                 ch.same("$tag: › height", g.navNext.height, g.topBar.height)
+                ch.near("$tag: the gear's right is the safe right (S-53)", kitRight(g.gear), e.right, KIT_EDGE_TOL_PX)
+                ch.near("$tag: the gear's width (S-53: 52 dp)", g.gear.width, KIT_GEAR_COLUMN_DP * d, KIT_SUM_TOL_PX)
+                ch.same("$tag: the gear's top (S-53: the bar's full height)", g.gear.top, g.topBar.top)
+                ch.same("$tag: the gear's height (S-53: the bar's full height)", g.gear.height, g.topBar.height)
                 ch.same("$tag: counter left", g.counter.left, kitRight(g.navPrev))
                 ch.same("$tag: counter right", kitRight(g.counter), g.navNext.left)
                 ch.same("$tag: counter top", g.counter.top, g.topBar.top)

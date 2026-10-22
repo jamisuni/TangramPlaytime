@@ -35,6 +35,10 @@
 // on the board, as drawn": the timer (`BoardTimer`) after the Restart pill and before the pieces, while the stored
 // setting is on and the puzzle is not Solved. It is never a control (`ShownControls` is unchanged), and this screen
 // never reads the time itself (library fact 5).
+// WO-007 TASK-056 · S-53 (designs/WO-007-design.md §2) · REQ-032 statement (the gear in the top bar), REQ-037 · decisions.md
+// 2026-10-21 "The gear and the settings screen, as drawn.": `ScreenGeometry.gear` is the top bar's fourth column, 52 dp at
+// the safe right edge and the bar's full height; › (`navNext`) now ends at `gear.left` (S-32Δ), and the counter is still
+// everything between ‹ and ›.
 package app.tangramplaytime.play
 
 import androidx.compose.foundation.layout.Box
@@ -122,7 +126,7 @@ internal class ShownCues(pulse: Pulse?, shake: Shake?, celebration: Celebration?
 
 /**
  * The Play screen (S-10): the top bar (‹, the counter with the title, the rating dots, "n / N" and the state word,
- * ›), the board with the flat silhouette, the Restart pill while In progress, the timer while its setting is on and the
+ * ›, the gear of S-53), the board with the flat silhouette, the Restart pill while In progress, the timer while its setting is on and the
  * puzzle is not Solved (S-47), and the locked pieces, and the tray
  * with the puzzle's cells and miniatures — replaced by the solved row once a Solved puzzle's picture is fully
  * shown; the dragged piece and the landing preview while a drag runs; the grid overview below the bar while it is
@@ -260,19 +264,23 @@ fun PlayScreen(
 
 /**
  * Where everything sits for one screen size, whole px of the `play-screen` node (S-32): the safe area, the top bar and
- * its three columns (S-22, inside the safe area), the board and its mapping, the tray strip and its cells (S-6 with the
- * safe width and the screen's full height), the thirds the solved row splits the tray band into (S-22), and the
- * overlays' areas (S-33). With `PlayInsets.NONE` and no keyboard every slot is WO-005's (seam note 1).
+ * its four columns (S-22 and S-53, inside the safe area), the board and its mapping, the tray strip and its cells (S-6
+ * with the safe width and the screen's full height), the thirds the solved row splits the tray band into (S-22), and
+ * the overlays' areas (S-33). With `PlayInsets.NONE` and no keyboard every slot is WO-005's (seam note 1), but for the
+ * top bar's right side, which S-53 changed: the gear's column at the right edge, › ending at its left, the counter
+ * narrower by the gear's width.
  */
 internal class ScreenGeometry(
     /** S-32: `topBarDp` tall from the safe top, across the safe width. */
     val topBar: Slot,
     /** ‹: the column from the safe left edge, 60 dp wide, the bar's full height (S-22, S-32). */
     val navPrev: Slot,
-    /** ›: the column ending at the safe right edge, 60 dp wide, the bar's full height (S-22, S-32). */
+    /** ›: the column ending at [gear]'s left, 60 dp wide, the bar's full height (S-22, S-32Δ, S-53). */
     val navNext: Slot,
     /** The counter zone: everything between ‹ and ›, the bar's full height (S-22). */
     val counter: Slot,
+    /** The gear (S-53): the column ending at the safe right edge, 52 dp wide, the bar's full height. */
+    val gear: Slot,
     /** S-32: from the bar's bottom + 4 dp to the tray's top − 8 dp, `sideMarginDp` inside the safe left and right edges. */
     val board: Slot,
     val mapping: BoardMapping,
@@ -310,9 +318,13 @@ internal class ScreenGeometry(
             val topBarPx = (layout.topBarDp * density).roundToInt()
             val topBar = Slot(safeLeft, safeTop, safeWidth, topBarPx)
             val column = (NAV_COLUMN_DP * density).roundToInt().coerceAtMost(safeWidth / 2)
+            // S-53: the gear's column at the safe right edge; › ends at its left, and the counter is everything between
+            // ‹ and ›. On a width too narrow for all four, ‹ and › keep their columns and the gear gets what is left.
+            val gearWidth = (GEAR_COLUMN_DP * density).roundToInt().coerceIn(0, safeWidth - 2 * column)
+            val gear = Slot(safeRight - gearWidth, safeTop, gearWidth, topBarPx)
             val navPrev = Slot(safeLeft, safeTop, column, topBarPx)
-            val navNext = Slot(safeRight - column, safeTop, column, topBarPx)
-            val counter = Slot(safeLeft + column, safeTop, (safeWidth - 2 * column).coerceAtLeast(0), topBarPx)
+            val navNext = Slot(gear.left - column, safeTop, column, topBarPx)
+            val counter = Slot(safeLeft + column, safeTop, (navNext.left - safeLeft - column).coerceAtLeast(0), topBarPx)
             val barBottom = safeTop + topBarPx
 
             // S-32 "Tray": S-6 with the safe width and the composable's full height (REQ-013's "screen height" is the
@@ -359,7 +371,7 @@ internal class ScreenGeometry(
             val sheetBottom = min(contentBottom, heightPx - keyboardPx).coerceAtLeast(overlayContent.top)
             val sheetContent = Slot(overlayContent.left, overlayContent.top, overlayContent.width, sheetBottom - overlayContent.top)
             return ScreenGeometry(
-                topBar, navPrev, navNext, counter, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, thirds, density,
+                topBar, navPrev, navNext, counter, gear, board, mapping, tray, trayGeometry.scaleDpPerUnit * density, cells, thirds, density,
                 safe, overlay, overlayContent, sheetContent,
             )
         }

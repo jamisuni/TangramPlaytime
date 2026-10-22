@@ -695,3 +695,111 @@ from starvation.
 - **Severity:** low overall. 9 IDs, 0 product defects, 4 corrected
   checks. Device time was about 9 h 40 min of station wall-clock; the
   kit fix took 1 h 46 min of it.
+
+## 2026-10-22 — WO-007 #Settings close: nine corrected checks, a data-loss finding graded as a Nit, two oracles never shown able to pass
+
+- **Corrected checks 1–6 (planned at P3, landed with the gear).** The
+  gear takes the top bar's last column, so every test that pinned the
+  bar's three columns moved:
+  - the scaffolds `ControlsScaffoldTest` (three → four columns) and
+    `SafeAreaScaffoldTest` (the WO-005 reference gains the gear);
+  - the kit pins `SafeAreaKitTest` :174–176, :202, :288 and
+    `TopBarKitTest` :192–252.
+
+  **Miscalibration:** the same class as WO-008's checks 1, 2 and 4: an
+  earlier WO's layout was pinned as if final, though `build-map.md` had
+  named #Settings (and so the gear) since G2. The design and the plan
+  listed all six before code, so they cost minutes.
+  **Proposal:** as at 2026-10-21. A pin of a layout a later WO is known
+  to change names that WO in a comment, and the later planner greps for
+  it.
+- **Corrected checks 7–8 (`TopBarFitKitTest`, the "drawn whole" oracle).**
+  Two misreadings of the Compose test API, red on the floor and on dev
+  (0/2 each):
+  1. The state word's layout was read from the tagged merging box, not
+     from its text node.
+  2. `hasVisualOverflow` compares the box with the paragraph's layout
+     width, so it is true for every text in the row, fitting or not.
+
+  The kit had harness controls that must fail, and they did. It had none
+  that must pass.
+  **Miscalibration:** a new oracle helper was used on the product before
+  it had been seen to pass on a known-good fixture.
+  **Proposal:** the test-author brief. Each new oracle helper runs once
+  against two harness controls before its first product run: one that
+  must pass and one that must fail. Both results go in the hand-back.
+  It costs one filtered self-run.
+  **Severity:** low-medium. It cost a recirculation (fit-fix, 13 min of
+  device time plus the floor and dev runs that found it).
+- **Corrected check 9 (`TouchTargetKitTest`'s settings sweep).** The sweep
+  called `scrollIntoView` on every control. Done sits in the fixed header,
+  so all three legs went red on the floor: "Semantic Node has no parent
+  layout with a Scroll". The design's S-49 said the header was fixed.
+  **Miscalibration:** the kit read the screen as one scroll body.
+  **Proposal:** the design's seam table marks each screen region as
+  fixed or scrolling, and the test-author brief names it as an input of
+  any sweep. **Severity:** low (one hop, about 30 min).
+- **A data-loss finding graded as a Nit (code review N4).**
+  - **The finding:** the reviewer saw that the reset question put Erase
+    where Reset had been, then called it rare ("the scroll must put Erase
+    under the finger"). The orchestrator's probe geometry (t059-probe)
+    showed Erase's bounds overlapping Reset's with no scroll at all.
+  - **The kit leg** (written first, red on the floor) collected 4
+    failures. A second press at Reset's corner erased a solved puzzle and
+    35 s of play time, against REQ-034 rule 1.
+  - **Outcome:** raised to a Should and fixed in one hop; the leg is green
+    on all three images.
+
+  **Miscalibration:** a confirmation's placement was graded by how likely
+  the tap is, when the question is whether it can happen at all.
+  **Proposal:** the code-reviewer checklist gains one line: "a control
+  that destroys user data is graded by geometry. Can its confirm sit under
+  the control that asked, at any reachable scroll or re-centring? If yes,
+  it is at least a Should." The orchestrator's triage should also ask for
+  a probe before it accepts "rare" on a destructive path.
+  **Severity:** medium (silent loss of a child's progress). It was caught
+  at P5 only because the probe screenshots were looked at.
+- **Test & Verify reopened an oracle G3 had settled** (obs. 1: "REQ-033.A1
+  is proven at the door, not at the speaker; add an evidence row or carry
+  it unverified"). The WO's § Constraints 7 reads "if no honest oracle
+  exists … carry the line unverified". It never said that one had been
+  found, so a fresh station read the clause as open. The orchestrator kept
+  the line covered (`decisions.md` 2026-10-22). **Proposal:** when G3
+  settles an oracle-cost question, the constraint is rewritten to state
+  the settled oracle ("oracle: `SoundKitTest` at the one door; the speaker
+  is the owner's ear test"), not left as the conditional.
+  **Severity:** low.
+- **wo-metrics' window, a third time** (2026-10-18, 2026-10-20,
+  2026-10-21). This time it was 2026-10-20 … 2026-10-24: the start holds
+  WO-008, and the end is the checkpoint default date. The same rows were
+  hand-corrected. **Proposal:** as before.
+  **Also:** `--write` stopped with "no '## Metrics' table" because the
+  orchestrator's WO file at open had dropped the template's § Metrics. The
+  script could append the template's section when it is missing.
+  **Severity:** low.
+- **D4 denied three reads:** `git config` twice (17:21, 17:51) and
+  `git check-attr` once (18:52), all from stations checking line endings.
+  **Proposal:** as at 2026-10-20 (the read allow-list gains
+  `git config --get`), plus `git check-attr`.
+- **One device run missed the run log.** The `TouchTargetKitTest` kit fix
+  on the floor (20:00–20:16) was recorded only in the WO log. The row
+  (tt-fix) was added at the close from the copied XML. This is an
+  orchestrator slip, not the framework's.
+- **What worked.**
+  - **Every class alone as it landed, then the whole sets once:**
+    TASK-062's 3 h 07 min on three images found nothing, the second WO in
+    a row. Each class inside the whole set ran near its time alone.
+  - **The design review re-derived the library again.** F1 found in the
+    ui-android bytecode that every Compose `clickable` plays the platform
+    click through `LocalSoundEffect`, so "no system click" was false. That
+    was before any test was written, and the one door now carries the
+    click.
+  - **The kit leg before the fix** (N4) proved the defect red, then green,
+    with no product edit until the leg existed.
+  - **D1 held:** three stations tried `sed -i` / `cat >>` on markdown;
+    each was denied and redone with Edit.
+  - **Test & Verify reused the t062 baseline** on matching hashes in about
+    4 minutes.
+- **Severity:** low overall. 16 IDs, 1 product defect (N4, found by
+  review, fixed), 9 corrected checks. Device time was about 6 h 50 min of
+  station wall-clock, against the plan's 8 h.

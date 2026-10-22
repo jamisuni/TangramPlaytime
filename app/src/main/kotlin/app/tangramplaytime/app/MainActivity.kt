@@ -21,6 +21,14 @@
 // WO-008 TASK-049 · S-15Δ3 (designs/WO-008-design.md §2): the window's touches (`dispatchTouchEvent`, before `super`) and the
 // activity's start and stop (`onStart`; `onStop`, after `goHome`) go to `AppGraph` · TYPE-005; REQ-029 · decisions.md
 // 2026-10-20 "TYPE-005 as code." · design §3 library facts 1 and 2.
+// WO-007 TASK-059 · S-15Δ4, its layer and Back (designs/WO-007-design.md §2): `SettingsScreen` (S-49) is composed after
+// `PlayScreen`, in this window, while the settings are open, and Back closes it · REQ-032 statement, rule 3 · decisions.md
+// 2026-10-21 "The settings screen sits in the activity's window …" (E3): never a `Dialog` or a `Popup`.
+// WO-007 TASK-061 · S-15Δ4, its feedback half (designs/WO-007-design.md §2): `setContent`'s whole content sits inside
+// `CompositionLocalProvider(LocalSoundEffect provides AppGraph.feedback)`, so every Compose tap click in the window goes
+// through the one door (S-50); the decor view is given to the playback in `onStart` and taken back in `onStop` (S-51) ·
+// REQ-033 A1; O-07 · decisions.md 2026-10-21 "Amends … the tap click follows the sound switch through `Feedback` …" (E7a);
+// reviews/WO-007-design-review.md § F1 re-check item 1 (the provider reaches every `clickable` / `toggleable`).
 package app.tangramplaytime.app
 
 import android.content.Context
@@ -41,12 +49,14 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoundEffect
 import androidx.compose.ui.unit.LayoutDirection
 import app.tangramplaytime.kernel.LayoutClass
 import app.tangramplaytime.play.DevAidHook
@@ -113,18 +123,30 @@ class MainActivity : ComponentActivity() {
             LayoutClass.PHONE -> PlayLayouts.phone
             LayoutClass.TABLET -> PlayLayouts.tablet
         }
+        // S-15Δ4: the one door, built by `AppGraph.start` above, before the load.
+        val feedback = AppGraph.feedback
         setContent {
-            // After a recreation the controller already exists, so the first frame composes the Play screen
-            // (designs/WO-004-design.md §2 "What survives": cues already set count as shown).
-            val controller by AppGraph.controller.collectAsState()
-            val current = controller
-            // S-35 step 4: both fill the window; the Play screen keeps its controls inside the insets itself (S-32).
-            if (current == null) {
-                PlayLoading(Modifier.fillMaxSize())
-            } else {
-                // S-35 step 5: Back closes the grid while it is open; nothing else handles Back (Q4).
-                BackHandler(enabled = current.overviewOpen) { current.closeOverview() }
-                PlayScreen(current, layout.inWindow(), texts, reducedMotion, Modifier.fillMaxSize(), devAid = DevAidHook.installed)
+            // S-15Δ4 (TASK-061): everything this window composes — the loading paper, the Play screen with its grid and the
+            // DEV sheet, the settings layer — reads its tap click from the one door, which plays it only while sound is on
+            // (E7a). The platform's default sits above this provider and nothing below re-provides it (F1 re-check item 1).
+            CompositionLocalProvider(LocalSoundEffect provides feedback) {
+                // After a recreation the controller already exists, so the first frame composes the Play screen
+                // (designs/WO-004-design.md §2 "What survives": cues already set count as shown).
+                val controller by AppGraph.controller.collectAsState()
+                val current = controller
+                // S-35 step 4: both fill the window; the Play screen keeps its controls inside the insets itself (S-32).
+                if (current == null) {
+                    PlayLoading(Modifier.fillMaxSize())
+                } else {
+                    // S-35 step 5: Back closes the grid while it is open (Q4).
+                    BackHandler(enabled = current.overviewOpen) { current.closeOverview() }
+                    PlayScreen(current, layout.inWindow(), texts, reducedMotion, Modifier.fillMaxSize(), devAid = DevAidHook.installed)
+                    // S-15Δ4 (WO-007): the settings layer, the Play screen's sibling in this window (E3), drawn over it and
+                    // taking every touch of the window while it is open; Back closes it (REQ-032 rule 3). The handler is enabled
+                    // only while the settings are open, so Back with nothing open still leaves the app.
+                    BackHandler(enabled = current.settingsOpen) { current.closeSettings() }
+                    if (current.settingsOpen) SettingsScreen(current, texts)
+                }
             }
         }
     }
@@ -145,6 +167,8 @@ class MainActivity : ComponentActivity() {
         reducedMotion = Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
         // S-15Δ3: the game is on screen from here to onStop (TYPE-005 "visible on screen"; design §3 library fact 1).
         AppGraph.visible(true)
+        // S-51: from here to onStop the tick and the click are made on this window's decor view.
+        AppGraph.feedbackView(window.decorView)
     }
 
     override fun onStop() {
@@ -155,6 +179,9 @@ class MainActivity : ComponentActivity() {
         if (controller != null && controller.dragged != null) controller.goHome()
         // S-15Δ3, after goHome: the game leaves the screen, and the times are written with the piece back home.
         AppGraph.visible(false)
+        // S-51: this activity takes back the decor view it set in onStart (a newer instance's view is left in place). The
+        // goHome above plays its home tone through the sound pool, which needs no view (design §3 "`onStop`'s `goHome`").
+        AppGraph.feedbackViewGone(window.decorView)
         super.onStop()
     }
 }

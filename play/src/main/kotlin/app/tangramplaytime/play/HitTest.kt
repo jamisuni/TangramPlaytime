@@ -17,6 +17,9 @@
 // WO-005 TASK-026 · S-22Δ2 (tasks.md § WO-005 › Seams, the touch geometry's hit order 3) · REQ-046 statement and rule
 // 5: the DEV button, while it is drawn, comes first in order 3 — it is drawn above every resting piece and badge, and
 // the visible thing wins (decisions.md 2026-10-17 "The DEV button, the overlay and the sheet, as placed").
+// WO-007 TASK-056 · S-53 (designs/WO-007-design.md §2) · REQ-032 statement, REQ-037: the gear is the top bar's fourth
+// column (`Control.GEAR`), hit with the other columns in order 2; it is inert under hit orders 0 and 1, which the router
+// holds (`PointerRouter`).
 package app.tangramplaytime.play
 
 import androidx.compose.ui.geometry.Offset
@@ -29,7 +32,7 @@ import kotlin.math.min
 /** REQ-015 rule: a board piece's touch area is its drawn shape grown by this many dp (DI-2 §4 "its shape grown by 12 dp"). */
 internal const val TOUCH_MARGIN_DP = 12f
 
-/** The controls of S-22: the top bar's three columns, the Restart pill and the solved row's thirds. */
+/** The controls of S-22 and S-53: the top bar's four columns, the Restart pill and the solved row's thirds. */
 internal enum class Control {
     /** ‹: the previous puzzle (REQ-024). */
     PREV,
@@ -39,6 +42,9 @@ internal enum class Control {
 
     /** The counter zone: the grid overview (REQ-050). */
     COUNTER,
+
+    /** The gear: the settings screen (REQ-032; S-53). Acted on at the lift within the slop, with no long press. */
+    GEAR,
 
     /** The Restart pill (REQ-025). */
     RESTART,
@@ -87,9 +93,9 @@ internal sealed interface Hit {
 /** The touch routing's hit order, in one function. */
 internal object HitTest {
     /**
-     * The first hit at [at] (`play-screen` px). In order (S-22 hit order 2 and 3, with S-22Δ2):
-     * 1. a top-bar column (‹, the counter, ›; full height, no gaps), or — while [shown] has the solved row — a third
-     *    of the solved row (Retry, the inert best time, Next);
+     * The first hit at [at] (`play-screen` px). In order (S-22 hit order 2 and 3, with S-22Δ2 and S-53):
+     * 1. a top-bar column (‹, the counter, ›, the gear; full height, no gaps), or — while [shown] has the solved row — a
+     *    third of the solved row (Retry, the inert best time, Next);
      * 1a. the DEV button, while [shown] has its slot (its touch area is the drawn pill);
      * 2. a badge's visible 38 dp disc ([badgeSlots]: the tray badge, or the one next to the placed parallelogram);
      * 3. a piece's drawn shape: the parallelogram's miniature at rest in its cell, where the tray badge's area lies
@@ -106,6 +112,7 @@ internal object HitTest {
         // 1. the top bar's columns, the solved row's thirds
         if (geometry.navPrev.contains(at)) return Hit.OnControl(Control.PREV)
         if (geometry.navNext.contains(at)) return Hit.OnControl(Control.NEXT)
+        if (geometry.gear.contains(at)) return Hit.OnControl(Control.GEAR)
         if (geometry.counter.contains(at)) return Hit.OnControl(Control.COUNTER)
         if (shown.solvedRow) {
             val third = geometry.solvedThirds.indexOfFirst { it.contains(at) }

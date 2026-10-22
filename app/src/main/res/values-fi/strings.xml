@@ -18,4 +18,24 @@
     <string name="done">Valmis</string>
     <!-- WO-008 (S-11Δ3): reference translation (G-10), listed in review-notes.md; "h" and "min" are the Finnish abbreviations too. -->
     <string name="time_hours_minutes">%1$d h %2$d min</string>
+    <!-- WO-007 (S-49): reference translations (G-10), listed in review-notes.md; never asserted by a test. The free note and
+         the privacy text follow the prototype's Finnish (DI-1; chg-draft-req009-req049-finnish-wording.md). -->
+    <string name="settings_title">Asetukset</string>
+    <string name="setting_timer">Ajastin näytöllä</string>
+    <string name="setting_sound">Äänet</string>
+    <string name="setting_on">Päällä</string>
+    <string name="setting_off">Pois</string>
+    <string name="play_time_title">Peliaika</string>
+    <string name="play_time_today">Tänään</string>
+    <string name="play_time_all">Yhteensä</string>
+    <string name="best_times_title">Parhaat ajat</string>
+    <string name="reset_all">Nollaa kaikki edistyminen</string>
+    <string name="reset_question">Poistetaanko kaikki tehtävät ja ajat? Asetukset säilyvät.</string>
+    <string name="reset_erase">Poista</string>
+    <string name="reset_cancel">Peruuta</string>
+    <string name="how_to_title">Näin pelataan</string>
+    <string name="how_to_text">Vedä pala tarjottimelta kuvion päälle. Napauta palaa, niin se kääntyy; vetäessäsi voit kiertää sitä toisella sormella. Suunnikkaan vieressä oleva merkki peilaa sen. Pudotettu pala napsahtaa paikalleen tai palaa tarjottimelle. Täytä kuvio, niin näet sen kuvan. Paina yläreunan numeroa, niin näet kaikki tehtävät.</string>
+    <string name="free_note">Nauti, se on ihan ilmaista. Ei mainoksia, ei ostoksia, ei verkkoa. Peliaikasi pysyy tällä laitteella.</string>
+    <string name="privacy_text">Tietosuoja: tämä peli ei kerää mitään tietoja. Sillä ei ole verkkoyhteyttä, tilejä eikä analytiikkaa. Ratkaisusi ja peliaikasi tallennetaan vain tälle laitteelle, ja ne poistuvat, kun peli poistetaan.</string>
+    <string name="licence_line">Avoin lähdekoodi, GPL-3.0 — lähdekoodi: github.com/jamisuni/TangramPlaytime</string>
 </resources>
