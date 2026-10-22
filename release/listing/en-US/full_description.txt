@@ -1,0 +1,17 @@
+Tangram Playtime is a tangram puzzle game. Rebuild a shape from the classic seven tangram pieces: five triangles, a square and a parallelogram.
+
+Drag a piece from the tray onto the shape. Tap a piece to turn it, or twist it with a second finger while you drag. The badge beside the parallelogram flips it. A piece you drop snaps into place or goes back to the tray. Fill the whole shape to see its picture.
+
+The challenge is in the puzzle, not in the controls. The game is made for players aged 8 and up.
+
+Enjoy, it's absolutely free. No ads, no purchases, no network. Your play time stays on this device. Nothing is for sale, nothing is locked, and nobody is asked for money.
+
+Nothing leaves your device. The game works without an internet connection and asks for no permissions. It collects no data: no accounts, no analytics. Your puzzle progress and play times are stored only on your device and are deleted when the game is uninstalled.
+
+In the settings you can switch the on-screen timer and the sound on or off, and see your play time and your best times.
+
+Play on a phone held upright or on a tablet, with a layout made for each.
+
+The game follows your device's language: Finnish when the device is set to Finnish, English otherwise.
+
+Tangram Playtime is open source under the GPL-3.0 licence. Source code: github.com/jamisuni/TangramPlaytime

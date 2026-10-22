@@ -1,7 +1,4 @@
 {
-  "delta_refrozen": {
-    "build-map.md": "2026-10-22T02:42:12"
-  },
   "files": {
     "Requirements/changes/CHG-001.md": "91008df4f6acc2e146e348c139b803b8e12d78f570f3408281b0f564a651e537",
     "Requirements/changes/CHG-002.md": "5a2b442d48234a34ae87eaa2b14c43e31792b498558a49b749ba67751e45acdb",
@@ -66,7 +63,7 @@
     "contracts/src/main/kotlin/app/tangramplaytime/contracts/IProgressStore.kt": "a916401c25f7bc9e8be95f84190b3445e66146a890e96699df6d2422191ddb7e",
     "contracts/src/main/kotlin/app/tangramplaytime/contracts/IPuzzleLibrary.kt": "99e1d759111377227f13e172bd9aa8a851a4bcaa7aea5614a60f9eae8beedabb",
     "contracts/src/main/kotlin/app/tangramplaytime/contracts/Types.kt": "0abf219cf263f67b53d7a480cfca96a6f657d650c6a8d1c584e4206fb0a32a8b",
-    "owner-evidence.md": "52497220bd3fdaf4f6ee7c30e5c31b923f2f748eaeb16e8d80e6cfed05b4b9c6"
+    "owner-evidence.md": "576b461c77f1728892cee3d7d39c48d2889653eff08396cb94add6cc1c5ee53c"
   },
-  "frozen": "2026-10-21"
+  "frozen": "2026-10-22"
 }

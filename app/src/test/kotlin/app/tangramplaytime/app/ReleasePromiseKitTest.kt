@@ -4,8 +4,10 @@
 // packages … is pinned untokened for G-01 / REQ-008's 'no ad, billing or donation component', backed by a self-test
 // that must fail").
 //
-// - Two tests. `theReleaseApkDeclaresNoPermission` carries the one acceptance token of this file, on the manifest
-//   assertion (the TASK-027 row). `everyReleaseClassLiesUnderAnAllowedTopLevelPackage` is a pin (guardrail G-01;
+// - Two tests. `theReleaseApkDeclaresNoPermission` carries this file's acceptance tokens, on the manifest assertion:
+//   REQ-010 A2's (the TASK-027 row) and, since WO-009, REQ-048 A3's beside it (the TASK-064 row; decisions.md
+//   2026-10-22 R6, "REQ-048 A3 is the release manifest and the installed app; …", quoted without the dot) — a token
+//   added, no assertion changed. `everyReleaseClassLiesUnderAnAllowedTopLevelPackage` is a pin (guardrail G-01;
 //   REQ-008 rule 1; architecture.md §5 "Allowed dependencies"), no token: a package list is a proxy for "no ad,
 //   billing or donation component", not that line's meaning (traceability-rules.md §2: "A token is a coverage claim").
 //   REQ-008's own lines, and the device leg of REQ-010 A2, are TASK-030's (the play-through and the installed app).
@@ -147,8 +149,12 @@ class ReleasePromiseKitTest {
     // token" — and, for "declares", no `permission`, `permission-group` or `permission-tree` element (the same
     // token's device leg reads "no requested or declared permission"). Liveness: the scan reads the package
     // `app.tangramplaytime` and at least one `activity` element. A stale or missing APK fails, never passes.
+    // REQ-048.A3 — "The installed app still declares no permissions (REQ-010)." The same assertion carries it (WO-009,
+    // TASK-064): decisions.md 2026-10-22 R6 ("REQ-048 A3 is the release manifest and the installed app; the
+    // throwaway-signed release install is evidence, not a token.", its IDs quoted here without the dots): "The token joins
+    // REQ-010 A2's on `ReleasePromiseKitTest` (the release APK's manifest)". No assertion changed.
     @Test
-    fun theReleaseApkDeclaresNoPermission() { // REQ-010.A2
+    fun theReleaseApkDeclaresNoPermission() { // REQ-010.A2 REQ-048.A3
         val checks = mutableListOf<Pair<Boolean, String>>()
         val apk = kitJudgeableApk(checks)
         if (apk != null) {

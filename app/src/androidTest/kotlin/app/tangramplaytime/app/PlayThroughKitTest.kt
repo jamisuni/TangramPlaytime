@@ -14,7 +14,9 @@
 //   (e), this class run alone): the channel line switched it on by the measured root route; the kit requires it on at the
 //   start and after the last step and never switches it. Below API 30 without the argument (the floor's ordinary run): the
 //   play-through still runs and asserts, without airplane mode, and its log points at floor step (e). Nothing here skips.
-// - The installed app (REQ-010 A2) on every image; its release-APK leg is TASK-027's `ReleasePromiseKitTest`.
+// - The installed app (REQ-010 A2) on every image; its release-APK leg is TASK-027's `ReleasePromiseKitTest`. Amended WO-009
+//   (TASK-064; decisions.md 2026-10-22 R6): REQ-048 A3's token joins REQ-010 A2's on that leg — a token added, no assertion
+//   changed.
 // - The app's controller is one per process and shared by every class of the run: each test leaves it, and the device, as
 //   it found them (seam note 3; `KitApp.restoreRule()`).
 // - Amended WO-007 (TASK-058; designs/WO-007-design.md §2 "Tokens (Q10)", re-covered: "`PlayThroughKitTest` (REQ-001 A1,
@@ -83,13 +85,17 @@ class PlayThroughKitTest {
         playThrough("the 800 × 1280 dp tablet") { kit.useTablet(portrait = true, what = it) }
     }
 
-    @Test // REQ-010.A2
+    @Test // REQ-010.A2 REQ-048.A3
     fun theInstalledAppDeclaresNoPermissionsNotEvenNetworkAccess() {
         // REQ-010 A2: "The installed app declares no permissions, not even network access." Rule: "The game requests no Android
         // permissions." Q8 part (2): the installed app on every image, no requested or declared permission. Oracle: the
         // `PackageManager.GET_PERMISSIONS` view of `app.tangramplaytime`: `requestedPermissions` and `permissions` null or empty.
         // Fixture: the same call on the test APK's own package returns its requested permissions (androidx.test's core library
         // asks for one), so an empty answer for the app is a read that could have seen a permission.
+        // REQ-048 A3: "The installed app still declares no permissions (REQ-010)." The same assertions carry it (WO-009,
+        // TASK-064): decisions.md 2026-10-22 R6 ("REQ-048 A3 is the release manifest and the installed app; …", its IDs quoted
+        // here without the dots): "The token joins REQ-010 A2's … on `PlayThroughKitTest` (the installed app, three images)".
+        // No assertion changed.
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val app = packageInfo(kit.target.packageManager, KIT_APP_PACKAGE)
         val requested = app.requestedPermissions?.toList().orEmpty()

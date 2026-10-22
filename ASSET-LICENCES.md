@@ -9,7 +9,7 @@ The table of puzzle figures lists **every** `Tangrams/*.json` file, the project'
 | Source | Where from | Licence | Credit |
 |---|---|---|---|
 | this project | `Tangrams/*.json`, drawn for this project | GPL-3.0 | TangramPlaytime (this repository, `LICENSE`) |
-| convex-13 | Wikimedia Commons, File:Convex_tangram_shapes.svg by László Németh, read 2026-10-17 through `C:/GitHub/AI/TangramCollections` (`collections/convex-13/figures.json`) | CC0-1.0 | The 13 convex tangram shapes (Fu Traing Wang and Chuan-Chih Hsiung proved in 1942 that exactly 13 convex shapes can be made from the seven pieces), drawn by László Németh with LibreLogo; Wikimedia Commons, File:Convex_tangram_shapes.svg; CC0 1.0 public-domain dedication |
+| convex-13 | Wikimedia Commons, File:Convex_tangram_shapes.svg by László Németh, read 2026-10-17 through `C:/GitHub/AI/TangramCollections` (`collections/convex-13/figures.json`) | CC0-1.0 | The 13 convex tangram shapes (Fu Traing Wang and Chuan-Chih Hsiung proved in 1942 that exactly 13 convex shapes can be made from the seven pieces), drawn by László Németh with LibreLogo; Wikimedia Commons, File:Convex_tangram_shapes.svg; CC0 1.0 public-domain dedication. The collection's `NOTICE.md` on the drawing program it keeps (`original/convex_librelogo.txt`): "One line differs from the copy I received: a small triangle in shape 10 had a vertex at x = 3 instead of 2, which made it too big and overlap its neighbour (possibly a copying error on my side)." |
 | android-tangram-131 | github.com/Typraeurion/Android-Tangram, commit e8cfa6e (2026-09-21), `app/src/main/assets/puzzles-*.json`, read 2026-10-17 through `C:/GitHub/AI/TangramCollections` (`collections/android-tangram-131/figures.json`) | GPL-3.0 | The Android-Tangram puzzle library by Trevin Beattie (github.com/Typraeurion/Android-Tangram; also on F-Droid as "Tangram"), GPL-3.0. Per its README, the shapes come from the worksheets at myhomeschoolmath.com (Tangram-Animals, -People, -Christmas, -Numbers) |
 
 ## Puzzle figures
@@ -130,6 +130,7 @@ One row per `Tangrams/*.json`, sorted by puzzle id. Source figure id and Source 
 - **Pictures:** every puzzle picture (`art`) is made for this project. A picture not drawn yet carries the one-colour stub `{"base": "#D9DCE8", "shapes": []}` (WO-010, until its batch draws it).
 - **Fonts:** the system font only; no font is bundled (ADR-005).
 - **Sounds:** five sound effects, each made for this project by `tools/make_sounds.py`, GPL-3.0; one row per file in § Sounds below.
+- **Launcher icon and store icon:** made for this project from DI-9 by `tools/make_icon.py`, GPL-3.0; one row per file in § Launcher icon below.
 
 ## Sounds
 
@@ -142,3 +143,23 @@ The five sound effects are made for this project by `tools/make_sounds.py` (Pyth
 | `sfx_lock.wav` | lock | triangle 1320 Hz + sine 1760 Hz | 60 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |
 | `sfx_home.wav` | return to the tray | sine, 300 → 180 Hz; the softest and lowest of the five | 160 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |
 | `sfx_solve.wav` | solve | four rising triangle notes, 523, 659, 784 and 1047 Hz, 110 ms apart | 570 ms | made for this project (`tools/make_sounds.py`) | GPL-3.0 |
+
+## Launcher icon
+
+The launcher icon and the store icon are made for this project from DI-9 (`Spec/icon/option-A-foreground.svg` and `Spec/icon/option-A-background.txt`: the classic square of the seven coloured pieces on a cream background, proposed for this project and picked by the owner on 2026-10-05). They show no text and no third-party mark (REQ-048 rule 2). `tools/make_icon.py` (Python standard library only, deterministic: a second run writes the same bytes) converts DI-9 path for path and never redraws it. To change the icon, change DI-9 and run the tool again (G-06). The launcher icon is an adaptive icon, with no PNG mipmaps (`minSdk 31`).
+
+| File | What | Source | Licence |
+|---|---|---|---|
+| `app/src/main/res/drawable/ic_launcher_foreground.xml` | the adaptive icon's foreground: DI-9's seven pieces as vector paths | made for this project (`tools/make_icon.py`, from DI-9) | GPL-3.0 |
+| `app/src/main/res/values/ic_launcher_background.xml` | the adaptive icon's background colour, `#FBF7EE` | made for this project (`tools/make_icon.py`, from DI-9) | GPL-3.0 |
+| `app/src/main/res/mipmap-anydpi/ic_launcher.xml` | the adaptive icon, the manifest's `android:icon` | made for this project (`tools/make_icon.py`, from DI-9) | GPL-3.0 |
+| `release/pictures/icon-512.png` | the store icon, 512 × 512 px: the adaptive icon's visible window | made for this project (`tools/make_icon.py`, from DI-9) | GPL-3.0 |
+
+## Store pictures
+
+The store's feature graphic (the banner) is made for this project by `tools/make_feature_graphic.py` (Python standard library only) from DI-9, the same seven pieces and background colour as § Launcher icon, and the store title "Tangram Playtime" (REQ-048 rule 1). The title is set in the machine's system sans-serif and rasterised into the PNG by headless Chrome; no font file is shipped or bundled (ADR-005). The SVG is the source, and a second run writes the same SVG bytes; the PNG is rendered from it (G-06). To change the banner, change DI-9 or the tool and run it again. Neither file is in the app: both are uploaded to the Play listing only.
+
+| File | What | Source | Licence |
+|---|---|---|---|
+| `release/pictures/feature-graphic.svg` | the feature graphic's source, 1024 × 500: DI-9's seven pieces on the left, the title on the right | made for this project (`tools/make_feature_graphic.py`, from DI-9 and the title) | GPL-3.0 |
+| `release/pictures/feature-graphic.png` | the feature graphic, 1024 × 500 px, 8-bit RGB: the SVG rasterised by headless Chrome, the title in the system sans-serif | made for this project (`tools/make_feature_graphic.py`, from DI-9 and the title) | GPL-3.0 |

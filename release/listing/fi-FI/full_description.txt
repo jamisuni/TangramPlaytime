@@ -1,0 +1,17 @@
+Tangram Playtime on tangram-pulmapeli. Rakenna kuvio seitsemästä klassisesta tangram-palasta: viidestä kolmiosta, neliöstä ja suunnikkaasta.
+
+Vedä pala tarjottimelta kuvion päälle. Napauta palaa, niin se kääntyy, tai kierrä sitä vetäessäsi toisella sormella. Suunnikkaan vieressä oleva merkki peilaa sen. Pudotettu pala napsahtaa paikalleen tai palaa tarjottimelle. Täytä koko kuvio, niin näet sen kuvan.
+
+Haaste on pulmassa, ei ohjauksessa. Peli on tehty 8-vuotiaille ja sitä vanhemmille.
+
+Nauti, se on ihan ilmaista. Ei mainoksia, ei ostoksia, ei verkkoa. Peliaikasi pysyy tällä laitteella. Mitään ei myydä, mitään ei ole lukittu, eikä keneltäkään pyydetä rahaa.
+
+Mikään ei lähde laitteeltasi. Peli toimii ilman verkkoyhteyttä eikä pyydä mitään käyttöoikeuksia. Se ei kerää mitään tietoja: ei tilejä, ei analytiikkaa. Ratkaisusi ja peliaikasi tallennetaan vain laitteellesi, ja ne poistuvat, kun peli poistetaan.
+
+Asetuksista voit kytkeä näytön ajastimen ja äänet päälle tai pois sekä nähdä peliaikasi ja parhaat aikasi.
+
+Pelaa puhelimella pystyasennossa tai tabletilla; kummallekin on oma asettelunsa.
+
+Peli seuraa laitteesi kieltä: suomeksi, kun laitteen kieli on suomi, muuten englanniksi.
+
+Tangram Playtime on avointa lähdekoodia GPL-3.0-lisenssillä. Lähdekoodi: github.com/jamisuni/TangramPlaytime

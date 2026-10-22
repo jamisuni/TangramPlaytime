@@ -2129,3 +2129,131 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   night's (22:24), handled before the close, and the 62 changed files
   are unchanged. Nothing was done; WO-007 stays closed and waits for
   your commit.
+
+## 2026-10-22 — WO-009 #Release opened (fresh orchestrator context)
+
+**Human input (verbatim, 05:12):**
+
+> WE ARE BETWEEN WORK ORDERS — open WO-009 #Release (TangramPlaytime, SWDev
+> v0.20, intake path C). Read AGENTS.md first (incl. the "from P3 on" framework
+> files), then governance.md, decisions.md (the 2026-10-21 and 2026-10-22 rows),
+> KICKOFF.md "State after WO-007" (the WO-009 carries, with those of "State
+> after WO-010" and "State after WO-006"), architecture.md (v1.5), build-map.md
+> (v1.10: #Release, #Promise A2, #Solving and #PuzzleArt A2), owner-evidence.md,
+> platform-notes/android.md, the last progress.md entry. Open WO-009 under row 8;
+> the Implements bullet holds IDs only; owner-evidence lines and anything
+> touching signing, accounts or money are the owner's (hard-stop 1, F-floors).
+> Channels: Python, JVM (the two-run line), the floor Phone_API_31 first, the
+> dev and tablet images, V-01. Stations as subagents; every class alone on the
+> floor and dev as it lands, the whole sets once on the final tree; device steps
+> as one background script per image; no replies to interim notices. The four
+> scripts are duties. End every turn with the one signal.
+
+**Summary (orchestrator, Opus 5.5; from 05:12):**
+- Framework v0.20 = project, no drift. HEAD `9d65059` (your WO-007
+  commit); the code is exactly what passed WO-007's final run.
+- 05:19 WO-009 opened (`workorders/WO-009.md`), Light. Ten requirement
+  lines: no ads or purchase labels on the store page, no toddler
+  mode, only puzzles you approved in the store version (at least 20,
+  four themes, the classic square), and the store duties (privacy
+  link, the title and promise, still no permissions, the icon you
+  picked).
+- Three of them can only be checked by you on the live Play page, so
+  they are rows in `owner-evidence.md` for you to sign. Three more wait
+  for your puzzle marks. So this WO closes after your steps; everything
+  else is built and checked first. Signing, the Play account, its fee
+  and the console stay yours: I prepare the texts and a checklist.
+- 05:22 the planner is splitting the work into tasks; the quick
+  channel checks (the three emulators) run in the background.
+- 05:25 the channel checks passed everywhere: the puzzle check, the
+  320 desktop tests, the release check, and Android 12, the dev
+  phone and the tablet.
+- 06:04 the plan is approved: nine tasks, the mark command first.
+  Its reviewer found no blockers and four wording points, all fixed.
+  The planner's 13 choices are rows in `decisions.md`. Five questions
+  for you are on this surface (below), each with a default that
+  stands on 2026-10-25. Building started: the mark command and the
+  first batch of tests.
+- 06:12 the mark command is ready and checked (14 tests pass; it
+  changes only the one true/false in a puzzle file). You can start
+  marking puzzles now; today 0 of 106 are marked.
+- 06:22 the first tests are in: they fail exactly where they should
+  while nothing is marked.
+- 06:38 the store version now takes only marked puzzles (none yet),
+  the test build keeps all 106, and the store build stops with a
+  clear list of what is missing. Version is 1.0.0. Tried on a copy
+  with 20 marks: the store build went through. That try also caught
+  a mistake in one of the new tests, which would have failed after
+  your marks; its writer is fixing it now, with the next tests.
+- 06:46 fixed, and the next tests are in.
+- 07:15 the app now has your icon A (checked on Android 12, the dev
+  phone and the tablet; I looked at the store icon myself). The store
+  version installs with no permissions at all. Play is no longer told
+  the game needs an upright-only screen. Google asks for a 32-bit
+  store icon, so that one file is being redone (same picture). The
+  listing texts, privacy page, banner and your checklist are being
+  written now.
+- 07:30 the store kit is written: `release/CHECKLIST.md` (your twelve
+  steps, in order), the listing texts in English and Finnish, the
+  console answers, `PRIVACY.md`, and the wide banner (I looked at
+  it: your icon's square and "Tangram Playtime"). Short description:
+  "Fill each shape with tangram pieces. Absolutely free — no ads,
+  nothing to buy." The texts are on your proof-reading list in
+  `review-notes.md`. The last tests, which check these files, are
+  going in.
+- 07:35 the last tests are in (351 tests; only the six that wait for
+  your marks fail). The independent code review started 07:37.
+
+**Human input (verbatim, 07:38):**
+
+> plz dont start anymore that 3h+ test run.. we need to stop before that.. but still have hour + time so finish tuff whats up
+
+**Summary (orchestrator, from 07:38):**
+- Understood: the full three-emulator run (TASK-070, about 3 h 20
+  min) will not start this session. The code review runs to its end,
+  its findings are triaged and small fixes land with their own
+  short checks; then the WO pauses with a resume prompt in
+  KICKOFF.md.
+- 07:41 the code review: no blockers, three fixes (the store build
+  deletes an old store file first; the install script refuses a real
+  phone so it can never wipe the kids' progress; the banner gets its
+  licence line), three notes for the close. Fixes 1 and 2 are being
+  made; fix 3 follows.
+
+**Human input (verbatim, 07:41):**
+
+> aye.. sounds good.. plz write few things to future improvements toward frameworks (1) we still get lot of spam from sub tasks and non stop receiving sometimes that "All ready, whats next Jami?". (2) I think it would be good idea to give me one and while when starting new tuff a kind of todo list of jobs .. so few latest ones done, ongoing ones.. and next 3-5 ones planned.. with some estimations of time. .. but all this just to report for later review session to improve framework.
+
+**Summary (orchestrator, from 07:41):**
+- Both written to `proposals.md` (2026-10-22 "WO-009 (mid-P5): two
+  owner requests for the next framework review"): (1) the station
+  notices still flood the chat with the signal line (about 35 in 45
+  minutes during the icon task), with three ways out; (2) a short job
+  list (done / running / next 3–5 with time estimates) at WO start, at
+  plan approval and when the next step changes. Not acted on now, as
+  asked.
+- 07:44 fix 2 done: the install script refuses anything but an
+  emulator, so it can never wipe your phone's game.
+- 07:47 fix 1 done: a refused store build leaves no old store file in
+  the build folder. The copy Android Studio's wizard saves elsewhere
+  is outside its reach, so the checklist warns about it.
+- 07:49 fix 3 done: the banner is listed in `ASSET-LICENCES.md`. Tests:
+  351, only the six that wait for your marks fail.
+- 07:50 **WO-009 paused** before the 3-hour run, as you asked.
+  Nothing is running. Next session: a short review of the three
+  fixes, then the full emulator run (≈ 3 h 20 min). The resume prompt
+  is in KICKOFF.md "WO-009 — PAUSED". You can mark puzzles any time;
+  your five questions stand on their defaults 2026-10-25.
+
+**Human input (verbatim, 07:52):**
+
+> plz give me info what to load my tablet for kiddos, if there is testable version available
+
+**Summary (orchestrator, from 07:52):**
+- The test build is `app/build/outputs/apk/debug/app-debug.apk`
+  (07:48, from the pause tree: all 106 puzzles, the new icon,
+  version 1.0.0, Android 12 or newer; read with `aapt2` 07:53). Gave
+  the two ways to put it on the tablet (USB + `adb install -r`, or
+  copy the file and open it). Warned off the release APK (no puzzles
+  yet, stops at start by design) and `tools/release_install.sh`
+  (uninstalls). Nothing installed, nothing changed.

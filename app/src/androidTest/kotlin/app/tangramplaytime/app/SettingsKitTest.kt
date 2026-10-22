@@ -7,7 +7,9 @@
 // - Tokens (design §2 "Tokens"): REQ-032 A1 and A2, REQ-009 A1, REQ-049 A1, REQ-029 A2 (its code home moved to `app/`: E9), and
 //   REQ-031 A2 as an extra token through the real switch (E4; its `play/` token stands). Each token sits on the one test whose
 //   assertion is that line's meaning (traceability-rules.md §2). Every other test is a pin and carries no token: it names its
-//   line without the dot.
+//   line without the dot. Amended WO-009 (TASK-066; tasks.md § WO-009 S-63; decisions.md 2026-10-22 R5): REQ-002 A2's settings
+//   half joins REQ-032 A2's token on `noDifficultyControlIsPresent`, whose exact control set is that oracle on this screen — a
+//   token and a comment added, no assertion changed.
 // - The texts (G-10; the brief): the free note and the privacy text are checked against the REQ sentences themselves (REQ-009
 //   statement; REQ-049 rule 1), in English, on an English device; the licence line against S-49's strings row (E1: plain text,
 //   not a link). No `R.string` that S-49 adds is named here (seam note 4), and no Finnish word.
@@ -119,7 +121,7 @@ class SettingsKitTest {
         assertEquals("positive control: after the closing the puzzle's time counts again (REQ-030 rule 1: it resumes on return)", before.seconds + 10, after.puzzle)
     }
 
-    @Test // REQ-032.A2
+    @Test // REQ-032.A2 REQ-002.A2
     fun noDifficultyControlIsPresent() {
         // REQ-032 A2: "No difficulty control is present." G-09: no difficulty level "appears in code, settings or UI". Oracle: the
         // controls on the open screen are exactly S-49's tag row ("Controls: `settings` (the scrim), `settings-done`,
@@ -131,6 +133,13 @@ class SettingsKitTest {
         // control: it sees S-49's five controls of the closed question, and the confirmation's two once Reset is pressed. The Play
         // screen under the layer is a New puzzle, which has no foundation control of its own (S-22: Restart only In progress,
         // the solved row only Solved).
+        // REQ-002.A2 — "No screen offers a toddler or picture-matching mode." The settings half of its oracle (tasks.md § WO-009
+        // S-63: "`SettingsKitTest`'s exact control set (`noDifficultyControlIsPresent`) is the same oracle on the settings
+        // screen"; decisions.md 2026-10-22 R5, "REQ-002 A2's oracle: every player screen offers only the controls its REQs
+        // name.", its ID quoted without the dot). A mode is offered by a control, and REQ-002 rule 2 says "there are no modes
+        // for younger children": such a mode on this screen would be one more control, which the exact set above cannot admit
+        // (REQ-032 rule 1 names the screen's items). The screen's texts are PlayThroughKitTest's closed-world walk, unchanged.
+        // A token and this comment added (WO-009, TASK-066); no assertion changed.
         kit.start("REQ-032 A2")
         val p = kit.firstNew(PuzzleKind.FULL, "REQ-032 A2: a New full puzzle")
         kit.openByController(p.id, "REQ-032 A2: ${p.id} New")

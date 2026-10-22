@@ -803,3 +803,72 @@ from starvation.
 - **Severity:** low overall. 16 IDs, 1 product defect (N4, found by
   review, fixed), 9 corrected checks. Device time was about 6 h 50 min of
   station wall-clock, against the plan's 8 h.
+
+## 2026-10-22 — WO-009 (mid-P5): two owner requests for the next framework review
+
+The owner asked for both to be written down for a later review session, not
+acted on now: "plz write few things to future improvements toward frameworks
+(1) we still get lot of spam from sub tasks and non stop receiving sometimes
+that "All ready, whats next Jami?". (2) I think it would be good idea to give
+me one and while when starting new tuff a kind of todo list of jobs .. so few
+latest ones done, ongoing ones.. and next 3-5 ones planned.. with some
+estimations of time. .. but all this just to report for later review session
+to improve framework." (`progress.md` 2026-10-22 07:41).
+
+- **(1) Interim notices still flood the chat with the turn signal.**
+  - **What happened.** The 2026-10-19 entry above proposed batching device
+    steps per image, and the briefs now do that. In WO-009, TASK-067 ran
+    each image's sequence as one background script. Even so, the harness
+    sent about 35 "the station is still waiting on its own background
+    work" notices in about 45 minutes (06:53–07:15). Principle 16 makes
+    every turn end with a signal, so each notice produced a bare `All
+    ready, whats next Jami?`. Thirty-five identical lines told the owner
+    nothing, and "All ready" was false: a station was running.
+  - **The cause is two rules meeting.** The harness wakes the main session
+    for every background step of a subagent, not only for its hand-back.
+    The framework then turns every wake-up into a visible reply. Batching
+    per image cut the wake-ups from the station's own steps, but not the
+    harness's notices.
+  - **Proposal.**
+    - (a) Make the 2026-10-19 third signal real in `00-principles.md` §16,
+      e.g. `Working, nothing needed from you Jami`, for "stations running,
+      not blocked".
+    - (b) Better: an interim notice with no hand-back is not a turn that
+      owes the owner a signal. The adapter page should say the main session
+      stays silent on it, if the harness allows a silent turn. If it does
+      not, this is a Claude Code feature request: an option to deliver a
+      subagent's interim notices only on hand-back.
+    - (c) A dispatch-brief line for long device stations: write progress to
+      a scratch file, not to the conversation.
+  - **Severity:** medium. It spends the owner's attention, which the
+    checkpoint rules work hard to protect, and it buries the real
+    messages.
+- **(2) A short job list on the owner's surface.**
+  - **What the owner asked for.** Every so often, and when new work
+    starts, a short to-do list:
+    - the last few jobs done;
+    - the jobs running now;
+    - the next 3–5 jobs planned, each with a time estimate.
+  - **Why it fits.** Today `tasks.md` has the statuses, and the WO log and
+    the plan's device-time line have the times. All of it sits in large
+    ledgers the owner does not read during a session, and the progress
+    lines report only what just happened. In this session the owner asked
+    for a stop before the 3 h+ run. A list showing "next: the whole sets on
+    three images, ≈ 3 h 20 min" would have let him plan that earlier.
+  - **Proposal.**
+    - (a) The orchestrator prints a "Jobs" block at WO open, at G3, at
+      every hand-back that changes the plan's next step, and when the owner
+      asks.
+    - (b) Its shape:
+      - **Done:** the last 2–3, one line each.
+      - **Running:** each running job and its started-at time.
+      - **Next:** 3–5 jobs, each with an estimate taken from the plan or
+        measured times, the long device runs marked.
+      - Plain words, no REQ ids, the owner's briefing style.
+    - (c) `orchestrator.md` names it as a duty. The WO template's Log can
+      hold the last block, so a resumed session prints it first.
+    - (d) The estimates come from the plan's device-time line and the run
+      log's measured times (`wo_metrics.py` could report per-class medians
+      across WOs), never from feel.
+  - **Severity:** low to medium. It costs little, and it lets the owner
+    plan his own time around long runs and pauses.

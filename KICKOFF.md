@@ -63,6 +63,49 @@ code, designs, decisions or reviews — comparing comes after, not during.
   superseded statements, no open forks), `decisions.md` rows of 2026-10-11.
   G2 status: see `architecture.md` §7 and the last `progress.md` entry.
 
+## WO-009 — PAUSED (2026-10-22 07:50; the owner: "plz dont start anymore that 3h+ test run.. we need to stop before that..") — in P5, before TASK-070
+
+- **Where it stands** (`workorders/WO-009.md` Log; run log `.swdev/run-log/WO-009.md` row `pause`):
+  - **Built and checked:** the mark command (TASK-063); the store version takes only marked puzzles, the test build keeps all 106, and the store build (`bundleRelease`) refuses below the release bar and leaves no old AAB behind (TASK-065, review S1); version 1.0.0; the launcher icon from DI-9 and the 32-bit store icon, the `uses-feature … portrait required="false"` line, the release install leg that refuses a real phone (TASK-067, review S2); the store kit `release/` with `CHECKLIST.md`, the listing texts, the console answers, `PRIVACY.md` and the banner, credited in `ASSET-LICENCES.md` (TASK-068, review S3); the three kit stages (TASK-064, 066, 069).
+  - **Results so far:** JVM 351 tests, only `ReleaseSetKitTest`'s six release legs red — the expected red until the owner's marks (run 2 with `--continue`, judged by the XMLs). The new device classes alone on floor / dev / tablet green (t067-*). V-01 + control PASS. plan-check GREEN; trace-check `--wo` 7 of 10 (the three owner-evidence rows await his signature).
+  - **Reviews:** plan 0 B / 4 S (applied); code 0 B / 3 S / 3 N — S1–S3 fixed and verified against the files, **not yet delta-reviewed**; N1–N3 for the G4 surface.
+  - **Corrected checks so far:** 1 (TASK-064's fixtures assumed the shipped mark; caught by TASK-065's positive control). Filed at close.
+  - **Pause baseline:** `9d65059 · 41 · test 598e72459933 · product 6550e479342c · 02feaef5d941 (106) · tools f1421752fb16` (`trees9.sh` in the run log header's definitions, extended 06:00). Nothing running.
+- **Next, in order** (`workorders/WO-009-briefs.md` § Dispatch order, steps 8–13):
+  1. A **fresh delta code review** of S1–S3 (`code-reviewer`, ≈ 5 min).
+  2. **TASK-070** — every channel once on the reviewed pre-marks tree: the floor `Phone_API_31` first, then dev, then tablet; the whole play and app sets; the release install leg; V-01 (**≈ 3 h 20 min** — start it only when the owner has that time).
+  3. **Test & Verify** from the run log (REQ-042 A1..A3 the expected red).
+  4. **The owner's marks** until `python tools/mark_puzzles.py status` says `release-ready: yes` (any time; he can start now).
+  5. **TASK-071** after the marks (≈ 30 min): the marks' diff, the JVM line green, the AAB, the release APK launched, the store screenshots.
+  6. Test & Verify (the delta) → the owner's console steps and his three `owner-evidence.md` signatures → trace-check `--wo WO-009` GREEN → the four scripts → close.
+- **Checkpoint items 1–5** (asked on the G3 surface 2026-10-22: which puzzles ship, the app id, the privacy page and a public repository, the age groups, the store pictures) **stand on their defaults 2026-10-25** unless answered.
+- **Owner steps now (any time):**
+  - Commit a backup snapshot if you like (the paused state; agents never commit).
+  - Mark puzzles as you play them: `python tools/mark_puzzles.py status`, `… mark <id>` (`Tangrams/README.md` "Marking a puzzle for release"). Commit the marks.
+  - Proof-read the store texts and look at the icon and banner (`review-notes.md` 2026-10-22; `release/pictures/`).
+  - Read `release/CHECKLIST.md`; its console steps are yours once the build is done.
+- **Framework feedback** written this session: `proposals.md` 2026-10-22 "WO-009 (mid-P5): two owner requests for the next framework review" (the notice spam; a done / running / next job list with times).
+
+```text
+WE ARE MID-WO — resume WO-009 #Release (TangramPlaytime, SWDev v0.20, intake
+path C), paused 2026-10-22 07:50 before TASK-070. Read AGENTS.md first (incl.
+the "from P3 on" framework files), then governance.md, KICKOFF.md "WO-009 —
+PAUSED", workorders/WO-009.md (Scope notes, Checkpoint items, the Log),
+tasks.md § WO-009 (TASK-070, TASK-071, the seams S-54…S-63, change log
+0.23–0.25), workorders/WO-009-briefs.md (header, Dispatch order, the TASK-070
+and TASK-071 briefs), decisions.md (the 2026-10-22 WO-009 rows),
+reviews/WO-009-code-review.md, .swdev/run-log/WO-009.md (header and the
+pause row), platform-notes/android.md, the last progress.md entry. Re-make the
+scratchpad's trees9.sh from the run log header and check the tree against the
+pause baseline. First a fresh delta code review of S1–S3; then TASK-070, every
+channel once on the reviewed tree (floor Phone_API_31 first, then dev, then
+tablet; ≈ 3 h 20 min — only if I have that time), then Test & Verify. TASK-071
+waits for my marks (python tools/mark_puzzles.py status says release-ready:
+yes). Stations as subagents; device steps as one background script per image;
+no replies to interim notices. The four scripts are duties. End every turn with
+the one signal.
+```
+
 ## State after WO-007 (2026-10-22, closed 02:49)
 
 - **WO-007 #Settings is done** (`workorders/WO-007.md`, Full (b); G4 `decisions.md` 2026-10-22 "WO-007 closed at G4").

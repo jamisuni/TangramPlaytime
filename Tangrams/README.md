@@ -29,6 +29,16 @@ python tools/build_prototype.py                            # the prototype picks
 
 `provenance.reviewedByHuman` stays `false` until a person has solved the puzzle and looked at its picture. The first release needs at least 20 reviewed puzzles over four themes, including the gift box (REQ-042).
 
+## Marking a puzzle for release
+
+Only the owner marks a puzzle, after solving it and approving its picture; only marked puzzles go into the release (REQ-039). Run from the project root:
+```bash
+python tools/mark_puzzles.py status                  # marked per category, the release bar, release-ready yes or no (--list adds the marked ids)
+python tools/mark_puzzles.py mark shapes-square      # reviewedByHuman false -> true; give one id or several
+python tools/mark_puzzles.py unmark shapes-square    # true -> false
+```
+`mark` and `unmark` change only that one `true` or `false` in each named file and keep every other byte, so the validator, the previews and `ASSET-LICENCES.md` stay as they are and nothing needs re-rendering. An unknown id, or a file without the field, refuses the whole call and writes nothing. The release bar has five items (REQ-042, REQ-045, REQ-041), and `status` says `release-ready: yes` once all five hold: at least 20 marked puzzles; marked puzzles in at least four categories; `shapes-square` (the gift box) marked; a marked `mini` with exactly three pieces and difficulty 1; at least four marked `warmup` puzzles of difficulty 1.
+
 ## Imported figures (WO-010)
 
 **93 more puzzles** come from the figures of `C:/GitHub/AI/TangramCollections` (design input DI-10): 12 of the 13 in `convex-13` (CC0-1.0) and 81 of the 131 in `android-tangram-131` (GPL-3.0, the app's own licence). With the 13 above, the folder holds 106 puzzles. Each figure's collection, source id, source name and licence are in [`../ASSET-LICENCES.md`](../ASSET-LICENCES.md), with each collection's credit.

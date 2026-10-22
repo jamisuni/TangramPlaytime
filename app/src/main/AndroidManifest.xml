@@ -11,9 +11,21 @@
         android:name="app.tangramplaytime.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         tools:node="remove" />
 
+    <!-- WO-009 S-58 (decisions.md 2026-10-22 "The first upload's identity: ..."): MainActivity's screenOrientation="portrait"
+         makes Google Play infer android.hardware.screen.portrait as required; this line says it is not, so a device that
+         cannot turn to portrait can install. A screen 600 dp or wider is the Tablet layout and turns (REQ-036; TYPE-007);
+         a narrower one is letterboxed upright by Android (the carry of decisions.md 2026-10-18 "A phone is portrait from
+         the manifest; a tablet is unlocked at run time"). -->
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false" />
+
+    <!-- WO-009 S-57: the launcher icon is the adaptive icon made from DI-9 by tools/make_icon.py (REQ-048 rule 2 and A4).
+         No roundIcon and no monochrome layer (minSdk 31; decisions.md 2026-10-22 "The launcher icon and the store icon
+         are made from DI-9 by one generator."). -->
     <application
         android:allowBackup="false"
-        android:icon="@android:drawable/sym_def_app_icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
