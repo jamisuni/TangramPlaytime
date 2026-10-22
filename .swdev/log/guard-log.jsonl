@@ -112,3 +112,5 @@
 {"ts": "2026-10-22T02:42:12", "hook": "guard", "event": "contract-delta", "path": "build-map.md", "pattern": "build-map.md", "tool": "Edit"}
 {"ts": "2026-10-22T04:26:19", "hook": "stop", "event": "progress-reminder", "age_min": 96}
 {"ts": "2026-10-22T05:21:29", "hook": "guard", "event": "allow-unlocked", "path": "owner-evidence.md", "tool": "Edit"}
+{"ts": "2026-10-22T15:40:47", "hook": "stop", "event": "progress-reminder", "age_min": 68}
+{"ts": "2026-10-22T16:48:58", "hook": "stop", "event": "progress-reminder", "age_min": 68}

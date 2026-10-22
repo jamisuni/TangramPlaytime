@@ -2257,3 +2257,70 @@ report lands in `reviews/WO-003-code-review.md` for the next context.
   copy the file and open it). Warned off the release APK (no puzzles
   yet, stops at start by design) and `tools/release_install.sh`
   (uninstalls). Nothing installed, nothing changed.
+
+**Human input (verbatim, 07:54):**
+
+> looks good! Lets see how Kiddos like it
+
+**Summary (orchestrator):** no work asked. WO-009 stays paused (KICKOFF
+"WO-009 — PAUSED"); the kids' play-test feedback can come back as notes
+or marks any time.
+
+## 2026-10-22 — WO-009 #Release resumed (fresh orchestrator context)
+
+**Human input (verbatim, 14:14):**
+
+> WE ARE MID-WO — resume WO-009 #Release (TangramPlaytime, SWDev v0.20, intake
+> path C), paused 2026-10-22 07:50 before TASK-070. Read AGENTS.md first (incl.
+> the "from P3 on" framework files), then governance.md, KICKOFF.md "WO-009 —
+> PAUSED", workorders/WO-009.md (Scope notes, Checkpoint items, the Log),
+> tasks.md § WO-009 (TASK-070, TASK-071, the seams S-54…S-63, change log
+> 0.23–0.25), workorders/WO-009-briefs.md (header, Dispatch order, the TASK-070
+> and TASK-071 briefs), decisions.md (the 2026-10-22 WO-009 rows),
+> reviews/WO-009-code-review.md, .swdev/run-log/WO-009.md (header and the
+> pause row), platform-notes/android.md, the last progress.md entry. Re-make the
+> scratchpad's trees9.sh from the run log header and check the tree against the
+> pause baseline. First a fresh delta code review of S1–S3; then TASK-070, every
+> channel once on the reviewed tree (floor Phone_API_31 first, then dev, then
+> tablet; ≈ 3 h 20 min — only if I have that time), then Test & Verify. TASK-071
+> waits for my marks (python tools/mark_puzzles.py status says release-ready:
+> yes). Stations as subagents; device steps as one background script per image;
+> no replies to interim notices. The four scripts are duties. End every turn with
+> the one signal.
+
+**Summary (orchestrator, from 14:14):**
+- Read the AGENTS.md list, the framework's P3-on files and every file the
+  prompt names. Framework v0.20 = project: no drift.
+- 14:16 `trees9.sh` re-made in the scratchpad. The tree equals the pause
+  baseline (test, product, bundle and tools hashes the same; HEAD is the
+  owner's pause commit `f80ed88`). The product tree's puzzle list leaves the
+  schema out, as the earlier helper did; written into the run log `resume` row.
+- Nothing running (no emulator, no Gradle). No puzzle marked yet (0 of 106).
+- 14:17 the delta code review of S1–S3 dispatched (`code-reviewer`, fresh).
+- TASK-070 (≈ 3 h 20 min) waited for the owner's yes on the time; asked
+  14:17, answered "Yes, run all three".
+- 14:31 the delta review came back: S1–S3 closed, no blockers or shoulds,
+  two notes for the close (`reviews/WO-009-code-review-delta.md`). Checked
+  by the orchestrator: JVM 351 tests, only the six that wait for the marks
+  red; no puzzle marked; tree unchanged. `decisions.md` row for the notes.
+- 14:33 TASK-070 dispatched (`slice-implementer`, Opus): every channel
+  once, floor `Phone_API_31` → dev → tablet, one background script per
+  image; expected to finish around 17:50.
+- 15:40 no new human input; TASK-070 still running (interim notices only,
+  no hand-back yet); nothing else changed.
+- 16:49 the same: no new human input, TASK-070 still running, no hand-back.
+- 17:39 TASK-070 done, checked by the orchestrator against the copied XMLs:
+  every channel green on the floor, dev and tablet images (2 h 55 min of
+  device time); JVM 351, only the six that wait for the marks red; the
+  store build refused (no marks yet); the release install found no
+  permission; V-01 and the verifiers green; tree unchanged. Two measured
+  readings to `decisions.md` (the 24-minute overview test; the uninstall
+  message on these images).
+- 17:41 Test & Verify dispatched (`test-verify`, fresh), from the run log.
+- 17:44 Test & Verify → forward, no blockers or shoulds, six notes
+  (`reviews/WO-009-test-verify.md`; triage row in `decisions.md`). Checked:
+  JVM 351, only the six mark-waiting tests red; trace-check red only on
+  the three rows that wait for the owner's signature.
+- 17:45 the WO now waits for the owner's marks. KICKOFF.md section renamed
+  "WO-009 — WAITING FOR THE OWNER'S MARKS" with a new resume prompt;
+  AGENTS.md's phase line updated. Nothing running.
